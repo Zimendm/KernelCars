@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using KernelCars.Data;
+//using Microsoft.EntityFrameworkCore;
+//using Microsoft.AspNetCore.Http;
 
 namespace KernelCars
 {
@@ -16,25 +19,53 @@ namespace KernelCars
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<DataContext>();
+            services.AddMvc(options =>
+            { 
+                options.EnableEndpointRouting = false; 
+            });
+
+
+            //services.AddControllersWithViews();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseDeveloperExceptionPage();
+            app.UseStatusCodePages();
+            app.UseStaticFiles();
 
-            app.UseRouting();
+            //app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World! From Kernel Cars");
-                });
-            });
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapControllers();
+            //});
+
+
+            app.UseMvcWithDefaultRoute();
+            //app.UseMvc(routes => {
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller}/{action}",
+            //        defaults: new { controller = "Car", action = "Index" });
+            //});
+            //if (env.IsDevelopment())
+            //{
+            //    app.UseDeveloperExceptionPage();
+            //}
+
+            //app.UseRouting();
+
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync("Hello World! From Kernel Cars");
+            //    });
+            //});
         }
     }
 }
