@@ -8,6 +8,6 @@ namespace KernelCars.Controllers
 {
     public class HomeController : Controller
     {
-        public string Index() => "Hello Kernel Cars";
+        public string Index() => "Hello From Kernel Cars";
     }
 }
