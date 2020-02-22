@@ -14,5 +14,7 @@ namespace KernelCars.Data
         }
 
         public DbSet<Car> Cars { get; set; }
+        public DbSet<Manufacturer> Manufacturers { get; set; }
+        public DbSet<CarModel> CarModels { get; set; }
     }
 }

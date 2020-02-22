@@ -56,27 +56,28 @@ namespace KernelCars
             //});
 
 
-            app.UseMvcWithDefaultRoute();
-            //app.UseMvc(routes => {
-            //    routes.MapRoute(
-            //        name: "default",
-            //        template: "{controller}/{action}",
-            //        defaults: new { controller = "Car", action = "Index" });
-            //});
+            //app.UseMvcWithDefaultRoute();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller}/{action}",
+                    defaults: new { controller = "Car", action = "Index" });
+            });
             //if (env.IsDevelopment())
             //{
             //    app.UseDeveloperExceptionPage();
             //}
 
-            //app.UseRouting();
+                //app.UseRouting();
 
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapGet("/", async context =>
-            //    {
-            //        await context.Response.WriteAsync("Hello World! From Kernel Cars");
-            //    });
-            //});
+                //app.UseEndpoints(endpoints =>
+                //{
+                //    endpoints.MapGet("/", async context =>
+                //    {
+                //        await context.Response.WriteAsync("Hello World! From Kernel Cars");
+                //    });
+                //});
         }
     }
 }

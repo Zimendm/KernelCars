@@ -20,19 +20,20 @@ namespace KernelCars.Models
         public string RegistrationNumber { get; set; }
         public int FirstRegistrationYear { get; set; }
         public string VinNumber { get; set; }
-        
+
         // Объём двигателя
-        public int Capacity { get; set; }
-        
-        
-        
+        public int EngineCapacity { get; set; }
+        // Ёмкость бака
+        public int TankCapacity { get; set; }
+
+
         //public TypeOfFuel TypeOfFuel { get; set; }
         //[DisplayName("Марка")]
         //public int ManufacturerId { get; set; }
         //public Manufacturer Manufacturer { get; set; }
 
         //[DisplayName("Модель")]
-        //public int CarTypeId { get; set; }
-        //public CarType CarType { get; set; }
+        public int CarModelId { get; set; }
+        public CarModel CarModel { get; set; }
     }
 }

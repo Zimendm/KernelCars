@@ -3,14 +3,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200221182553_AddCarType1")]
+    partial class AddCarType1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,9 +26,6 @@ namespace KernelCars.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("CarModelId")
-                        .HasColumnType("int");
 
                     b.Property<int>("EngineCapacity")
                         .HasColumnType("int");
@@ -44,8 +43,6 @@ namespace KernelCars.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CarModelId");
 
                     b.ToTable("Cars");
                 });
@@ -83,15 +80,6 @@ namespace KernelCars.Migrations
                     b.HasKey("ManufacturerId");
 
                     b.ToTable("Manufacturers");
-                });
-
-            modelBuilder.Entity("KernelCars.Models.Car", b =>
-                {
-                    b.HasOne("KernelCars.Models.CarModel", "CarModel")
-                        .WithMany("Cars")
-                        .HasForeignKey("CarModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("KernelCars.Models.CarModel", b =>

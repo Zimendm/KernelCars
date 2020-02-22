@@ -10,16 +10,42 @@ namespace KernelCars.Data
     {
         public static void Initialize(DataContext context)
         {
-            if (context.Cars.Any())
+            if (context.Manufacturers.Any())
             {
                 return;
-                //context.Manufacturers.Add(new Manufacturer { Id = 1, Name = "Audi" });
-                //context.SaveChanges();
             }
+
+            var manufacturars = new Manufacturer[]
+            {
+                new Manufacturer{ Name = "Mercedes-Benz" },
+                new Manufacturer{ Name = "Audi" },
+                new Manufacturer{ Name = "Bmw" },
+                new Manufacturer{ Name = "Volkswagen" }
+            };
+            foreach (Manufacturer m in manufacturars)
+            {
+                context.Manufacturers.Add(m);
+            }
+            context.SaveChanges();
+            var models = new CarModel[]
+            {
+                new CarModel {ManufacturerId=1,Model="G 63 AMG"},
+                new CarModel {ManufacturerId=1,Model="GLE 43 AMG"},
+                new CarModel {ManufacturerId=1,Model="GLC 250 4 Matic"},
+                new CarModel {ManufacturerId=2,Model="A8"}
+            };
+            foreach (CarModel carModel in models)
+            {
+                context.CarModels.Add(carModel);
+            }
+            context.SaveChanges();
+
             var cars = new Car[]
             {
-                new Car {RegistrationNumber="AX1938BP",FirstRegistrationYear=2012},
-                new Car {RegistrationNumber="AA2260OX",FirstRegistrationYear=2016}
+                new Car {RegistrationNumber="AX1938BP",FirstRegistrationYear=2012, CarModelId=1},
+                new Car {RegistrationNumber="AA2269OX",FirstRegistrationYear=2016, CarModelId=2},
+                new Car {RegistrationNumber="AA8400OX",FirstRegistrationYear=2019, CarModelId=2},
+                new Car {RegistrationNumber="AA8422II",FirstRegistrationYear=2017, CarModelId=3}
                 //new Car { ManufacturerId=1, CarTypeId =1,TypeOfFuel=TypeOfFuel.D,RegistrationNumber="AX1938ВР",FirstRegistrationYear=2010,VinNumber="ZZZ",Capacity=1598},
                 //new Car { ManufacturerId=4, CarTypeId =8,TypeOfFuel=TypeOfFuel.D,RegistrationNumber="AА2269ОХ",FirstRegistrationYear=2010,VinNumber="ZZZ",Capacity=1598}
                 //new Car { Make ="BMW", Type="520",TypeOfFuel=TypeOfFuel.D,RegistrationNumber="AА4804ОХ",FirstRegistrationYear=2010,VinNumber="ZZZ",Capacity=1598},
