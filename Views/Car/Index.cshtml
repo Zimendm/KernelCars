@@ -3,5 +3,6 @@
 <h1>Cars</h1>
 @foreach (var item in Model)
 {
-    <p>@item.RegistrationNumber</p>
+<p>@item.RegistrationNumber @item.CarModel.Manufacturer.Name @item.CarModel.Model</p>
+   
 }
