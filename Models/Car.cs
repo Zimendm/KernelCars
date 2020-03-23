@@ -35,5 +35,8 @@ namespace KernelCars.Models
         //[DisplayName("Модель")]
         public int CarModelId { get; set; }
         public CarModel CarModel { get; set; }
+        
+        public int? CarOwnerId { get; set; }
+        public Employee CarOwner  { get; set; }
     }
 }

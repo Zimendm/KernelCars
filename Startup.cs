@@ -28,13 +28,15 @@ namespace KernelCars
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddRazorPages();
+
             services.AddDbContext<DataContext>(options=>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             
-            services.AddMvc(options =>
-            {
-                options.EnableEndpointRouting = false; 
-            });
+            //services.AddMvc(options =>
+            //{
+            //    options.EnableEndpointRouting = false; 
+            //});
 
 
             //services.AddControllersWithViews();
@@ -48,36 +50,37 @@ namespace KernelCars
             app.UseStatusCodePages();
             app.UseStaticFiles();
 
-            //app.UseRouting();
+            app.UseRouting();
 
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapControllers();
-            //});
+            app.UseEndpoints(endpoints =>
+            {
+                //endpoints.MapControllers();
+                endpoints.MapRazorPages();
+            });
 
 
             //app.UseMvcWithDefaultRoute();
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action}",
-                    defaults: new { controller = "Car", action = "Index" });
-            });
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller}/{action}",
+            //        defaults: new { controller = "Car", action = "Index" });
+            //});
             //if (env.IsDevelopment())
             //{
             //    app.UseDeveloperExceptionPage();
             //}
 
-                //app.UseRouting();
+            //app.UseRouting();
 
-                //app.UseEndpoints(endpoints =>
-                //{
-                //    endpoints.MapGet("/", async context =>
-                //    {
-                //        await context.Response.WriteAsync("Hello World! From Kernel Cars");
-                //    });
-                //});
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync("Hello World! From Kernel Cars");
+            //    });
+            //});
         }
     }
 }
