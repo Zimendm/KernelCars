@@ -28,16 +28,17 @@ namespace KernelCars
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRazorPages();
+            //services.AddRazorPages();
+            //services.AddMvc(options =>
+            //{
+            //    options.EnableEndpointRouting = false;
+            //});
+            services.AddMvc();
 
             services.AddDbContext<DataContext>(options=>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
-            //services.AddMvc(options =>
-            //{
-            //    options.EnableEndpointRouting = false; 
-            //});
 
+            
 
             //services.AddControllersWithViews();
 
@@ -55,11 +56,30 @@ namespace KernelCars
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapControllers();
-                endpoints.MapRazorPages();
+                endpoints.MapControllerRoute(
+                    name: "pagination",
+                    pattern: "Cars/Page{carPage}",
+                    defaults: new { Controller = "Car", action = "Index" });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Car}/{action=Index}/{id?}");// .MapControllers();
+                //endpoints.MapRazorPages();
+
             });
 
 
             //app.UseMvcWithDefaultRoute();
+            //app.UseMvc(routes => {
+            //    routes.MapRoute(
+            //        name: "pagination",
+            //        template: "Cars/Page{carPage}",
+            //        defaults: new { Controller = "Car", action = "Index" });
+                
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller=Car}/{action=Index}/{id?}");
+            //});
             //app.UseMvc(routes =>
             //{
             //    routes.MapRoute(
