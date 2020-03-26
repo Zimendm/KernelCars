@@ -1,0 +1,127 @@
+﻿@model KernelCars.Models.Car
+
+<h1>Edit</h1>
+
+<script type="text/javascript">
+        $(document).ready(function () {
+            var url = "/Car/GetCarOwnerList";
+            var manufacturerId = 1;
+            $.getJSON(url, { ManufacturerId: manufacturerId}, function (data) {
+                $.each(data, function (i, cartype) {
+                    //alert("Hello");
+                    //$.each(data, function (i, item) {
+                    //$("#owners").append($("<option>").attr('value', cartype.value).text(cartype.text));
+                    //$("#owners").append($("<option>").attr('value',cartype.value).text(cartype.text));
+                    $("#owners").append($("<option>").text(cartype.text));
+                    //});
+                });
+            });
+            //var url = "/Car/GetCarTypeList";
+            //$.getJSON(url, { ManufacturerId: "3" }, function (data) {
+            //    $.each(data, function (i, cartype) {
+            //        alert(cartype.text);
+            //    });
+            //});
+            //$.getJSON(url1, { ManufacturerId: manufacturerId }, function (data) {
+                //$("#carTypeList").empty();
+                //var item = "<option value='0'>-- Выберите модель --</option>";
+                //$.each(data, function (i, cartype) {
+                //    item += '<option value="' + cartype.text + '">' + '</option>'
+                //});
+                //$("#owners").html(item);
+                //// se.show();
+                // se[0].clientHeight = 2;
+
+
+
+            //});
+
+
+        $("#manufacturerList").change(function () {
+            var manufacturerId = $("#manufacturerList").val();
+            //$("#carTypeList").simulate('mousedown');
+            var url = "/Car/GetCarTypeList";
+            $.getJSON(url, { ManufacturerId: manufacturerId }, function (data) {
+                $("#carTypeList").empty();
+                var item = "<option value='0'>-- Выберите модель --</option>";
+                $.each(data, function (i, cartype) {
+
+                    item += '<option value="' + cartype.value + '">' + cartype.text + '</option>'
+
+               });
+                $("#carTypeList").html(item);
+
+                //var nameArray = ["Rick Bross", "Madison Smith", "Jack Johnson"];
+
+                //                Add options to the datalist.
+                //- "attr" helps if you need an i.d to identify each option.
+                //- "text" is the content to be displayed.
+
+                //$.each(data, function (i, item) {
+                //    $("#owners").append($("<option>").attr('value', i.value).text(item.text));
+                //});
+
+               // se.show();
+               // se[0].clientHeight = 2;
+
+            });
+            //$("#carTypeList").trigger('mousedown');
+
+
+
+
+
+
+
+        });
+            //$("#ownerList").keyup(function () {
+            //    var elem = $("<option value='Udo'></option>");
+            //    $("owners").add(elem);
+            //});
+       });
+</script>
+
+
+
+
+
+
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <div>@Html.DisplayFor(model => model.Id)</div>
+            </div>
+            <div class="form-group">
+                <label asp-for="RegistrationNumber" class="control-label"></label>
+                <input asp-for="RegistrationNumber" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CarModel.ManufacturerId" class="control-label" ></label>
+                <select asp-for="CarModel.ManufacturerId" class="form-control" asp-items="ViewBag.ManufacturerId" id="manufacturerList">
+                    <option value="">-- Select Department --</option>
+                </select>
+                @*<span asp-validation-for="DepartmentID" class="text-danger" />*@
+            </div>
+            <div class="form-group">
+                <label asp-for="CarModelId" class="control-label"></label>
+                <select asp-for="CarModelId" class="form-control" asp-items="ViewBag.CarModelId" id="carTypeList">
+                    <option value="">-- Select Department --</option>
+                </select>
+                @*<span asp-validation-for="DepartmentID" class="text-danger" />*@
+            </div>
+            <div>
+                <input asp-for="CarOwner.FirstName" list="owners" class="form-control" name="owners" id="ownerList" />
+                <datalist id="owners"></datalist>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
