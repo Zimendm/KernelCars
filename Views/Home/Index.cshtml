@@ -21,5 +21,17 @@
     });
 </script>*@
 
-<component type="typeof(KernelCars.Components.CarModelSelect)" render-mode="ServerPrerendered" 
-           param-Manufacturers= "ViewBag.Manufacturers" />
+@*<component type="typeof(KernelCars.Components.CarModelSelect)" render-mode="ServerPrerendered" 
+           param-Manufacturers= "ViewBag.Manufacturers" />*@
+
+<form enctype="multipart/form-data" method="post">
+    <dl>
+        <dt>
+            <label></label>
+        </dt>
+        <dd>
+            <input type="file" multiple/>
+        </dd>
+    </dl>
+    <input type="submit" value="Upload"/>
+</form>
