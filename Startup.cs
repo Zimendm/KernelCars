@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using KernelCars.Models;
+using Microsoft.AspNetCore.Identity;
 
 //using System.Configuration;
 
@@ -46,14 +48,14 @@ namespace KernelCars
             //services.AddControllers().AddNewtonsoftJson(options =>
             //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-            services.AddMvc();//.AddJsonOptions(opt=>opt.JsonSerializerOptions.MaxDepth=255);//.AddNewtonsoftJson();
+           //.AddJsonOptions(opt=>opt.JsonSerializerOptions.MaxDepth=255);//.AddNewtonsoftJson();
 
             //services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
             //services.AddControllersWithViews().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
             //services.AddRazorPages().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
-            services.AddControllers().AddNewtonsoftJson(options =>
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-);
+//            services.AddControllers().AddNewtonsoftJson(options =>
+//    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+//);
 
             services.AddControllersWithViews()
     .AddNewtonsoftJson(options =>
@@ -66,8 +68,14 @@ namespace KernelCars
             services.AddDbContext<DataContext>(options=>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddDbContext<AppIdentityDbContext>(options =>
+                options.UseSqlServer(Configuration["KernelCarsIdentity:ConnectionString"]));
             
+            services.AddIdentity<IdentityUser, IdentityRole>()
+            .AddEntityFrameworkStores<AppIdentityDbContext>()
+            .AddDefaultTokenProviders();
 
+            services.AddMvc();
             //services.AddControllersWithViews();
 
         }
@@ -79,7 +87,13 @@ namespace KernelCars
             app.UseStatusCodePages();
             app.UseStaticFiles();
 
+                      
+
             app.UseRouting();
+
+            app.UseAuthentication();
+            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
@@ -98,6 +112,7 @@ namespace KernelCars
                 endpoints.MapFallbackToController("Blazor", "Home");
             });
 
+            IdentitySeedData.EnsurePopulated(app);
 
             //app.UseMvcWithDefaultRoute();
             //app.UseMvc(routes => {
@@ -105,7 +120,7 @@ namespace KernelCars
             //        name: "pagination",
             //        template: "Cars/Page{carPage}",
             //        defaults: new { Controller = "Car", action = "Index" });
-                
+
             //    routes.MapRoute(
             //        name: "default",
             //        template: "{controller=Car}/{action=Index}/{id?}");

@@ -9,9 +9,11 @@ using Microsoft.EntityFrameworkCore;
 using KernelCars.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.IO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KernelCars.Controllers
 {
+   
     public class CarController : Controller
     {
         private readonly DataContext _context;
@@ -62,6 +64,7 @@ namespace KernelCars.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Edit(long? id)
         {
             if (id == null)
@@ -94,7 +97,7 @@ namespace KernelCars.Controllers
 
             return View(car);
         }
-
+        [Authorize]
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public IActionResult EditPost(Car car, string owners)
