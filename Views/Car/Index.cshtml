@@ -1,8 +1,64 @@
-﻿@model IEnumerable<KernelCars.Models.Car>
+﻿@*@model IEnumerable<KernelCars.Models.Car>*@
+@model CarsListViewModel
 
 <h1>Cars</h1>
-@foreach (var item in Model)
+@*@foreach (var item in Model.Cars)
 {
-<p>@item.RegistrationNumber @item.CarModel.Manufacturer.Name @item.CarModel.Model</p>
-   
-}
+    //@Html.Partial("CarSummary", item)
+    <partial name="CarSummary" model="item"/>
+}*@
+
+
+<a asp-action="Create">Create New</a>
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cars.First().CarModel.Manufacturer.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cars.First().RegistrationNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cars.First().FirstRegistrationYear)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Cars.First().CarOwner)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Cars)
+            {
+
+                <tr>
+                    <td>
+                        <input type="hidden" asp-for="@item.Id" />
+                    </td>
+                    <td>@item.CarModel.Manufacturer.Name @item.CarModel.Model</td>
+                    @*<td>@item.CarType.Type</td>*@
+                    @*<td>@item.TypeOfFuel</td>*@
+                    <td>@item.RegistrationNumber</td>
+                    @*<td>@item.VinNumber</td>*@
+                    <td>@item.FirstRegistrationYear</td>
+                    <td>@Html.DisplayFor(c=>item.CarOwner.FirstName)</td>
+                    @*<td>@item.Capacity</td>*@
+                    <td>
+                        <a asp-action="Edit" class="btn btn-sm btn-warning" asp-route-id="@item.Id">Edit</a>
+                    </td>
+                       @*Html.Partial("CarSummary",item)*@
+                    @*<td>
+                        <partial name="CarSummary" model="item">
+                    </td>*@
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+
+<div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
+     page-class="btn" page-class-normal="btn-secondary"
+     page-class-selected="btn-primary" class="btn-group float-left m-1">
+</div>

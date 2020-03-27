@@ -6,332 +6,191 @@ using Microsoft.AspNetCore.Mvc;
 using KernelCars.Models;
 using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using System.Text;
-using System.Data;
-using Newtonsoft.Json;
-using DocumentFormat.OpenXml;
+using KernelCars.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.IO;
 
 namespace KernelCars.Controllers
 {
     public class CarController : Controller
     {
         private readonly DataContext _context;
+
+        public int PageSize = 4;
+
         public CarController(DataContext context)
         {
             _context = context;
         }
-        public string Index()
-            //public IActionResult Index()
+        public IActionResult Index(int carPage = 1)
         {
-
-            string str = ReadExcelasJSON();
-
-
-
-
-
-
-
-
-
-
-
-            //using (SpreadsheetDocument doc = SpreadsheetDocument.Open(@"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\InFiles\Cars.xlsx", false))
-            using (SpreadsheetDocument doc = SpreadsheetDocument.Open(@"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\InFiles\Автотранспорт.xlsx", false))
-            {
-                WorkbookPart workbookPart = doc.WorkbookPart;
-                Sheets thesheetcollection = workbookPart.Workbook.GetFirstChild<Sheets>();
-                StringBuilder excelResult = new StringBuilder();
-
-
-
-                //using for each loop to get the sheet from the sheetcollection  
-                foreach (Sheet thesheet in thesheetcollection)
-                {
-                    if (thesheet.Name=="Исходник")
+            return View(
+                new CarsListViewModel {
+                    Cars =_context.Cars
+                    .Include(c => c.CarModel)
+                    .ThenInclude(c => c.Manufacturer)
+                    .Include(c=>c.CarOwner)
+                    .Skip((carPage - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToList(),
+                    PagingInfo = new PagingInfo
                     {
-
-                   
-                    excelResult.AppendLine("Excel Sheet Name : " + thesheet.Name);
-                    excelResult.AppendLine("----------------------------------------------- ");
-                    //statement to get the worksheet object by using the sheet id  
-                    Worksheet theWorksheet = ((WorksheetPart)workbookPart.GetPartById(thesheet.Id)).Worksheet;
-
-                    SheetData thesheetdata = (SheetData)theWorksheet.GetFirstChild<SheetData>();
-                    
-                    foreach (Row thecurrentrow in thesheetdata)
-                    {
-                        foreach (Cell thecurrentcell in thecurrentrow)
-                        {
-                            //statement to take the integer value  
-                            string currentcellvalue = string.Empty;
-                            if (thecurrentcell.DataType != null)
-                            {
-                                if (thecurrentcell.DataType == CellValues.SharedString)
-                                {
-                                    int id;
-                                    if (Int32.TryParse(thecurrentcell.InnerText, out id))
-                                    {
-                                        SharedStringItem item = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
-                                        if (item.Text != null)
-                                        {
-                                            //code to take the string value  
-                                            excelResult.AppendLine(item.Text.Text + " ");
-                                        }
-                                        else if (item.InnerText != null)
-                                        {
-                                            currentcellvalue = item.InnerText;
-                                        }
-                                        else if (item.InnerXml != null)
-                                        {
-                                            currentcellvalue = item.InnerXml;
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                //excelResult.Append(Convert.ToInt16(thecurrentcell.InnerText) + " ");
-                            }
-                        }
-                        excelResult.AppendLine();
+                        CurrentPage=carPage,
+                        ItemsPerPage=PageSize,
+                        TotalItems=_context.Cars.Count()
                     }
-                    excelResult.Append("");
-
-
-                    }
-                    int shdsghds = 0;
                 }
 
+                //_context.Cars
+                //.Include(c=>c.CarModel)
+                //.ThenInclude(c=>c.Manufacturer)
+                //.Skip((productPage-1)*PageSize)
+                //.Take(PageSize)
+                //.ToList())
 
 
+                );
+        }
+
+        public IActionResult Create()
+        {
+            var manufacturerQuery = from m in _context.Manufacturers
+                                    orderby m.Name
+                                    select m;
+            ViewBag.ManufacturerID = new SelectList(manufacturerQuery.AsNoTracking(), "ManufacturerId", "Name",null);
+
+            return View();
+        }
+
+        public IActionResult Edit(long? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var car = _context.Cars.Include(c => c.CarModel).ThenInclude(c => c.Manufacturer).Include(c=>c.CarOwner)
+                .AsNoTracking()
+                .FirstOrDefault(m => m.Id == id);
+
+            if (car == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Manufacturers = _context.Manufacturers;
+            //ViewBag.CarTypes = context.CarTypes.Include(c=>c.Manufacturer);
+            //return View("Editor", repository.GetProduct(id));
+            var manufacturersQuery = from m in _context.Manufacturers
+                                     orderby m.Name
+                                     select m;
+            ViewBag.ManufacturerId = new SelectList(manufacturersQuery.AsNoTracking(), "ManufacturerId", "Name");
+
+            var carModelsQuery = from m in _context.CarModels
+                                     orderby m.Model
+                                     select m;
+            ViewBag.CarModelId = new SelectList(carModelsQuery.AsNoTracking(), "CarModelId", "Model");
 
 
+            return View(car);
+        }
 
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditPost(Car car, string owners)
+        {
+            //if (id == null)
+            //{
+            //    return NotFound();
+            //}
 
+            var str = owners;
 
+            Car c = _context.Cars.Find(car.Id);
+            c.CarModelId = car.CarModelId;
+            //c.CarTypeId = car.CarTypeId;
 
+            var owner = (from o in _context.Employees
+                        where o.FirstName == owners
+                        select o).First();
 
-
-
-
-
-
-           ////////////////         int z = 0;
-
-
-           ////////////////     List<Car> persons = new List<Car>()
-           //////////////// {
-           ////////////////     new Car {Id=1,  RegistrationNumber="11", VinNumber="111"},
-           ////////////////     new Car {Id=2,  RegistrationNumber="22", VinNumber="222"}
-
-           ////////////////};
-
-           ////////////////     // Lets converts our object data to Datatable for a simplified logic.
-           ////////////////     // Datatable is most easy way to deal with complex datatypes for easy reading and formatting. 
-           ////////////////     DataTable table = (DataTable)JsonConvert.DeserializeObject(JsonConvert.SerializeObject(persons), (typeof(DataTable)));
-
-           ////////////////     using (SpreadsheetDocument document = SpreadsheetDocument.Create(@"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\OutFiles\CarsOut.xlsx", SpreadsheetDocumentType.Workbook))
-           ////////////////     {
-           ////////////////         WorkbookPart workbookPart1 = document.AddWorkbookPart();
-           ////////////////         workbookPart1.Workbook = new Workbook();
-
-           ////////////////         WorksheetPart worksheetPart = workbookPart1.AddNewPart<WorksheetPart>();
-           ////////////////         var sheetData = new SheetData();
-           ////////////////         worksheetPart.Worksheet = new Worksheet(sheetData);
-
-           ////////////////         Sheets sheets = workbookPart1.Workbook.AppendChild(new Sheets());
-           ////////////////         Sheet sheet = new Sheet() { Id = workbookPart1.GetIdOfPart(worksheetPart), SheetId = 1, Name = "Sheet1" };
-
-           ////////////////         sheets.Append(sheet);
-
-           ////////////////         Row headerRow = new Row();
-
-           ////////////////         List<String> columns = new List<string>();
-           ////////////////         foreach (System.Data.DataColumn column in table.Columns)
-           ////////////////         {
-           ////////////////             columns.Add(column.ColumnName);
-
-           ////////////////             Cell cell = new Cell();
-           ////////////////             cell.DataType = CellValues.String;
-           ////////////////             cell.CellValue = new CellValue(column.ColumnName);
-           ////////////////             headerRow.AppendChild(cell);
-           ////////////////         }
-
-           ////////////////         sheetData.AppendChild(headerRow);
-
-           ////////////////         foreach (DataRow dsrow in table.Rows)
-           ////////////////         {
-           ////////////////             Row newRow = new Row();
-           ////////////////             foreach (String col in columns)
-           ////////////////             {
-           ////////////////                 Cell cell = new Cell();
-           ////////////////                 cell.DataType = CellValues.String;
-           ////////////////                 cell.CellValue = new CellValue(dsrow[col].ToString());
-           ////////////////                 newRow.AppendChild(cell);
-           ////////////////             }
-
-           ////////////////             sheetData.AppendChild(newRow);
-           ////////////////         }
-
-           ////////////////         workbookPart1.Workbook.Save();
-           ////////////////     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                return excelResult.ToString();
+            if (owner != null)
+            {
+                c.CarOwnerId = owner.Id;
             }
 
 
+            _context.SaveChanges();
 
+            return RedirectToAction(nameof(Index));
+            //return View();
+            //var courseToUpdate = await _context.Courses
+            //    .FirstOrDefaultAsync(c => c.CourseID == id);
 
-
-                //var cars = _context.Cars.Include(c => c.CarModel).ThenInclude(c => c.Manufacturer);
-            //return View(cars.ToList());
-            
+            //if (await TryUpdateModelAsync<Course>(courseToUpdate,
+            //    "",
+            //    c => c.Credits, c => c.DepartmentID, c => c.Title))
+            //{
+            //    try
+            //    {
+            //        await _context.SaveChangesAsync();
+            //    }
+            //    catch (DbUpdateException /* ex */)
+            //    {
+            //        //Log the error (uncomment ex variable name and write a log.)
+            //        ModelState.AddModelError("", "Unable to save changes. " +
+            //            "Try again, and if the problem persists, " +
+            //            "see your system administrator.");
+            //    }
+            //    return RedirectToAction(nameof(Index));
+            //}
+            //PopulateDepartmentsDropDownList(courseToUpdate.DepartmentID);
+            //return View(courseToUpdate);
         }
 
 
-
-
-        static string ReadExcelasJSON()
+        private void PopulateOwnersDropDownList(object selectedOwner = null)
         {
-            try
-            {
-                DataTable dtTable = new DataTable();
-                //Lets open the existing excel file and read through its content . Open the excel using openxml sdk
-                using (SpreadsheetDocument doc = SpreadsheetDocument.Open(@"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\InFiles\Автотранспорт.xlsx", false))
-                {
-                    //create the object for workbook part  
-                    WorkbookPart workbookPart = doc.WorkbookPart;
-                    Sheets thesheetcollection = workbookPart.Workbook.GetFirstChild<Sheets>();
-
-                    string sheetId = "";
-                    foreach (Sheet thesheet in thesheetcollection)
-                    {
-                        if (thesheet.Name == "Исходник")
-                        {
-
-
-                            //excelResult.AppendLine("Excel Sheet Name : " + thesheet.Name);
-                            //excelResult.AppendLine("----------------------------------------------- ");
-                            ////statement to get the worksheet object by using the sheet id  
-                            //Worksheet theWorksheet = ((WorksheetPart)workbookPart.GetPartById(thesheet.Id)).Worksheet;
-                            sheetId = thesheet.Id;
-                            break;
-                        }
-                    }
-
-
-
-                            //using for each loop to get the sheet from the sheetcollection  
-                    //foreach (Sheet thesheet in thesheetcollection.OfType<Sheet>())
-                    //{
-                        //statement to get the worksheet object by using the sheet id  
-                        //Worksheet theWorksheet = ((WorksheetPart)workbookPart.GetPartById(thesheet.Id)).Worksheet;
-                        Worksheet theWorksheet = ((WorksheetPart)workbookPart.GetPartById(sheetId)).Worksheet;
-
-
-                        SheetData thesheetdata = theWorksheet.GetFirstChild<SheetData>();
-
-
-
-                        for (int rCnt = 4; rCnt < thesheetdata.ChildElements.Count()-4; rCnt++)
-                        {
-                            List<string> rowList = new List<string>();
-
-                        int[] columns = new int[] { 1,2,4,6,9,12,13,15,20,21,31,32,33,34,36,41 };
-
-                        //foreach (var item in collection)
-                        //{
-
-                        //}
-                        for (int c = 0; c < columns.Count(); c++)
-                            //for (int rCnt1 = 0; rCnt1 < thesheetdata.ElementAt(rCnt).ChildElements.Count()-10; rCnt1++)
-                            {
-
-                            //Cell thecurrentcell = (Cell)thesheetdata.ElementAt(rCnt).ChildElements.ElementAt(rCnt1);
-                            Cell thecurrentcell = (Cell)thesheetdata.ElementAt(rCnt).ChildElements.ElementAt(columns[c]);
-                            //statement to take the integer value  
-                            string currentcellvalue = string.Empty;
-                                if (thecurrentcell.DataType != null)
-                                {
-                                    if (thecurrentcell.DataType == CellValues.SharedString)
-                                    {
-                                        int id;
-                                        if (Int32.TryParse(thecurrentcell.InnerText, out id))
-                                        {
-                                            SharedStringItem item = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
-                                            if (item.Text != null)
-                                            {
-                                                //first row will provide the column name.
-                                                if (rCnt == 4)
-                                                {
-                                                    dtTable.Columns.Add(item.Text.Text);
-                                                }
-                                                else
-                                                {
-                                                    rowList.Add(item.Text.Text);
-                                                }
-                                            }
-                                            else if (item.InnerText != null)
-                                            {
-                                                currentcellvalue = item.InnerText;
-                                            }
-                                            else if (item.InnerXml != null)
-                                            {
-                                                currentcellvalue = item.InnerXml;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    if (rCnt != 4)//reserved for column values
-                                    {
-                                        rowList.Add(thecurrentcell.InnerText);
-                                    }
-                                }
-                            }
-                            if (rCnt != 4)//reserved for column values
-                            {
-                            if (rowList[4] == "Легкові")
-                            {
-                                dtTable.Rows.Add(rowList.ToArray());
-                            }
-                        }
-                        }
-
-                    //}
-
-                    return JsonConvert.SerializeObject(dtTable);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
+            var ownersQuery = from o in _context.Employees
+                              orderby o.FirstName
+                              select o;
+            ViewBag.OwnerID = new SelectList(ownersQuery.AsNoTracking(), "Id", "FirstName", selectedOwner);
         }
+
+        [HttpGet]
+        public JsonResult GetCarTypeList(int ManufacturerId)
+        {
+            var carTypelist = new SelectList(_context.CarModels.Where(c => c.ManufacturerId == ManufacturerId), "CarModelId", "Model");
+            return Json(carTypelist);
+        }
+
+        [HttpGet]
+        public JsonResult GetCarOwnerList(int ManufacturerId)
+        {
+            var carTypelist = new SelectList(_context.Employees, "Id", "FirstName");
+            return Json(carTypelist);
+        }
+
+        //[HttpGet]
+        public FileResult DownloadFile()
+        {
+            int z = 0;
+
+            var testFile = (from f in _context.Cars
+                            where f.ImagePage1 != null
+                            select f).First();
+
+            //if (testFile ==null)
+            //{
+            //    return NotFound();
+            //}
+            return File(testFile.ImagePage1, "image/jpg", "testfile.jpg");
+        }
+        //public ActionResult GetImage()
+        //{
+        //    /MemoryStream ms = new MemoryStream();
+
+        //    return null;
+        //}
     }
 }

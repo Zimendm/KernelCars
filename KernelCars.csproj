@@ -5,8 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DocumentFormat.OpenXml" Version="2.10.0" />
-    <PackageReference Include="itext7" Version="7.1.10" />
+    <Compile Remove="Migrations\20200320100111_AddingCarOwners.cs" />
+    <Compile Remove="Migrations\20200320100111_AddingCarOwners.Designer.cs" />
+    <Compile Remove="Migrations\20200320100237_AddingCarOwners.cs" />
+    <Compile Remove="Migrations\20200320100237_AddingCarOwners.Designer.cs" />
+    <Compile Remove="Migrations\20200320101013_AddingCarOwners.cs" />
+    <Compile Remove="Migrations\20200320101013_AddingCarOwners.Designer.cs" />
+    <Compile Remove="Migrations\20200320103623_AddingCarOwners.cs" />
+    <Compile Remove="Migrations\20200320103623_AddingCarOwners.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
@@ -15,10 +25,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\OutFiles\" />
   </ItemGroup>
 
 </Project>

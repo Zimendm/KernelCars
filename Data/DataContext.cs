@@ -16,5 +16,13 @@ namespace KernelCars.Data
         public DbSet<Car> Cars { get; set; }
         public DbSet<Manufacturer> Manufacturers { get; set; }
         public DbSet<CarModel> CarModels { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Car>()
+        //        .HasOne(a=>a.CarOwner)
+        //        .WithOne(b=>b)
+        //}
     }
 }

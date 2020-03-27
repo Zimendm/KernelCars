@@ -11,6 +11,7 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 //using System.Configuration;
 
@@ -28,14 +29,44 @@ namespace KernelCars
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            //services.AddRazorPages();
+            //services.AddMvc(options =>
+            //{
+            //    options.EnableEndpointRouting = false;
+            //});
+            //services.AddMvc().AddNewtonsoftJson(opt => opt.SerializerSettings.MaxDepth=64);//.AddNewtonsoftJson();//.AddJsonOptions(options => {
+            //options.JsonSerializerOptions.MaxDepth = 256;  // or however deep you need
+            //});
+
+            //services.AddMvc().AddNewtonsoftJson(options =>
+            //    { options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            //        options.SerializerSettings.MaxDepth = 64;
+            //    });//.AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 1);
+
+            //services.AddControllers().AddNewtonsoftJson(options =>
+            //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            services.AddMvc();//.AddJsonOptions(opt=>opt.JsonSerializerOptions.MaxDepth=255);//.AddNewtonsoftJson();
+
+            //services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
+            //services.AddControllersWithViews().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
+            //services.AddRazorPages().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
+            services.AddControllers().AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+
+            services.AddControllersWithViews()
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+);
+
+
+            services.AddServerSideBlazor();
+
             services.AddDbContext<DataContext>(options=>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            
-            services.AddMvc(options =>
-            {
-                options.EnableEndpointRouting = false; 
-            });
 
+            
 
             //services.AddControllersWithViews();
 
@@ -48,36 +79,58 @@ namespace KernelCars
             app.UseStatusCodePages();
             app.UseStaticFiles();
 
-            //app.UseRouting();
+            app.UseRouting();
 
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapControllers();
-            //});
+            app.UseEndpoints(endpoints =>
+            {
+                //endpoints.MapControllers();
+                endpoints.MapControllerRoute(
+                    name: "pagination",
+                    pattern: "Cars/Page{carPage}",
+                    defaults: new { Controller = "Car", action = "Index" });
+
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");// .MapControllers();
+                //endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
+
+                endpoints.MapFallbackToController("Blazor", "Home");
+            });
 
 
             //app.UseMvcWithDefaultRoute();
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller}/{action}",
-                    defaults: new { controller = "Car", action = "Index" });
-            });
+            //app.UseMvc(routes => {
+            //    routes.MapRoute(
+            //        name: "pagination",
+            //        template: "Cars/Page{carPage}",
+            //        defaults: new { Controller = "Car", action = "Index" });
+                
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller=Car}/{action=Index}/{id?}");
+            //});
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "default",
+            //        template: "{controller}/{action}",
+            //        defaults: new { controller = "Car", action = "Index" });
+            //});
             //if (env.IsDevelopment())
             //{
             //    app.UseDeveloperExceptionPage();
             //}
 
-                //app.UseRouting();
+            //app.UseRouting();
 
-                //app.UseEndpoints(endpoints =>
-                //{
-                //    endpoints.MapGet("/", async context =>
-                //    {
-                //        await context.Response.WriteAsync("Hello World! From Kernel Cars");
-                //    });
-                //});
+            //app.UseEndpoints(endpoints =>
+            //{
+            //    endpoints.MapGet("/", async context =>
+            //    {
+            //        await context.Response.WriteAsync("Hello World! From Kernel Cars");
+            //    });
+            //});
         }
     }
 }

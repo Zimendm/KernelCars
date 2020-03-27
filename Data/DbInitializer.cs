@@ -40,12 +40,24 @@ namespace KernelCars.Data
             }
             context.SaveChanges();
 
+            var carOwners = new Employee[]
+            {
+                new Employee {FirstName="АТП-2004"},
+                new Employee {FirstName="КЕРНЕЛ-ТРЕЙД ТОВ"}
+            };
+            foreach (Employee item in carOwners)
+            {
+                context.Employees.Add(item);
+            }
+            context.SaveChanges();
+
+
             var cars = new Car[]
             {
-                new Car {RegistrationNumber="AX1938BP",FirstRegistrationYear=2012, CarModelId=1},
-                new Car {RegistrationNumber="AA2269OX",FirstRegistrationYear=2016, CarModelId=2},
-                new Car {RegistrationNumber="AA8400OX",FirstRegistrationYear=2019, CarModelId=2},
-                new Car {RegistrationNumber="AA8422II",FirstRegistrationYear=2017, CarModelId=3}
+                new Car {RegistrationNumber="AX1938BP",FirstRegistrationYear=2012, VinNumber="WDD10000000", CarModelId=1, CarOwnerId=1},
+                new Car {RegistrationNumber="AA2269OX",FirstRegistrationYear=2016, VinNumber="WDD10000001", CarModelId=2, CarOwnerId=1},
+                new Car {RegistrationNumber="AA8400OX",FirstRegistrationYear=2019, VinNumber="WDD10000002", CarModelId=2, CarOwnerId=1},
+                new Car {RegistrationNumber="AA8422II",FirstRegistrationYear=2017, VinNumber="WDD10000003", CarModelId=3, CarOwnerId=2}
                 //new Car { ManufacturerId=1, CarTypeId =1,TypeOfFuel=TypeOfFuel.D,RegistrationNumber="AX1938ВР",FirstRegistrationYear=2010,VinNumber="ZZZ",Capacity=1598},
                 //new Car { ManufacturerId=4, CarTypeId =8,TypeOfFuel=TypeOfFuel.D,RegistrationNumber="AА2269ОХ",FirstRegistrationYear=2010,VinNumber="ZZZ",Capacity=1598}
                 //new Car { Make ="BMW", Type="520",TypeOfFuel=TypeOfFuel.D,RegistrationNumber="AА4804ОХ",FirstRegistrationYear=2010,VinNumber="ZZZ",Capacity=1598},
