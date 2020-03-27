@@ -8,6 +8,7 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using KernelCars.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.IO;
 
 namespace KernelCars.Controllers
 {
@@ -169,5 +170,27 @@ namespace KernelCars.Controllers
             var carTypelist = new SelectList(_context.Employees, "Id", "FirstName");
             return Json(carTypelist);
         }
+
+        //[HttpGet]
+        public FileResult DownloadFile()
+        {
+            int z = 0;
+
+            var testFile = (from f in _context.Cars
+                            where f.ImagePage1 != null
+                            select f).First();
+
+            //if (testFile ==null)
+            //{
+            //    return NotFound();
+            //}
+            return File(testFile.ImagePage1, "image/jpg", "testfile.jpg");
+        }
+        //public ActionResult GetImage()
+        //{
+        //    /MemoryStream ms = new MemoryStream();
+
+        //    return null;
+        //}
     }
 }

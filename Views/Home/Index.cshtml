@@ -8,30 +8,34 @@
 <div id="div1"></div>
 
 @*<script>
-    $(document).ready(function () {
+        $(document).ready(function () {
 
-        //alert("Hello");
+            //alert("Hello");
 
-        var newElems = $("<p>Hello from jQuery</p>");
-        var newElems2 = document.createElement("p");
-        newElems2.innerHTML = "Hello from JQuery 2";
+            var newElems = $("<p>Hello from jQuery</p>");
+            var newElems2 = document.createElement("p");
+            newElems2.innerHTML = "Hello from JQuery 2";
 
-        $("#div1").append(newElems);
-        $("#div1").append(newElems2);
-    });
-</script>*@
+            $("#div1").append(newElems);
+            $("#div1").append(newElems2);
+        });
+    </script>*@
 
-@*<component type="typeof(KernelCars.Components.CarModelSelect)" render-mode="ServerPrerendered" 
-           param-Manufacturers= "ViewBag.Manufacturers" />*@
+@*<component type="typeof(KernelCars.Components.CarModelSelect)" render-mode="ServerPrerendered"
+    param-Manufacturers= "ViewBag.Manufacturers" />*@
 
-<form enctype="multipart/form-data" method="post">
+<form enctype="multipart/form-data" asp-action="Create" method="post">
     <dl>
         <dt>
             <label></label>
         </dt>
         <dd>
-            <input type="file" multiple/>
+            <input type="file" name="Images" multiple />
         </dd>
     </dl>
-    <input type="submit" value="Upload"/>
+    <input type="submit" value="Upload" />
+
+
+
+
 </form>

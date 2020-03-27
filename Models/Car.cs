@@ -38,5 +38,7 @@ namespace KernelCars.Models
         
         public int? CarOwnerId { get; set; }
         public Employee CarOwner  { get; set; }
+
+        public byte[] ImagePage1 { get; set; }
     }
 }

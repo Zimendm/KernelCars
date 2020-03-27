@@ -8,6 +8,8 @@ using KernelCars.Data;
 using KernelCars.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace KernelCars.Controllers
 {
@@ -22,21 +24,43 @@ namespace KernelCars.Controllers
 
         public ViewResult Index()
         {
-            var manufacturersQuery = from m in _context.Manufacturers
-                                     orderby m.Name
-                                     select m;
-            ViewBag.ManufacturerId = new SelectList(manufacturersQuery.AsNoTracking(), "Id", "Name");
+            //var manufacturersQuery = from m in _context.Manufacturers
+            //                         orderby m.Name
+            //                         select m;
+            //ViewBag.ManufacturerId = new SelectList(manufacturersQuery.AsNoTracking(), "Id", "Name");
 
 
 
             //ViewBag.Manufacturers = _context.Manufacturers.ToList();
             //=> "Hello From Kernel Cars";
             //var dat = _context.Manufacturers.Include(m => m.CarModels).ToList();//.ToArray();
-            ViewBag.Manufacturers = _context.Manufacturers.ToList();
-            //return View(new List<string> {"красный","синий","зелёный" });
-            return View(_context.Manufacturers.Include(m => m.CarModels).ToList());
+            //ViewBag.Manufacturers = _context.Manufacturers.ToList();
+            ////return View(new List<string> {"красный","синий","зелёный" });
+            //return View(_context.Manufacturers.Include(m => m.CarModels).ToList());
+            return View();
         }
+        [HttpPost]
+        public async Task<IActionResult> Create(Car car, List<IFormFile> images)
+        {
+            foreach (var item in images)
+            {
+                if (item.Length>0)
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        await item.CopyToAsync(stream);
+                        car.ImagePage1 = stream.ToArray();
+                    }
 
+                }
+            }
+
+            car.CarModelId = 2;
+            _context.Cars.Add(car);
+            _context.SaveChanges();
+            int z = 0;
+            return RedirectToAction("Index");
+        }
 
         public IActionResult Blazor()
         {
