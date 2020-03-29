@@ -63,7 +63,7 @@ namespace KernelCars
 );
 
 
-            services.AddServerSideBlazor();
+            //services.AddServerSideBlazor();
 
             services.AddDbContext<DataContext>(options=>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -107,12 +107,12 @@ namespace KernelCars
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");// .MapControllers();
                 //endpoints.MapRazorPages();
-                endpoints.MapBlazorHub();
+                //endpoints.MapBlazorHub();
 
-                endpoints.MapFallbackToController("Blazor", "Home");
+                //endpoints.MapFallbackToController("Blazor", "Home");
             });
 
-            IdentitySeedData.EnsurePopulated(app);
+            //IdentitySeedData.EnsurePopulated(app);
 
             //app.UseMvcWithDefaultRoute();
             //app.UseMvc(routes => {

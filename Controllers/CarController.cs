@@ -64,7 +64,7 @@ namespace KernelCars.Controllers
             return View();
         }
 
-        [Authorize]
+        //[Authorize]
         public IActionResult Edit(long? id)
         {
             if (id == null)
@@ -97,7 +97,7 @@ namespace KernelCars.Controllers
 
             return View(car);
         }
-        [Authorize]
+        //[Authorize]
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public IActionResult EditPost(Car car, string owners)
