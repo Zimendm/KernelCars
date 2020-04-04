@@ -57,10 +57,10 @@ namespace KernelCars
 //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
 //);
 
-            services.AddControllersWithViews()
-    .AddNewtonsoftJson(options =>
-    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-);
+//            services.AddControllersWithViews()
+//    .AddNewtonsoftJson(options =>
+//    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+//);
 
 
             //services.AddServerSideBlazor();
@@ -87,14 +87,14 @@ namespace KernelCars
             app.UseStatusCodePages();
             app.UseStaticFiles();
 
-                      
+
 
             app.UseRouting();
 
             app.UseAuthentication();
             //app.UseAuthorization();
             app.UseAuthorization();
-
+            //app.UseMvcWithDefaultRoute();
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapControllers();

@@ -15,7 +15,7 @@ namespace KernelCars.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.1")
+                .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -79,6 +79,24 @@ namespace KernelCars.Migrations
                     b.ToTable("CarModels");
                 });
 
+            modelBuilder.Entity("KernelCars.Models.Department", b =>
+                {
+                    b.Property<int>("DepartmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<bool>("IsAgriBusines")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("DepartmentId");
+
+                    b.ToTable("Departments");
+                });
+
             modelBuilder.Entity("KernelCars.Models.Employee", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +116,36 @@ namespace KernelCars.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("KernelCars.Models.Firm", b =>
+                {
+                    b.Property<int>("FirmId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("FirmId");
+
+                    b.ToTable("Firms");
+                });
+
+            modelBuilder.Entity("KernelCars.Models.FirmDepartment", b =>
+                {
+                    b.Property<int>("FirmId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.HasKey("FirmId", "DepartmentId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("FirmDepartment");
                 });
 
             modelBuilder.Entity("KernelCars.Models.Manufacturer", b =>
@@ -133,6 +181,21 @@ namespace KernelCars.Migrations
                     b.HasOne("KernelCars.Models.Manufacturer", "Manufacturer")
                         .WithMany("CarModels")
                         .HasForeignKey("ManufacturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KernelCars.Models.FirmDepartment", b =>
+                {
+                    b.HasOne("KernelCars.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KernelCars.Models.Firm", "Firm")
+                        .WithMany()
+                        .HasForeignKey("FirmId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
