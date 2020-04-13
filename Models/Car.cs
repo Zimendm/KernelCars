@@ -40,5 +40,12 @@ namespace KernelCars.Models
         public Employee CarOwner  { get; set; }
 
         public byte[] ImagePage1 { get; set; }
+
+        public string TempUser { get; set; }
+        public string TempModel { get; set; }
+        public string TempOwner { get; set; }
+        public string TempType { get; set; }
+        public string TempInv { get; set; }
+        public string TempFirm { get; set; }
     }
 }

@@ -11,5 +11,26 @@ namespace KernelCars.Models
         public string LastName { get; set; }
         public string MiddleName { get; set; }
         public string FirstName { get; set; }
+        public string FullName {
+            get
+            {
+                return LastName + " " + FirstName + " " + MiddleName;
+            }
+        }
+        public bool IsFirm { 
+            get
+            {
+                if (FirstName==null && MiddleName==null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+
+        public Firm Firm { get; set; }
     }
 }

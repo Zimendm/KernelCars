@@ -47,6 +47,24 @@ namespace KernelCars.Migrations
                     b.Property<int>("TankCapacity")
                         .HasColumnType("int");
 
+                    b.Property<string>("TempFirm")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TempInv")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TempModel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TempOwner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TempType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TempUser")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("VinNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -70,11 +88,15 @@ namespace KernelCars.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Model")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("CarModelId");
 
                     b.HasIndex("ManufacturerId");
+
+                    b.HasIndex("Model", "ManufacturerId")
+                        .IsUnique()
+                        .HasFilter("[Model] IS NOT NULL");
 
                     b.ToTable("CarModels");
                 });
@@ -85,9 +107,6 @@ namespace KernelCars.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsAgriBusines")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -125,10 +144,16 @@ namespace KernelCars.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("FirmId");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("Firms");
                 });
@@ -156,11 +181,41 @@ namespace KernelCars.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("ManufacturerId");
 
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasFilter("[Name] IS NOT NULL");
+
                     b.ToTable("Manufacturers");
+                });
+
+            modelBuilder.Entity("KernelCars.Models.Unit", b =>
+                {
+                    b.Property<int>("UnitId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("FirmId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsAgriBusiness")
+                        .HasColumnType("bit");
+
+                    b.HasKey("UnitId");
+
+                    b.HasIndex("FirmId");
+
+                    b.HasIndex("DepartmentId", "FirmId")
+                        .IsUnique();
+
+                    b.ToTable("Units");
                 });
 
             modelBuilder.Entity("KernelCars.Models.Car", b =>
@@ -185,7 +240,31 @@ namespace KernelCars.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("KernelCars.Models.Firm", b =>
+                {
+                    b.HasOne("KernelCars.Models.Employee", "Employee")
+                        .WithOne("Firm")
+                        .HasForeignKey("KernelCars.Models.Firm", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("KernelCars.Models.FirmDepartment", b =>
+                {
+                    b.HasOne("KernelCars.Models.Department", "Department")
+                        .WithMany("FirmDepartments")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KernelCars.Models.Firm", "Firm")
+                        .WithMany()
+                        .HasForeignKey("FirmId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KernelCars.Models.Unit", b =>
                 {
                     b.HasOne("KernelCars.Models.Department", "Department")
                         .WithMany()

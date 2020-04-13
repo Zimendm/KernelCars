@@ -24,7 +24,7 @@ namespace KernelCars.Controllers
     {
         private readonly DataContext _context;
 
-        public int PageSize = 4;
+        public int PageSize = 100;
 
         public CarController(DataContext context)
         {
@@ -219,17 +219,173 @@ namespace KernelCars.Controllers
             }
 
             DataTable dataTable = ReadExcelasJSON(path);
+            
+            UpdateData(dataTable);
 
-            var outpath = Path.Combine(
-                Directory.GetCurrentDirectory(), @"wwwroot/OutFiles",
-                file.FileName);
+            return RedirectToAction("Index");
+
+            ///*Получение моделей авто*/
+            //var models = (from m in dataTable.AsEnumerable()
+            //              orderby m.Field<string>("Модель")
+            //              select new
+            //              {
+            //                  model = m.Field<string>("Модель").Split(" ")[0].ToUpper()
+            //              }).GroupBy(m => m.model).ToArray();
 
 
-            CreateSpreadsheetWorkbook(outpath,dataTable);
+            //List<Manufacturer> manufacturers = new List<Manufacturer>();
+
+            //for (int i = 0; i < models.Count(); i++)
+            //{
+            //    if (models[i].Key !="")
+            //    {
+            //        Manufacturer man = new Manufacturer
+            //        {
+            //            Name = models[i].Key
+            //        };
+
+            //        var manEx = (from m in _context.Manufacturers
+            //                     where m.Name.ToUpper() == models[i].Key.ToUpper()
+            //                     select m).FirstOrDefault();
+
+            //        if (manEx==null)
+            //        {
+            //            manufacturers.Add(man);
+            //        }
+            //    }
+            //}
+
+            //_context.Manufacturers.AddRange(manufacturers);
+            //_context.SaveChanges();
+
+            ////for (int i = 0; i < length; i++)
+            ////{
+
+            ////}
+            //var cm = (from m in dataTable.AsEnumerable()
+            //         orderby m.Field<string>("Модель")
+            //         select new
+            //         {
+            //             model = m.Field<string>("Модель").ToUpper()
+            //         }).GroupBy(m => m.model).ToArray();
+
+            //List<CarModel> carModels = new List<CarModel>();
+
+            //foreach (var item in cm)
+            //{
+            //    var man = (from m in _context.Manufacturers
+            //               where item.Key.ToUpper().IndexOf(m.Name.ToUpper()) == 0
+            //               select m).FirstOrDefault();
+
+            //    int z = 0;
+
+            //    if (man != null)
+            //    {
+            //        if (true)
+            //        {
+            //            var cme = (from cm_ in _context.CarModels
+            //                      where cm_.Model.IndexOf(item.Key.Replace(man.Name, "").Trim()) > -1
+            //                      select cm_).FirstOrDefault();
+            //            if (cme == null)
+            //            {
+            //                CarModel cn = new CarModel
+            //                {
+            //                    ManufacturerId = man.ManufacturerId,
+            //                    Model = item.Key.Replace(man.Name, "").Trim()
+            //                };
+            //                _context.CarModels.Add(cn);
+            //            }
+            //        }
+            //    }
+
+            //    //}
+
+            //    _context.SaveChanges();
+            //    //for (int i = 0; i < length; i++)
+            //    //{
+
+            //    //}
+            //    ////foreach (var item in _context.Manufacturers)
+            //    //{
+            //    //    if ()
+            //    //    {
+
+            //    //    }
+
+
+            //}
+
+
+            ////_context.Manufacturers.AddRange(models);
 
 
 
-            return RedirectToAction("WorkWithData");
+
+            //for (int i = 0; i < dataTable.Rows.Count; i++)
+            //{
+            //    try
+            //    {
+
+            //        DateTime regDate;
+            //        try
+            //        {
+            //            regDate = Convert.ToDateTime(dataTable.Rows[i]["Дата випуску"]);
+            //        }
+            //        catch (Exception)
+            //        {
+            //            regDate=new DateTime( 1917,11,7);
+            //        }
+
+            //        var manuf = from m in _context.Manufacturers
+            //                    where ((string)dataTable.Rows[i]["Модель"]).IndexOf(m.Name) > -1
+            //                    select m;
+
+            //        var model  = from m in _context.CarModels
+            //                    where ((string)dataTable.Rows[i]["Модель"]).IndexOf(m.Model) > -1
+            //                    select m;
+
+            //        int cmId = 2195;
+            //        if (manuf!=null && model!=null)
+            //        {
+            //            if (model.Count()==1)
+            //            {
+            //               cmId = model.First().CarModelId;
+            //            }
+                       
+            //        }
+
+
+            //        Car car = new Car
+            //        {
+            //            RegistrationNumber = (string)dataTable.Rows[i]["Державний номер"],
+            //            FirstRegistrationYear = regDate.Year,
+            //            CarModelId = cmId,
+            //            CarOwnerId = 1,
+            //            VinNumber = (string)dataTable.Rows[i]["Кластер"]
+            //        };
+
+            //        _context.Cars.Add(car);
+            //    }
+            //    catch (Exception)
+            //    {
+
+            //        //throw;
+            //    }
+                
+            //}
+
+            //_context.SaveChanges();
+
+            //var outpath = Path.Combine(
+            //    Directory.GetCurrentDirectory(), @"wwwroot/OutFiles",
+            //    file.FileName);
+
+
+            //CreateSpreadsheetWorkbook(outpath,dataTable);
+
+
+
+            //return RedirectToAction("WorkWithData");
         }
 
         static DataTable ReadExcelasJSON(string fileName)
@@ -276,7 +432,7 @@ namespace KernelCars.Controllers
                     int? startRowIndex = null;
                     int ozColumnIndex = 0;
 
-                    string[] vechicleType = new string[] { "Легкові", "Автобуси" };
+                    string[] vechicleType = new string[] { "Легкові", "Автобуси", "Вантажопасажирські" };
 
                     List<string> passengerCellValue = new List<string>();
                     List<int> rowsToProc = new List<int>();
@@ -368,7 +524,7 @@ namespace KernelCars.Controllers
 
 
 
-                    rowHeaders = new string[] { "Кластер", "Назва підприємства", "Назва основного засобу", "Класифікатор ОЗ" };
+                    rowHeaders = new string[] { "Кластер", "Назва підприємства", "Назва основного засобу", "Класифікатор ОЗ", "Дата випуску", "Державний номер", "Стан ОЗ", "Модель", "М.В.О.", "Власник/Орендодавець" };
                     SharedStringTablePart stringTablePart = workbookPart.SharedStringTablePart;
                     List<int> columns = new List<int>();
 
@@ -631,6 +787,138 @@ namespace KernelCars.Controllers
 
             // Close the document.
             spreadsheetDocument.Close();
+        }
+
+        void UpdateData(DataTable dataTable)
+        {
+            ///*Получение моделей авто*/
+            //var models = (from m in dataTable.AsEnumerable()
+            //              orderby m.Field<string>("Модель")
+            //              select new
+            //              {
+            //                  model = m.Field<string>("Модель").Split(" ")[0].ToUpper()
+            //              }).GroupBy(m => m.model).ToArray();
+
+            //List<Manufacturer> manufacturers = new List<Manufacturer>();
+
+            //for (int i = 0; i < models.Count(); i++)
+            //{
+            //    if (models[i].Key != "")
+            //    {
+            //        Manufacturer man = new Manufacturer
+            //        {
+            //            Name = models[i].Key
+            //        };
+
+            //        var manEx = (from m in _context.Manufacturers
+            //                     where m.Name.ToUpper() == models[i].Key.ToUpper()
+            //                     select m).FirstOrDefault();
+
+            //        if (manEx == null)
+            //        {
+            //            manufacturers.Add(man);
+            //        }
+            //    }
+            //}
+
+            //_context.Manufacturers.AddRange(manufacturers);
+            //_context.SaveChanges();
+
+
+            for (int i = 0; i < dataTable.Rows.Count; i++)
+            {
+                try
+                {
+
+                    DateTime regDate;
+                    try
+                    {
+                        regDate = Convert.ToDateTime(dataTable.Rows[i]["Дата випуску"]);
+                    }
+                    catch (Exception)
+                    {
+                        regDate = new DateTime(1917, 11, 7);
+                    }
+
+                    if (((string)dataTable.Rows[i]["Модель"]).IndexOf("ЗАЗ DAEWOO T13110") >-1)
+                    {
+                        int kdsjfk = 0;
+                    }
+
+
+                    var manuf = from m in _context.Manufacturers
+                                where ((string)dataTable.Rows[i]["Модель"]).IndexOf(m.Name) > -1
+                                select m;
+
+                    string onlyModel="";
+
+                    if (manuf.First()!=null)
+                    {
+                        if (manuf.Count() > 1)
+                        {
+                            foreach (var item in manuf)
+                            {
+                                if (((string)dataTable.Rows[i]["Модель"]).ToUpper().IndexOf(item.Name)==0)
+                                {
+                                    onlyModel = ((string)dataTable.Rows[i]["Модель"]).Replace(item.Name, "").Trim();
+                                    break;
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            onlyModel = ((string)dataTable.Rows[i]["Модель"]).Replace((string)manuf.First().Name, "").Trim();
+                        }
+                    }
+
+
+
+                    var model = (from m in _context.CarModels
+                                 where  (m.Model.ToUpper().Trim()).Equals(onlyModel.ToUpper()) 
+                                 select m).FirstOrDefault();
+
+                    int cmId = 1;
+                    if (manuf != null && model != null)
+                    {
+                        cmId = model.CarModelId;
+                    }
+
+                    int carOwnerId = 1;
+                    string ownerStr = ((string)dataTable.Rows[i]["Власник/Орендодавець"]).Replace(" ","").ToUpper();
+
+                    var owner = from o in _context.Employees
+                                where (o.LastName + o.FirstName + o.MiddleName).Replace(" ", "").ToUpper() == ownerStr
+                                select o;
+
+                    if (owner.FirstOrDefault() != null)
+                    {
+                        if (owner.Count()==1)
+                        {
+                            carOwnerId = owner.First().Id;
+                        }
+                    }
+
+
+
+                    Car car = new Car
+                    {
+                        RegistrationNumber = (string)dataTable.Rows[i]["Державний номер"],
+                        FirstRegistrationYear = regDate.Year,
+                        CarModelId = cmId,
+                        CarOwnerId = carOwnerId,
+                        TempModel= (string)dataTable.Rows[i]["Модель"]
+                    };
+
+                    _context.Cars.Add(car);
+                }
+                catch (Exception)
+                {
+                    //throw;
+                }
+
+            }
+            _context.SaveChanges();
         }
         //public ActionResult GetImage()
         //{

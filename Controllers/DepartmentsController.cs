@@ -46,6 +46,13 @@ namespace KernelCars.Controllers
         // GET: Departments/Create
         public IActionResult Create()
         {
+            //var firm = new Firm
+            //{
+            //    Name="АТР-2004"
+            //};
+            //var dep = new Department {Name="GoSDep" };
+            
+
             return View();
         }
 

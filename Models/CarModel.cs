@@ -9,7 +9,6 @@ namespace KernelCars.Models
     {
         public int CarModelId { get; set; }
         public string Model { get; set; }
-
         public int ManufacturerId { get; set; }
         public Manufacturer Manufacturer { get; set; }
         public List<Car> Cars { get; set; }

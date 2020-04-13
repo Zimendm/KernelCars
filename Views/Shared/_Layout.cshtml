@@ -69,6 +69,9 @@
                     <li class="nav-item active">
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-area="" asp-controller="ImportData" asp-action="Index">Import Data</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="firmDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Компанія
@@ -76,8 +79,10 @@
                         <div class="dropdown-menu" aria-labelledby="firmDropdown">
                             <a class="dropdown-item" asp-controller="Departments" asp-action="Index">Підрозділи</a>
                             <a class="dropdown-item" asp-controller="Firms" asp-action="Index">Підприємства</a>
+                            <a class="dropdown-item" asp-controller="Units" asp-action="Index">Units</a>
+                            <a class="dropdown-item" asp-controller="Employee" asp-action="Index">Співробітники</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>
+                            <a class="dropdown-item" asp-controller="Car" asp-action="WorkWithData">Авто</a>
                         </div>
                     </li>
                     <li class="nav-item dropdown">
@@ -86,7 +91,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" asp-controller="Manufacturers" asp-action="Index">Виробники</a>
-                            <a class="dropdown-item" href="#">Моделі</a>
+                            <a class="dropdown-item" asp-controller="CarModels" asp-action="Index">Моделі</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>
                         </div>

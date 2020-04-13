@@ -13,6 +13,20 @@
     <Compile Remove="Migrations\20200320101013_AddingCarOwners.Designer.cs" />
     <Compile Remove="Migrations\20200320103623_AddingCarOwners.cs" />
     <Compile Remove="Migrations\20200320103623_AddingCarOwners.Designer.cs" />
+    <Compile Remove="Migrations\20200409052437_TestUpdate.cs" />
+    <Compile Remove="Migrations\20200409052437_TestUpdate.Designer.cs" />
+    <Compile Remove="Migrations\20200410110228_ArgiCorrection2.cs" />
+    <Compile Remove="Migrations\20200410110228_ArgiCorrection2.Designer.cs" />
+    <Compile Remove="Migrations\20200413093311_FirmDataUpdate.cs" />
+    <Compile Remove="Migrations\20200413093311_FirmDataUpdate.Designer.cs" />
+    <Compile Remove="Migrations\20200413093628_FirmDataUpdate.cs" />
+    <Compile Remove="Migrations\20200413093628_FirmDataUpdate.Designer.cs" />
+    <Compile Remove="Migrations\20200413093752_FirmDataUpdate.cs" />
+    <Compile Remove="Migrations\20200413093752_FirmDataUpdate.Designer.cs" />
+    <Compile Remove="Migrations\20200413112423_FirmDataUpdate1.cs" />
+    <Compile Remove="Migrations\20200413112423_FirmDataUpdate1.Designer.cs" />
+    <Compile Remove="Migrations\20200413114705_FirmDataUpdate3.cs" />
+    <Compile Remove="Migrations\20200413114705_FirmDataUpdate3.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
