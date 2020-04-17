@@ -19,7 +19,8 @@ namespace KernelCars.Models
         //public string CEO { get; set; }
 
         public Employee Employee { get; set; }
-        //public ICollection<FirmDepartment> FirmDepartments { get; set; }
+        
+        public ICollection<Unit> Units { get; set; }
         
 
     }

@@ -13,6 +13,8 @@ namespace KernelCars.Models
         public int DepartmentId { get; set; }
         public Firm Firm { get; set; }
         public Department Department { get; set; }
+        public List<CarStatus> CarStatuses { get; set; }
+
 
     }
 }

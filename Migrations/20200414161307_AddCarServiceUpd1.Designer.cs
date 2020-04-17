@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200414161307_AddCarServiceUpd1")]
+    partial class AddCarServiceUpd1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,12 +43,6 @@ namespace KernelCars.Migrations
                     b.Property<byte[]>("ImagePage1")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<byte[]>("ImagePage2")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<bool>("LPG")
-                        .HasColumnType("bit");
-
                     b.Property<string>("RegistrationNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -69,9 +65,6 @@ namespace KernelCars.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TempUser")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tyres")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VinNumber")

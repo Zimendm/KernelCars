@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200413193702_CarStatusAdd")]
+    partial class CarStatusAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,12 +43,6 @@ namespace KernelCars.Migrations
                     b.Property<byte[]>("ImagePage1")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<byte[]>("ImagePage2")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<bool>("LPG")
-                        .HasColumnType("bit");
-
                     b.Property<string>("RegistrationNumber")
                         .HasColumnType("nvarchar(max)");
 
@@ -71,8 +67,8 @@ namespace KernelCars.Migrations
                     b.Property<string>("TempUser")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tyres")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("UnitId")
+                        .HasColumnType("int");
 
                     b.Property<string>("VinNumber")
                         .HasColumnType("nvarchar(max)");
@@ -82,6 +78,8 @@ namespace KernelCars.Migrations
                     b.HasIndex("CarModelId");
 
                     b.HasIndex("CarOwnerId");
+
+                    b.HasIndex("UnitId");
 
                     b.ToTable("Cars");
                 });
@@ -110,32 +108,6 @@ namespace KernelCars.Migrations
                     b.ToTable("CarModels");
                 });
 
-            modelBuilder.Entity("KernelCars.Models.CarService", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("CarId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("CompleteDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("OpenDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ServiceDescription")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("CarId");
-
-                    b.ToTable("CarServices");
-                });
-
             modelBuilder.Entity("KernelCars.Models.CarStatus", b =>
                 {
                     b.Property<int>("ID")
@@ -146,13 +118,16 @@ namespace KernelCars.Migrations
                     b.Property<DateTime>("BeginDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("CarId")
+                    b.Property<int>("CarId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("CarId1")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Comment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("StatusId")
@@ -163,44 +138,13 @@ namespace KernelCars.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CarId");
+                    b.HasIndex("CarId1");
 
                     b.HasIndex("StatusId");
 
                     b.HasIndex("UnitId");
 
                     b.ToTable("CarStatuses");
-                });
-
-            modelBuilder.Entity("KernelCars.Models.CarUser", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<long>("CarId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("EndUsingDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("StartUsingDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("CarUser");
                 });
 
             modelBuilder.Entity("KernelCars.Models.Department", b =>
@@ -312,21 +256,6 @@ namespace KernelCars.Migrations
                     b.ToTable("Statuses");
                 });
 
-            modelBuilder.Entity("KernelCars.Models.TypeOfService", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Service")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("TypeOfServices");
-                });
-
             modelBuilder.Entity("KernelCars.Models.Unit", b =>
                 {
                     b.Property<int>("UnitId")
@@ -353,21 +282,6 @@ namespace KernelCars.Migrations
                     b.ToTable("Units");
                 });
 
-            modelBuilder.Entity("KernelCars.Models.WorkAssigment", b =>
-                {
-                    b.Property<int>("TypeOfServiceId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CarServiceID")
-                        .HasColumnType("int");
-
-                    b.HasKey("TypeOfServiceId", "CarServiceID");
-
-                    b.HasIndex("CarServiceID");
-
-                    b.ToTable("WorkAssigment");
-                });
-
             modelBuilder.Entity("KernelCars.Models.Car", b =>
                 {
                     b.HasOne("KernelCars.Models.CarModel", "CarModel")
@@ -377,8 +291,12 @@ namespace KernelCars.Migrations
                         .IsRequired();
 
                     b.HasOne("KernelCars.Models.Employee", "CarOwner")
-                        .WithMany()
+                        .WithMany("Cars")
                         .HasForeignKey("CarOwnerId");
+
+                    b.HasOne("KernelCars.Models.Unit", null)
+                        .WithMany("Cars")
+                        .HasForeignKey("UnitId");
                 });
 
             modelBuilder.Entity("KernelCars.Models.CarModel", b =>
@@ -390,22 +308,11 @@ namespace KernelCars.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("KernelCars.Models.CarService", b =>
-                {
-                    b.HasOne("KernelCars.Models.Car", "Car")
-                        .WithMany("CarSevices")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("KernelCars.Models.CarStatus", b =>
                 {
                     b.HasOne("KernelCars.Models.Car", "Car")
                         .WithMany("CarStatuses")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("CarId1");
 
                     b.HasOne("KernelCars.Models.Status", "Status")
                         .WithMany()
@@ -414,23 +321,8 @@ namespace KernelCars.Migrations
                         .IsRequired();
 
                     b.HasOne("KernelCars.Models.Unit", "Unit")
-                        .WithMany("CarStatuses")
+                        .WithMany()
                         .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("KernelCars.Models.CarUser", b =>
-                {
-                    b.HasOne("KernelCars.Models.Car", "Car")
-                        .WithMany("CarUsers")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KernelCars.Models.Employee", "Employee")
-                        .WithMany("CarUsers")
-                        .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -447,7 +339,7 @@ namespace KernelCars.Migrations
             modelBuilder.Entity("KernelCars.Models.FirmDepartment", b =>
                 {
                     b.HasOne("KernelCars.Models.Department", "Department")
-                        .WithMany()
+                        .WithMany("FirmDepartments")
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -462,29 +354,14 @@ namespace KernelCars.Migrations
             modelBuilder.Entity("KernelCars.Models.Unit", b =>
                 {
                     b.HasOne("KernelCars.Models.Department", "Department")
-                        .WithMany("Units")
+                        .WithMany()
                         .HasForeignKey("DepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("KernelCars.Models.Firm", "Firm")
-                        .WithMany("Units")
+                        .WithMany()
                         .HasForeignKey("FirmId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("KernelCars.Models.WorkAssigment", b =>
-                {
-                    b.HasOne("KernelCars.Models.CarService", "CarService")
-                        .WithMany("WorkAssigments")
-                        .HasForeignKey("CarServiceID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KernelCars.Models.TypeOfService", "TypeOfService")
-                        .WithMany("WorkAssigments")
-                        .HasForeignKey("TypeOfServiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

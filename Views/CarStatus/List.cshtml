@@ -1,0 +1,20 @@
+﻿@model KernelCars.Models.ViewModels.CarStatusListViewModel
+@{
+    ViewData["Title"] = "List";
+}
+
+<h1>List</h1>
+
+@foreach (var item in Model.CarStatuses)
+{
+    <p>@item.Car.RegistrationNumber</p>
+}
+
+<ul class="pagination">
+    @for (int i = 1; i <= Model.PagingInfo.TotalPages; i++)
+    {
+            <li class="@(i == Model.PagingInfo.CurrentPage ? "page-item active" : "page-item")">
+                <a class="page-link" href="@Url.Action("List", new {status=Model.CurrentStatus , carPage = i })">@i</a>
+            </li>
+     }
+</ul>  

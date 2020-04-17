@@ -27,6 +27,18 @@
     <Compile Remove="Migrations\20200413112423_FirmDataUpdate1.Designer.cs" />
     <Compile Remove="Migrations\20200413114705_FirmDataUpdate3.cs" />
     <Compile Remove="Migrations\20200413114705_FirmDataUpdate3.Designer.cs" />
+    <Compile Remove="Migrations\20200413191804_CarStatusAdd.cs" />
+    <Compile Remove="Migrations\20200413191804_CarStatusAdd.Designer.cs" />
+    <Compile Remove="Migrations\20200413192614_CarStatusAdd.cs" />
+    <Compile Remove="Migrations\20200413192614_CarStatusAdd.Designer.cs" />
+    <Compile Remove="Migrations\20200413195044_CarStatusAdd1.cs" />
+    <Compile Remove="Migrations\20200413195044_CarStatusAdd1.Designer.cs" />
+    <Compile Remove="Migrations\20200413195329_CarStatusAdd1.cs" />
+    <Compile Remove="Migrations\20200413195329_CarStatusAdd1.Designer.cs" />
+    <Compile Remove="Migrations\20200413200909_CarStatusAdd1.cs" />
+    <Compile Remove="Migrations\20200413200909_CarStatusAdd1.Designer.cs" />
+    <Compile Remove="Migrations\20200414142911_AddCarService.cs" />
+    <Compile Remove="Migrations\20200414142911_AddCarService.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -32,5 +32,7 @@ namespace KernelCars.Models
         }
 
         public Firm Firm { get; set; }
+        public List <CarUser> CarUsers { get; set; }
+        //public List<CarStatus> CarStatuses { get; set; }
     }
 }

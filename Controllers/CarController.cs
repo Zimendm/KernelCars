@@ -30,22 +30,58 @@ namespace KernelCars.Controllers
         {
             _context = context;
         }
-        public IActionResult Index(int carPage = 1)
+        public IActionResult Index(string currentFilter, string searchString, int carPage = 1)
         {
+            if (searchString != null)
+            {
+                carPage = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            //var cars = _context.Cars
+            //        .Include(c => c.CarModel)
+            //        .ThenInclude(c => c.Manufacturer)
+            //        .Include(c => c.CarOwner); 
+            var cars = from c in _context.Cars
+                       select c;
+
+            //        .Skip((carPage - 1) * PageSize)
+            //       .Take(PageSize);
+            //.ToList();
+
+            if (String.IsNullOrEmpty(searchString))
+            {
+                cars = cars.Include(c => c.CarModel)
+                .ThenInclude(c => c.Manufacturer)
+                .Include(c => c.CarOwner)
+                .Skip((carPage - 1) * PageSize);
+                
+            }
+            else
+            {
+                cars = cars.Include(c => c.CarModel)
+                .ThenInclude(c => c.Manufacturer)
+                .Include(c => c.CarOwner)
+                .Where(c => c.RegistrationNumber.Contains(searchString))
+                .Skip((carPage - 1) * PageSize);
+                
+            }
+
+
             return View(
                 new CarsListViewModel {
-                    Cars =_context.Cars
-                    .Include(c => c.CarModel)
-                    .ThenInclude(c => c.Manufacturer)
-                    .Include(c=>c.CarOwner)
-                    .Skip((carPage - 1) * PageSize)
-                    .Take(PageSize)
-                    .ToList(),
+                    Cars =cars
+                    .ToList().Take(PageSize),
                     PagingInfo = new PagingInfo
                     {
                         CurrentPage=carPage,
                         ItemsPerPage=PageSize,
-                        TotalItems=_context.Cars.Count()
+                        TotalItems=cars.Count()
                     }
                 }
 
@@ -96,6 +132,7 @@ namespace KernelCars.Controllers
             ViewBag.ManufacturerId = new SelectList(manufacturersQuery.AsNoTracking(), "ManufacturerId", "Name");
 
             var carModelsQuery = from m in _context.CarModels
+                                 where m.ManufacturerId==car.CarModel.ManufacturerId
                                      orderby m.Model
                                      select m;
             ViewBag.CarModelId = new SelectList(carModelsQuery.AsNoTracking(), "CarModelId", "Model");
@@ -120,7 +157,7 @@ namespace KernelCars.Controllers
             //c.CarTypeId = car.CarTypeId;
 
             var owner = (from o in _context.Employees
-                        where o.FirstName == owners
+                        where o.LastName == owners
                         select o).First();
 
             if (owner != null)
@@ -161,9 +198,9 @@ namespace KernelCars.Controllers
         private void PopulateOwnersDropDownList(object selectedOwner = null)
         {
             var ownersQuery = from o in _context.Employees
-                              orderby o.FirstName
+                              orderby o.FullName
                               select o;
-            ViewBag.OwnerID = new SelectList(ownersQuery.AsNoTracking(), "Id", "FirstName", selectedOwner);
+            ViewBag.OwnerID = new SelectList(ownersQuery.AsNoTracking(), "Id", "FullName", selectedOwner);
         }
 
         [HttpGet]
@@ -176,7 +213,7 @@ namespace KernelCars.Controllers
         [HttpGet]
         public JsonResult GetCarOwnerList(int ManufacturerId)
         {
-            var carTypelist = new SelectList(_context.Employees, "Id", "FirstName");
+            var carTypelist = new SelectList(_context.Employees, "Id", "FullName");
             return Json(carTypelist);
         }
 
@@ -195,12 +232,10 @@ namespace KernelCars.Controllers
             //}
             return File(testFile.ImagePage1, "image/jpg", "testfile.jpg");
         }
-
         public IActionResult WorkWithData()
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
@@ -387,7 +422,6 @@ namespace KernelCars.Controllers
 
             //return RedirectToAction("WorkWithData");
         }
-
         static DataTable ReadExcelasJSON(string fileName)
         {
             DataTable dtTable = new DataTable();
@@ -701,7 +735,6 @@ namespace KernelCars.Controllers
 
             return dtTable;
         }
-
         public static void CreateSpreadsheetWorkbook(string filepath,DataTable dataTable)
         {
             // Create a spreadsheet document by supplying the filepath.
@@ -788,7 +821,6 @@ namespace KernelCars.Controllers
             // Close the document.
             spreadsheetDocument.Close();
         }
-
         void UpdateData(DataTable dataTable)
         {
             ///*Получение моделей авто*/
@@ -920,11 +952,5 @@ namespace KernelCars.Controllers
             }
             _context.SaveChanges();
         }
-        //public ActionResult GetImage()
-        //{
-        //    /MemoryStream ms = new MemoryStream();
-
-        //    return null;
-        //}
     }
 }

@@ -19,6 +19,12 @@ namespace KernelCars.Data
         public DbSet <Firm> Firms { get; set; }
         public DbSet <Department> Departments { get; set; }
         public DbSet <Unit> Units { get; set; }
+        public DbSet <Status> Statuses { get; set; }
+        public DbSet<CarStatus> CarStatuses { get; set; }
+
+        public DbSet<CarService> CarServices { get; set; }
+        public DbSet<FirmDepartment> FirmDepartment { get; set; }
+        public DbSet<TypeOfService> TypeOfServices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,8 +43,19 @@ namespace KernelCars.Data
             modelBuilder.Entity<Manufacturer>()
                 .HasIndex(m => new { m.Name })
                 .IsUnique(true);
+            modelBuilder.Entity<WorkAssigment>()
+                .HasKey(c => new { c.TypeOfServiceId, c.CarServiceID });
+
+
+            //modelBuilder.Entity<CarStatus>()
+            //    .HasOne<Employee>(e => e.Employee)
+            //    .WithMany(cs => cs.CarStatuses)
+            //    .HasForeignKey(e => e.EmployeeId)
+            //    .OnDelete(DeleteBehavior.Restrict);
         }
 
-        public DbSet<KernelCars.Models.FirmDepartment> FirmDepartment { get; set; }
+        
+
+        
     }
 }

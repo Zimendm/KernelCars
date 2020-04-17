@@ -12,6 +12,6 @@ namespace KernelCars.Models
         //public bool IsAgriBusines { get; set; }
 
         //public List<Firm> Firms { get; set; }
-        public ICollection<FirmDepartment> FirmDepartments { get; set; }
+        public ICollection<Unit> Units { get; set; }
     }
 }

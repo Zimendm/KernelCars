@@ -22,7 +22,7 @@ namespace KernelCars.Controllers
         // GET: Units
         public async Task<IActionResult> Index()
         {
-            var dataContext = _context.Units.Include(u => u.Department).Include(u => u.Firm);
+            var dataContext = _context.Units.Include(u => u.Department).Include(u => u.Firm).ThenInclude(u=>u.Employee);
             return View(await dataContext.ToListAsync());
         }
 
