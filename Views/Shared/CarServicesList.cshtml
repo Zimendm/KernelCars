@@ -34,7 +34,7 @@
                     @service.Odometr
                 </td>
                 <td>
-                    @service.Odometr
+                    @service.Ammount
                 </td>
                 <td>
                     @if (service.CompleteDate == null)
@@ -43,7 +43,7 @@
                     }
                     else
                     {
-                        <a asp-controller="CarServices" asp-action="Edit" asp-route-id="@service.ID">Просмотреть</a>
+                        <a asp-controller="CarServices" asp-action="Details" asp-route-id="@service.ID">Просмотреть</a>
                     }
                     @if (service.CompleteDate == null)
                     {

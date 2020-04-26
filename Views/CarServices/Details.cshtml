@@ -10,32 +10,110 @@
     <h4>CarService</h4>
     <hr />
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.OpenDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.OpenDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.CompleteDate)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CompleteDate)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Odometr)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Odometr)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Ammount)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Ammount)
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ServiceDescription)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.ServiceDescription)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Car)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Car.Id)
         </dd>
+        
     </dl>
-</div>
+
+    <div class="form-group">
+        <b>Выполненные работы:</b>
+        <div class="col-md-offset-2 col-md-10">
+            <table>
+                <tr>
+                    @{
+                        int cnt = 0;
+                        List<KernelCars.Models.ViewModels.AssignedTypeOfService> services = ViewBag.Works;
+
+                        foreach (var service in services)
+                        {
+                            if (cnt++ % 3 == 0)
+                            {
+                            @:</tr><tr>
+                            }
+                            @:<td>
+                                <input type="checkbox"
+                                       name="selectedWorks"
+                                       value="@service.TypeOfServiceID"
+                                       @(Html.Raw(service.IsAssigned ? "checked=\"checked\"" : "")) disabled/>
+                                @service.Service
+                            @:</td>
+                        }
+                    @:</tr>
+                    }
+                </table>
+            </div>
+        </div>
+
+
+        @if (@Model.DocumentPath != null)
+        {
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapsePhoto" aria-expanded="false" aria-controls="collapsePhoto">
+                    Акт/Накладная
+                </button>
+            </p>
+            <div class="collapse" id="collapsePhoto">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>@Html.ActionLink("Скачать Акт/Накладную", "GetPDF", "CarServices", new { fileName = Model.DocumentPath })</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <iframe src=@Url.Action("GetPDFtoPreview", "CarServices", new { fileName = Model.DocumentPath }) width="600" height="200"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+@*<dl>
+    @if (@Model.DocumentPath != null)
+    {
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DocumentPath)
+        </dt>
+        <dd class="col-sm-10">
+            
+        </dd>
+
+    }
+</dl>*@
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
     <a asp-action="Index">Back to List</a>

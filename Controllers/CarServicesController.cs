@@ -13,6 +13,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using System.Net;
 
+
 namespace KernelCars.Controllers
 {
     public class CarServicesController : Controller
@@ -46,15 +47,54 @@ namespace KernelCars.Controllers
 
             var carService = await _context.CarServices
                 .Include(c => c.Car)
+                .Include(cs => cs.WorkAssigments)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (carService == null)
             {
                 return NotFound();
             }
 
+            //string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, @"AccountingDocuments");
+            //string filePath = Path.Combine(uploadFolder, carService.DocumentPath);
+
+            //ViewData["Scan"] = "~/AccountingDocuments/"+ carService.DocumentPath;
+
+            PopulateAssignedWorks(carService);
             return View(carService);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetPDF(string fileName)
+        {
+            string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, @"AccountingDocuments");
+            string filePath = Path.Combine(uploadFolder, fileName);
+            //string filePath = Path.Combine(uploadFolder, "Test.pdf");
+
+            //Response.Headers.Add("Content-Disposition", "inline; filename=" + fileName);
+            //return File(filePath, "application/pdf","testFile.pdf");
+
+            var memory = new MemoryStream();
+            using (var stream = new FileStream(filePath, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            //GetContentType(filePath)
+
+            Response.Headers.Add("Content-Disposition", $"inline; filename=\"{fileName}\"");
+            return File(memory, "application/pdf", fileName);
+
+
+
+        }
+
+        [HttpGet]
+        public FileStreamResult GetPDFtoPreview(string fileName)
+        {
+            FileStream fs = new FileStream(Path.Combine(Path.Combine(hostingEnvironment.WebRootPath, @"AccountingDocuments"), fileName), FileMode.Open, FileAccess.Read);
+            return File(fs, "application/pdf");
+        }
 
         public IActionResult CarSeviceList(int carId)
         {
@@ -180,13 +220,14 @@ namespace KernelCars.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public RedirectToActionResult Close([Bind("CarServiceId", "CarService")] CarCloseServiceViewModel model)
+        public RedirectToActionResult Close([Bind("CarServiceId", "CarService", "DocumentScan")] CarCloseServiceViewModel model)
         {
+            string uniqueFileName = null;
             if (ModelState.IsValid)
             {
                 try
                 {
-                    string uniqueFileName = null;
+                    
                     if (model.DocumentScan != null)
                     {
                         string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, @"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\AccountingDocuments\");
@@ -217,6 +258,14 @@ namespace KernelCars.Controllers
                 if (model.CarService.Odometr!=0)
                 {
                     carServiceToClose.Odometr = model.CarService.Odometr;
+                }
+                if (model.CarService.Ammount > 0)
+                {
+                    carServiceToClose.Ammount = model.CarService.Ammount;
+                }
+                if (uniqueFileName!=null)
+                {
+                    carServiceToClose.DocumentPath = uniqueFileName;
                 }
 
                 _context.SaveChanges();
