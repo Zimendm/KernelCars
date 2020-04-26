@@ -21,8 +21,18 @@ namespace KernelCars.Components
         {
             //ViewBag.SelectedStatus = RouteData?.Values["CarStatus"];
 
-            //todo заменить на Route Value
-            ViewBag.SelectedStatus = (HttpContext.Request.Query["status"]).ToString();
+            //todo заменить на Route Value Как нибудь изменить потом
+
+            //if ((HttpContext.Request.Query["status"]).ToString()=="")
+            //{
+            //    var status = _context.Statuses.FirstOrDefault();
+            //    ViewBag.SelectedStatus = status.State;// (HttpContext.Request.Query["status"]).ToString();
+            //}
+            //else
+            //{
+                ViewBag.SelectedStatus = (HttpContext.Request.Query["status"]).ToString();
+            //}
+            
 
 
             IEnumerable<string> statuses = from s in _context.Statuses

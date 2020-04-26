@@ -1,12 +1,16 @@
-﻿@model KernelCars.Models.CarStatus
+﻿@model KernelCars.Models.Car
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <h1>Details</h1>
+@foreach (var services in @Model.CarSevices)
+{
+    
+}
 
-<div>
+@*<div>
     <h4>CarStatus</h4>
     <hr />
     <dl class="row">
@@ -51,4 +55,4 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
     <a asp-action="Index">Back to List</a>
-</div>
+</div>*@

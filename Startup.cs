@@ -105,7 +105,7 @@ namespace KernelCars
 
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");// .MapControllers();
+                    pattern: "{controller=Car}/{action=List}/{id?}");// .MapControllers();
                 //endpoints.MapRazorPages();
                 //endpoints.MapBlazorHub();
 

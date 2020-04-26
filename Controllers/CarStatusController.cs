@@ -14,7 +14,7 @@ namespace KernelCars.Controllers
     public class CarStatusController : Controller
     {
         private readonly DataContext _context;
-        private int PageSize = 1;
+        private int PageSize = 5;
 
         public CarStatusController(DataContext context)
         {
@@ -28,26 +28,43 @@ namespace KernelCars.Controllers
             return View(await dataContext.ToListAsync());
         }
 
-        public ViewResult List(string status, int carPage = 1)
+        public ViewResult List(string status="In Use", int carPage = 1)
         {
             List<CarStatus> cs;
-            if (String.IsNullOrEmpty(status))
-            {
-                cs= _context.CarStatuses.Include(s => s.Status).Include(s => s.Car)
+            List<CarStatusViewModel> csView=new List<CarStatusViewModel>();
+            //if (String.IsNullOrEmpty(status))
+            //{
+            //    //cs = _context.CarStatuses.Include(s => s.Status)
+            //    //    .Include(s => s.Car).ThenInclude(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            //    //    .Include(c => c.Unit).ThenInclude(u => u.Firm).ThenInclude(f => f.Employee)
+            //    //    .Include(c => c.Unit).ThenInclude(u => u.Department)
+            //    //    .Include(c => c.Location)
+            //    //    .Include(c => c.Car.CarOwner)
+            //    //    .ToList();
+            //}
+            //else
+            //{
+                cs = _context.CarStatuses.Include(s => s.Status)
+                    .Include(s => s.Car).ThenInclude(c=>c.CarModel).ThenInclude(c=>c.Manufacturer)
+                    .Include(c=>c.Unit).ThenInclude(u=>u.Firm).ThenInclude(f=>f.Employee)
+                    .Include(c=>c.Unit).ThenInclude(u=>u.Department)
+                    .Include(c=>c.Location)
+                    .Include(c=>c.Car.CarOwner)
+                    .Where(s => s.Status.State == status || String.IsNullOrEmpty(s.Status.State))
                     .ToList();
-            }
-            else
-            {
-                cs = _context.CarStatuses.Include(s => s.Status).Include(s => s.Car)
-                    .Where(s => s.Status.State == status)
-                    .ToList();
-            }
+
+                foreach (var item in cs)
+                {
+                    CarStatusViewModel v = new CarStatusViewModel(item);
+                    csView.Add(v);
+                }
+            //}
             
 
             return View(
                 new CarStatusListViewModel
                 {
-                    CarStatuses = cs
+                    CarStatuses = csView
                      .Skip((carPage - 1) * PageSize)
                     .Take(PageSize),
                     PagingInfo = new PagingInfo
@@ -73,7 +90,7 @@ namespace KernelCars.Controllers
                 .Include(c => c.Car)
                 .Include(c => c.Status)
                 .Include(c => c.Unit)
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.CarId == id);
             if (carStatus == null)
             {
                 return NotFound();

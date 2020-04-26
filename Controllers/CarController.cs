@@ -96,6 +96,101 @@ namespace KernelCars.Controllers
                 );
         }
 
+        public IActionResult List(string status, int carPage = 1)
+        {
+            var carsQuery = _context.Cars
+                .Include(c=>c.CarModel).ThenInclude(c=>c.Manufacturer)
+                .Include(c => c.CarOwner)
+                .Include(c=>c.CarStatuses).ThenInclude(c=>c.Unit).ThenInclude(c=>c.Firm).ThenInclude(c=>c.Employee)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                .Include(c=>c.CarUsers).ThenInclude(c=>c.Employee)
+                .Include(c=>c.CarStatuses).ThenInclude(c=>c.Status)
+                .ToList();
+
+            List<Car> cars = new List<Car>();
+            if (status==null)
+            {
+                foreach (var item in carsQuery)
+                {
+                    cars.Add(item);
+                }
+            }
+            else
+            {
+                if (status != "Undefined")
+                {
+                    foreach (var item in carsQuery)
+                    {
+                        if (item.CarStatuses.Count >= 1)
+                        {
+                            if (item.CarStatuses.LastOrDefault().Status.State == status)
+                            {
+                                cars.Add(item);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in carsQuery)
+                    {
+                        if (item.CarStatuses.Count == 0)
+                        {
+                            //if (item.CarStatuses.LastOrDefault().Status.State == status)
+                            //{
+                                cars.Add(item);
+                            //}
+                        }
+                    }
+                }
+            }
+
+
+            //foreach (var item in cars)
+            //{
+            //    if (item.CarOwner == null)
+            //    {
+            //        int lskl = 0;
+            //    }
+            //}
+            
+
+            return View(cars);
+        }
+
+        public IActionResult Details(int? id)
+        {
+            if (id==null)
+            {
+                return NotFound();
+            }
+
+            var car = _context.Cars
+                .Include(c => c.CarModel).ThenInclude(c=>c.Manufacturer)
+                .Include(c => c.CarOwner)
+                .Include(c => c.CarSevices)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+                .Where(c => c.Id == id)
+                .FirstOrDefault();
+            if (car==null)
+            {
+                return NotFound();
+            }
+
+            if (car.CarStatuses.LastOrDefault()!=null)
+            {
+                ViewData["CarStatus"] = car.CarStatuses.LastOrDefault().Status.State;
+            }
+            else
+            {
+                ViewData["CarStatus"] = "Undefined";
+            }
+            
+            return View(car);
+        }
         public IActionResult Create()
         {
             var manufacturerQuery = from m in _context.Manufacturers

@@ -1,0 +1,116 @@
+﻿@model KernelCars.Models.ViewModels.CarCloseServiceViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>CarService</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form enctype="multipart/form-data" asp-action="Close" method="post">
+            <input asp-for="CarServiceId" hidden />
+            @*<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ID" />
+        <div class="form-group">
+            <label asp-for="OpenDate" class="control-label"></label>
+            <input asp-for="OpenDate" class="form-control" />
+            <span asp-validation-for="OpenDate" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CompleteDate" class="control-label"></label>
+            <input asp-for="CompleteDate" class="form-control" />
+            <span asp-validation-for="CompleteDate" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ServiceDescription" class="control-label"></label>
+            <input asp-for="ServiceDescription" class="form-control" />
+            <span asp-validation-for="ServiceDescription" class="text-danger"></span>
+        </div>*@
+            <div class="form-group">
+                <label asp-for="CarService.OpenDate" class="control-label"></label>
+                <input asp-for="CarService.OpenDate" class="form-control" disabled />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CarService.CompleteDate" class="control-label"></label>
+                <input asp-for="CarService.CompleteDate" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="CarService.Odometr" class="control-label"></label>
+                <input asp-for="CarService.Odometr" class="form-control" />
+            </div>
+            @* Заменить на стоимость выполенных работ *@
+            <div class="form-group">
+                <label asp-for="CarService.Odometr" class="control-label"></label>
+                <input asp-for="CarService.Odometr" class="form-control" />
+            </div>
+
+
+            <div class="form-group">
+                <label>Выполненные работы:</label>
+                <div class="col-md-offset-2 col-md-10">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+                                List<KernelCars.Models.ViewModels.AssignedTypeOfService> services = ViewBag.Works;
+
+                                foreach (var service in services)
+                                {
+                                    if (cnt++ % 3 == 0)
+                                    {
+                                    @:</tr><tr>
+                                    }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedWorks"
+                                               value="@service.TypeOfServiceID"
+                                               @(Html.Raw(service.IsAssigned ? "checked=\"checked\"" : "")) />
+                                        @service.Service
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CarService.ServiceDescription" class="control-label"></label>
+                    <textarea asp-for="CarService.ServiceDescription" class="form-control" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Скан-копия акта/накладной</label>
+                    <div class="custom-file">
+                        <input type="file" class="form-control custom-file-input" asp-for="DocumentScan" />
+                        <label class="custom-file-label">Выберите акт...</label>
+                    </div>
+                </div>
+                <script>
+                    // Add the following code if you want the name of the file appear on select
+                    $(".custom-file-input").on("change", function () {
+                        var fileName = $(this).val().split("\\").pop();
+                        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);});
+                </script>
+
+
+                @*<div class="form-group">
+                <label asp-for="CarId" class="control-label"></label>
+                <select asp-for="CarId" class="form-control" asp-items="ViewBag.CarId"></select>
+                <span asp-validation-for="CarId" class="text-danger"></span>
+            </div>*@
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

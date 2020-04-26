@@ -8,7 +8,9 @@ namespace KernelCars.Models
 {
     public enum TypeOfFuel
     {
-        B, D, E
+        Benzine,
+        Diesel, 
+        Electro
     }
 
     public class Car
@@ -25,6 +27,8 @@ namespace KernelCars.Models
         [DisplayName("Объём двигателя")]
         public int EngineCapacity { get; set; }
         // Ёмкость бака
+        [DisplayName("Топливо")]
+        public TypeOfFuel? Fuel { get; set; }
         [DisplayName("Ёмкость бака")]
         public int TankCapacity { get; set; }
         [DisplayName("Размер шин")]
@@ -42,6 +46,114 @@ namespace KernelCars.Models
         public List<CarStatus> CarStatuses { get; set; }
         public List<CarUser> CarUsers { get; set; }
         public List<CarService> CarSevices { get; set; }
+
+
+        public bool IsPrivat 
+        {
+            get 
+            {
+                if (!CarOwner.IsFirm)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        }
+        public bool IsRentCar 
+        { 
+            get 
+            {
+                try
+                {
+                    var status = (from s in CarStatuses
+                                  select s).LastOrDefault();
+
+                    if (status!=null)
+                    {
+                        if (CarOwnerId != status.Unit.Firm.EmployeeId)
+                        {
+                            return true;
+                        }
+                        
+                    }
+                    return false;
+                }
+                catch (Exception)
+                {
+
+                    return false;
+                }
+            }
+        }
+        public bool IsEnableService 
+        {
+            get
+            {
+                try
+                {
+                    var status = (from s in CarStatuses
+                                  select s).LastOrDefault();
+
+                    if (status != null)
+                    {
+                        return status.IsEnableService;
+                    }
+                    return false;
+                }
+                catch (Exception)
+                {
+
+                    return false;
+                }
+            }
+                
+        }
+        public string DepartmentNameForView 
+        {
+            get
+            {
+                var status = (from s in CarStatuses
+                              select s).LastOrDefault();
+
+                if (status != null)
+                {
+                    return status.Unit.Department.Name;
+                }
+                return "";
+            }
+        }
+        public string FullNameFirmForView 
+        {
+            get
+            {
+                var status = (from s in CarStatuses
+                              select s).LastOrDefault();
+
+                if (status != null)
+                {
+                    return status.Unit.Firm.Employee.FullName;
+                }
+                return "";
+            }
+        }
+        public string CarUserForView
+        {
+            get
+            {
+                var carUser = (from u in CarUsers
+                              select u).LastOrDefault();
+
+                if (carUser != null)
+                {
+                    return carUser.Employee.FullName;
+                }
+                return "";
+            }
+        }
+
 
 
         //Вспомогательные временные поля

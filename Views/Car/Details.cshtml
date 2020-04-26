@@ -1,0 +1,378 @@
+﻿@model KernelCars.Models.Car
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<style>
+    /*DL, DT, DD TAGS LIST DATA*/
+    dl {
+        margin-bottom: 50px;
+    }
+
+        dl dt {
+            font-weight:normal;
+            float: left;
+            margin-right: 10px;
+            padding: 5px;
+            width: 150px;
+        }
+
+        dl dd {
+            font-weight: bold;
+            margin: 2px 0;
+            padding: 5px 0;
+        }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var url = "/Car/GetCarOwnerList";
+        var manufacturerId = 1;
+        $.getJSON(url, { ManufacturerId: manufacturerId }, function (data) {
+            $.each(data, function (i, cartype) {
+                //alert("Hello");
+                //$.each(data, function (i, item) {
+                //$("#owners").append($("<option>").attr('value', cartype.value).text(cartype.text));
+                //$("#owners").append($("<option>").attr('value',cartype.value).text(cartype.text));
+                $("#owners").append($("<option>").text(cartype.text));
+                //});
+            });
+        });
+        //var url = "/Car/GetCarTypeList";
+        //$.getJSON(url, { ManufacturerId: "3" }, function (data) {
+        //    $.each(data, function (i, cartype) {
+        //        alert(cartype.text);
+        //    });
+        //});
+        //$.getJSON(url1, { ManufacturerId: manufacturerId }, function (data) {
+        //$("#carTypeList").empty();
+        //var item = "<option value='0'>-- Выберите модель --</option>";
+        //$.each(data, function (i, cartype) {
+        //    item += '<option value="' + cartype.text + '">' + '</option>'
+        //});
+        //$("#owners").html(item);
+        //// se.show();
+        // se[0].clientHeight = 2;
+
+        $("#image,#image1").click(function () {
+            //$(this).rotate(90);
+            //alert("Rotate");
+
+            var angle = ($(this).data('angle') + 90) || 90;
+            $(this).css({ 'transform': 'rotate(' + angle + 'deg)' });
+            $(this).data('angle', angle);
+            $(this).css({ 'margin-top': 0 });
+            //$(this).css({ 'max-height':'400px'});
+
+        });
+
+        //});
+
+
+        $("#manufacturerList").change(function () {
+            var manufacturerId = $("#manufacturerList").val();
+            //$("#carTypeList").simulate('mousedown');
+            var url = "/Car/GetCarTypeList";
+            $.getJSON(url, { ManufacturerId: manufacturerId }, function (data) {
+                $("#carTypeList").empty();
+                var item = "<option value='0'>-- Выберите модель --</option>";
+                $.each(data, function (i, cartype) {
+
+                    item += '<option value="' + cartype.value + '">' + cartype.text + '</option>'
+
+                });
+                $("#carTypeList").html(item);
+
+                //var nameArray = ["Rick Bross", "Madison Smith", "Jack Johnson"];
+
+                //                Add options to the datalist.
+                //- "attr" helps if you need an i.d to identify each option.
+                //- "text" is the content to be displayed.
+
+                //$.each(data, function (i, item) {
+                //    $("#owners").append($("<option>").attr('value', i.value).text(item.text));
+                //});
+
+                // se.show();
+                // se[0].clientHeight = 2;
+
+            });
+            //$("#carTypeList").trigger('mousedown');
+
+
+
+
+
+
+
+        });
+        //$("#ownerList").keyup(function () {
+        //    var elem = $("<option value='Udo'></option>");
+        //    $("owners").add(elem);
+        //});
+    });
+</script>
+
+<div class="card">
+    <div class="card-header">
+        <h2><b>@Model.RegistrationNumber</b></h2>
+        <span class="badge badge-pill badge-success" style="float:left">@ViewBag.CarStatus</span>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-sm">
+                <dl>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.CarModel.Manufacturer.Name)
+                    </dt>
+                    <dd>
+                        @Model.CarModel.Manufacturer.Name
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.CarModel.Model)
+                    </dt>
+                    <dd>
+                        @Model.CarModel.Model
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.FirstRegistrationYear)
+                    </dt>
+                    <dd>
+                        @Model.FirstRegistrationYear
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.VinNumber)
+                    </dt>
+                    <dd>
+                        @Model.VinNumber<b style="color:white">.</b>
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.EngineCapacity)
+                    </dt>
+                    <dd>
+                        @Model.EngineCapacity
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Fuel)
+                    </dt>
+                    <dd>
+                        @Model.Fuel <b style="color:white">.</b>
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.TankCapacity)
+                    </dt>
+                    <dd>
+                        @Model.TankCapacity
+                    </dd>
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Tyres)
+                    </dt>
+                    <dd>
+                        <b style="color:white">.</b>@Model.Tyres
+                    </dd>
+                    @if (@Model.LPG)
+                    {
+                        @:<dt>@Html.DisplayNameFor(model => model.LPG)</dt>
+                        @:<dd><input type="checkbox" value="@Model.LPG" disabled /></dd>
+                    }
+
+                </dl>
+            </div>
+
+
+
+
+
+
+            <div class="col-sm">
+                <dl>
+                    <dt>
+                        Владелец:
+                    </dt>
+                    <dd>
+                        @Model.CarOwner.FullName
+                    </dd>
+                    @if (@Model.CarStatuses.Count >= 1)
+                    {
+                        <dt>Подразделение:</dt>
+                        <dd>@Model.DepartmentNameForView (@Model.FullNameFirmForView)</dd>
+                    }
+
+                    @if (@Model.CarUserForView != "")
+                    {
+                        @:<dt>Водитель:</dt>
+                        @:<dd>@Model.CarUserForView</dd>
+                    }
+                    @if (@Model.IsRentCar)
+                    {
+                        @:<dt>Авто в аренде</dt>
+                        @:<dd><input type="checkbox" value="@Model.IsRentCar" @(Html.Raw(Model.IsRentCar ? "checked=\"checked\"" : "")) disabled /><b style="color:white">.</b></dd>
+                    }
+                    @if (@Model.IsPrivat)
+                    {
+                        @:<dt>Частный авто</dt>
+                        @:<dd><input type="checkbox" value="@Model.IsRentCar" @(Html.Raw(Model.IsPrivat ? "checked=\"checked\"" : "")) disabled /><b style="color:white">.</b></dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+        <div @(Html.Raw(@Model.ImagePage1 == null ? "hidden" : ""))>
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapsePhoto" aria-expanded="false" aria-controls="collapsePhoto">
+                    Техпаспорт
+                </button>
+            </p>
+            <div class="collapse" id="collapsePhoto">
+                @*<div class="card card-body">*@
+                <div class="row">
+                    <div class="col-sm text-center">
+                        @*<div style="height:600px">*@
+                        @{
+                            try
+                            {
+                                var base64 = Convert.ToBase64String(Model.ImagePage1);
+                                var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                                <img src="@imgsrc" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
+                            }
+
+                        }
+
+                        @*@Html.ActionLink("Download", "DownloadFile")*@
+                        @*</div>*@
+                    </div>
+                    <div class="col-sm text-center">
+                        @{
+                            try
+                            {
+                                var base64 = Convert.ToBase64String(Model.ImagePage1);
+                                var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                                <img src="@imgsrc" class="img-thumbnail" id="image1" style="width:auto;height:400px;transform-origin:center center" />
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
+                            }
+
+                        }
+                    </div>
+                    <div class="col-sm">
+
+                    </div>
+                </div>
+                @*</div>*@
+            </div>
+        </div>
+        <div @(Html.Raw(@Model.CarStatuses.Count < 2 ? "hidden" : ""))>
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseStatus" aria-expanded="false" aria-controls="collapseStatus">
+                    Статусы
+                </button>
+            </p>
+            <div class="collapse" id="collapseStatus">
+                <div class="card card-body">
+                    Список статусов авто (в разработке)
+                </div>
+            </div>
+        </div>
+        <div @(Html.Raw(@Model.CarUsers.Count < 2 ? "hidden" : ""))>
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseUser" aria-expanded="false" aria-controls="collapseUser">
+                    Пользователи
+                </button>
+            </p>
+            <div class="collapse" id="collapseUser">
+                <div class="card card-body">
+                    Список пользователей авто (в разработке)
+                </div>
+            </div>
+        </div>
+
+        @* Информация о техническом обслуживании авто *@
+        <div @(Html.Raw(@Model.CarSevices.Count < 1 ? "hidden" : ""))>
+            <p>
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseService" aria-expanded="false" aria-controls="collapseService">
+                    Тех.обслуживание
+                </button>
+            </p>
+            <div class="collapse" id="collapseService">
+                
+                <div class="card">
+                    <partial name="CarServicesList" model="Model.CarSevices"/>
+                </div>
+            </div>
+            <div >
+                <p>
+                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseTemp" aria-expanded="false" aria-controls="collapseTemp">
+                        Временно
+                    </button>
+                </p>
+                <div class="collapse" id="collapseTemp">
+                    <div class="card">
+
+                        <div class="card-header">
+                            <h4>Временная справочная инфо</h4>
+                        </div>
+                        <div class="card-body">
+                            <dl>
+                                <dt class="col-sm-3">
+                                    @Html.DisplayNameFor(model => model.CarModel)
+                                </dt>
+                                <dd class="col-sm-9">
+                                    @Html.DisplayFor(model => model.CarModel.CarModelId)
+                                </dd>
+                                <dt class="col-sm-3">
+                                    @Html.DisplayNameFor(model => model.CarOwner)
+                                </dt>
+                                <dd class="col-sm-9">
+                                    @Html.DisplayFor(model => model.CarOwner.Id)
+                                </dd>
+                                <dt class="col-sm-3">
+                                    @Html.DisplayNameFor(model => model.TempUser)
+                                </dt>
+                                <dd class="col-sm-9">
+                                    @Html.DisplayFor(model => model.TempUser)
+                                </dd>
+                                <dt class="col-sm-2">
+                                    @Html.DisplayNameFor(model => model.TempModel)
+                                </dt>
+                                <dd class="col-sm-10">
+                                    @Html.DisplayFor(model => model.TempModel)
+                                </dd>
+                                <dt class="col-sm-2">
+                                    @Html.DisplayNameFor(model => model.TempOwner)
+                                </dt>
+                                <dd class="col-sm-10">
+                                    @Html.DisplayFor(model => model.TempOwner)
+                                </dd>
+                                <dt class="col-sm-2">
+                                    @Html.DisplayNameFor(model => model.TempType)
+                                </dt>
+                                <dd class="col-sm-10">
+                                    @Html.DisplayFor(model => model.TempType)
+                                </dd>
+                                <dt class="col-sm-2">
+                                    @Html.DisplayNameFor(model => model.TempInv)
+                                </dt>
+                                <dd class="col-sm-10">
+                                    @Html.DisplayFor(model => model.TempInv)
+                                </dd>
+                                <dt class="col-sm-2">
+                                    @Html.DisplayNameFor(model => model.TempFirm)
+                                </dt>
+                                <dd class="col-sm-10">
+                                    @Html.DisplayFor(model => model.TempFirm)
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+         </div>
+    </div>
+</div>

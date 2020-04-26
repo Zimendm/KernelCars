@@ -39,6 +39,10 @@
     <Compile Remove="Migrations\20200413200909_CarStatusAdd1.Designer.cs" />
     <Compile Remove="Migrations\20200414142911_AddCarService.cs" />
     <Compile Remove="Migrations\20200414142911_AddCarService.Designer.cs" />
+    <Compile Remove="Migrations\20200418052525_UpdateCarStatusModel.cs" />
+    <Compile Remove="Migrations\20200418052525_UpdateCarStatusModel.Designer.cs" />
+    <Compile Remove="Migrations\20200426082512_AddAmmountToService.cs" />
+    <Compile Remove="Migrations\20200426082512_AddAmmountToService.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,6 +58,10 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\AccountingDocuments\" />
   </ItemGroup>
 
 </Project>

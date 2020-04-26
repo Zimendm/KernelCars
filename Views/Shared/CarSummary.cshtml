@@ -1,7 +1,58 @@
-﻿@model Car
+﻿@model KernelCars.Models.ViewModels.CarStatusViewModel
 
-    <div class="card border-secondary m-1 p-1">
+    <div class="card border-secondary m-1 p-1 carList">
         <div class="card-body">
-            @Model.RegistrationNumber
+            <p class="searchField"> @Model.Car.CarModel.Manufacturer.Name @Model.Car.CarModel.Model (<b>@Model.Car.RegistrationNumber</b>) Владелец: <b>@Model.Car.CarOwner.FullName</b></p>
+
+            <p class="searchField">
+                Подразделение: <b>@Model.Unit.Department.Name</b> (@Model.Unit.Firm.Employee.FullName)
+                <div @(Html.Raw(Model.IsRentCar ? "style=\"display:block\"" : "style=\"display:none\""))>
+                    <input type="checkbox"
+                           value="@Model.IsRentCar"
+                           @(Html.Raw(Model.IsRentCar ? "checked=\"checked\"" : ""))
+                           disabled /> Арендованный автомобиль
+                </div>
+                <div @(Html.Raw(Model.IsPrivat ? "style=\"display:block\"" : "style=\"display:none\""))>
+                    <input type="checkbox" class="custom-checkbox"
+                           value="@Model.IsPrivat"
+                           @(Html.Raw(Model.IsPrivat ? "checked=\"checked\"" : ""))
+                           disabled /> Частный автомобиль
+                </div>
+            </p>
+            @*<p> Дислокация: @Model.Location.LocationName</p>*@
+            <a class="card-link" asp-controller="Car" asp-action="Details" asp-route-id="@Model.CarId">Подробно</a>
+            @if (@Model.IsEnableService)
+            {
+                <a class="card-link" asp-controller="CarServices" asp-action="Create" asp-route-carId="@Model.CarId">Запись на ТО</a>
+            }
+
+            @*<div class="row">
+        <div class="col-md-10">*@
+            @*  @Model.Car.CarModel.Manufacturer.Name @Model.Car.CarModel.Model (@Model.Car.RegistrationNumber)
+           </div>
+        <div class="col-md-2">
+            <div class="row">
+                <a class="btn btn-primary" style="float:right" asp-controller="Home" asp-action="Index" role="button"> Link </a>
+            </div>
+            <div class="row">
+                <a class="btn btn-primary" style="float:right" asp-controller="Home" asp-action="Index" role="button">Detail</a>
+            </div>*@
+
+            @*//This should work:
+
+        <a asp-action="Create"><button class="btn btn-primary">Create</button></a>
+        <a asp-action="Create"><button class="btn btn-primary">Test</button></a>*@
+            @*</div>
+        </div>*@
+
+            @*</div>
+        <button type="button"
+                class="btn btn-success btn-sm pull-right" style="float:right" asp-action="Home" asp-controller="Index">
+
+            Add To Cart
+        </button>*@
+            @*<a asp-action="Create"><button class="btn btn-primary">Create</button></a>*@
+
+
         </div>
-    </div>
+     </div>

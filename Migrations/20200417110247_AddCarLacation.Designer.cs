@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200417110247_AddCarLacation")]
+    partial class AddCarLacation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,9 +38,6 @@ namespace KernelCars.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("FirstRegistrationYear")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Fuel")
                         .HasColumnType("int");
 
                     b.Property<byte[]>("ImagePage1")
@@ -120,20 +119,11 @@ namespace KernelCars.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<float>("Ammount")
-                        .HasColumnType("real");
-
                     b.Property<long>("CarId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime?>("CompleteDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("DocumentPath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Odometr")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("OpenDate")
                         .HasColumnType("datetime2");
@@ -166,9 +156,6 @@ namespace KernelCars.Migrations
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsEnableService")
-                        .HasColumnType("bit");
 
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
@@ -333,27 +320,6 @@ namespace KernelCars.Migrations
                         .HasFilter("[Name] IS NOT NULL");
 
                     b.ToTable("Manufacturers");
-                });
-
-            modelBuilder.Entity("KernelCars.Models.ServiceStation", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Contact")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("ServiceStations");
                 });
 
             modelBuilder.Entity("KernelCars.Models.Status", b =>

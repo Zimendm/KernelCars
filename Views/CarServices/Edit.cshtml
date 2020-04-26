@@ -10,7 +10,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form enctype="multipart/form-data" asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID" />
             <div class="form-group">
@@ -28,15 +28,65 @@
                 <input asp-for="ServiceDescription" class="form-control" />
                 <span asp-validation-for="ServiceDescription" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="CarId" class="control-label"></label>
-                <select asp-for="CarId" class="form-control" asp-items="ViewBag.CarId"></select>
-                <span asp-validation-for="CarId" class="text-danger"></span>
+                <label>Техпаспорт. Сторона 1</label>
+                <div class="custom-file">
+                    <input type="file" class="form-control custom-file-input" @*asp-for="ImagePage1"*@ />
+                    <label class="custom-file-label">Choose file...</label>
+                </div>
             </div>
+
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="col-md-offset-2 col-md-10">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+                                List<KernelCars.Models.ViewModels.AssignedTypeOfService> services = ViewBag.Works;
+
+                                foreach (var service in services)
+                                {
+                                    if (cnt++ % 3 == 0)
+                                    {
+                                    @:</tr><tr>
+                                    }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedWorks"
+                                               value="@service.TypeOfServiceID"
+                                               @(Html.Raw(service.IsAssigned ? "checked=\"checked\"" : "")) />
+                                               @service.Service
+                                    @:</td>
+                                }
+                            @:</tr>
+                            }
+                        </table>
+                    </div>
+                </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                <div class="form-group">
+                    <label asp-for="CarId" class="control-label"></label>
+                    <select asp-for="CarId" class="form-control" asp-items="ViewBag.CarId"></select>
+                    <span asp-validation-for="CarId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
     </div>
 </div>
 

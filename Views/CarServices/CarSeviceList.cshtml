@@ -1,0 +1,68 @@
+﻿@model List<KernelCars.Models.CarService>
+
+<body>
+    <div class="card">
+        <div class="card-header ">
+            <h2>@ViewBag.RegistrationNumber</h2>
+            <a class="card-link" asp-controller="CarServices" asp-action="Create" asp-route-carId="@ViewBag.CarId">Новая запись на ТО</a>
+        </div>
+        <div class="card-body">
+            <div class="row"></div>
+            <table class="servicelist table table-hover">
+                <thead>
+                    <tr>
+                        <th>Дата начала</th>
+                        <th>Дата окончания</th>
+                        <th>Одометр</th>
+                        <th>Стоимость (грн.)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var service in Model)
+                    {
+                        <tr>
+                            @*<td>
+                                    @service.ID
+                                </td>*@
+                            <td>
+                                @service.OpenDate.ToShortDateString()
+                            </td>
+                            <td>
+                                @if (service.CompleteDate == null)
+                                {
+                                    @:<b>В работе</b>
+                                }
+                                else
+                                {
+                                    @(((DateTime)service.CompleteDate).ToShortDateString())
+                                }
+                            </td>
+                            <td>
+                                @service.Odometr
+                            </td>
+                            <td>
+                                @service.Odometr
+                            </td>
+                            <td>
+                                @if (service.CompleteDate == null)
+                                {
+                                    <a asp-controller="CarServices" asp-action="Edit" asp-route-id="@service.ID">Изменить</a> @:|
+                                }
+                                else
+                                {
+                                    <a asp-controller="CarServices" asp-action="Edit" asp-route-id="@service.ID">Просмотреть</a>
+                                }
+                                @if (service.CompleteDate == null)
+                                {
+                                    <a asp-controller="CarServices" asp-action="Close" asp-route-id="@service.ID">Закрыть Акт</a>
+                                }
+                            </td>
+                        </tr>
+                     }
+                </tbody>
+            </table>
+            <div>
+            </div>
+        </div>
+    </div>
+</body>

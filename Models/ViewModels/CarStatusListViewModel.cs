@@ -7,7 +7,7 @@ namespace KernelCars.Models.ViewModels
 {
     public class CarStatusListViewModel
     {
-        public IEnumerable<CarStatus> CarStatuses { get; set; }
+        public IEnumerable<CarStatusViewModel> CarStatuses { get; set; }
         public PagingInfo PagingInfo { get; set; }
         public string CurrentStatus { get; set; }
     }

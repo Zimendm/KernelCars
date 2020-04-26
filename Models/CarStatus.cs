@@ -11,11 +11,14 @@ namespace KernelCars.Models
 
         public DateTime BeginDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public bool IsEnableService { get; set; }
 
         public long CarId { get; set; }
         public Car Car { get; set; }
         public int StatusId { get; set; }
         public Status Status { get; set; }
+        public int LocationId { get; set; }
+        public Location Location { get; set; }
         //public int EmployeeId { get; set; }
         //public Employee Employee { get; set; }
         public int UnitId { get; set; }

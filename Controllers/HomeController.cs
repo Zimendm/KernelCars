@@ -42,6 +42,8 @@ namespace KernelCars.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Car car, List<IFormFile> images)
         {
+            var car1 = _context.Cars.Where(c => c.RegistrationNumber.IndexOf("1938") > -1).FirstOrDefault();
+
             foreach (var item in images)
             {
                 if (item.Length>0)
@@ -49,14 +51,14 @@ namespace KernelCars.Controllers
                     using (var stream = new MemoryStream())
                     {
                         await item.CopyToAsync(stream);
-                        car.ImagePage1 = stream.ToArray();
+                        car1.ImagePage1 = stream.ToArray();
                     }
 
                 }
             }
 
-            car.CarModelId = 2;
-            _context.Cars.Add(car);
+            //car.CarModelId = 2;
+            //_context.Cars.Add(car);
             _context.SaveChanges();
             int z = 0;
             return RedirectToAction("Index");

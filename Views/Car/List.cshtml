@@ -1,13 +1,14 @@
-﻿@model KernelCars.Models.ViewModels.CarStatusListViewModel
-@*@{
+﻿@model IEnumerable<KernelCars.Models.Car>
+
+@{
     ViewData["Title"] = "List";
-}*@
+}
 
 <h1>List</h1>
-
-
-<div class="col-md-4">
-    <input type="search" class="form-control" placeholder="Поиск авто ..." id="searchString" />
+<div class="row">
+    <div class="col-md-4 m-md-2 p-1">
+        <input type="search" class="form-control" placeholder="Поиск авто ..." id="searchString" />
+    </div>
 </div>
 <script>
     $(document).ready(function ()
@@ -35,21 +36,11 @@
                 }
             });
         });
-    });1
-</script>
+    });
+ </script>
 
-<div class="col-md-10">
-    @foreach (var item in Model.CarStatuses)
-    {
-        @Html.Partial("CarSummary", item)
-    }
-</div>
+@foreach (var car in Model)
+{
+    <partial name="CarSummaryList" for="@car" />
+}
 
-<ul class="pagination col-md-10">
-    @for (int i = 1; i <= Model.PagingInfo.TotalPages; i++)
-    {
-            <li class="@(i == Model.PagingInfo.CurrentPage ? "page-item active" : "page-item")">
-                <a class="page-link" href="@Url.Action("List", new {status=Model.CurrentStatus , carPage = i })">@i</a>
-            </li>
-     }
-</ul>  
