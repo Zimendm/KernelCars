@@ -1,0 +1,37 @@
+﻿@model List<KernelCars.Models.CarUser>
+
+@{
+    ViewData["Title"] = "List";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5> @ViewBag.Manufacturer  @ViewBag.Model (<b>@ViewBag.RegistrationNumber</b>)</h5>
+        <a asp-action="Assign" asp-route-carId="@ViewBag.carId" class="card-link">Новое назначение</a>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead></thead>
+            <tbody>
+                @foreach (var item in @Model)
+                {
+                <tr>
+                    <td>@item.StartUsingDate.ToShortDateString()</td>
+                    @if (item.EndUsingDate != null)
+                    {
+                        DateTime endDate = (DateTime) item.EndUsingDate;
+                        <td>@endDate</td>
+                    }
+                    else
+                    {
+                        <td>Активный</td>
+                    }
+                    <td>@item.Employee.FullName</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        
+    </div>
+</div>
+

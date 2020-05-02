@@ -1,0 +1,35 @@
+﻿@model IEnumerable<KernelCars.Models.Employee>
+
+@{
+    ViewData["Title"] = "Assing";
+}
+
+<h1>Assing</h1>
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.LastName
+                </td>
+                <td>
+                    <a asp-action="Assign">Выбрать</a>
+                </td>
+            </tr>
+            @*<tr>
+            <form id="@item.Id">
+                
+                <td>
+                    <button type="submit"
+                            class="btn btn-success btn-sm pull-right" style="float:right">
+                        Выбрать
+                    </button>
+                </td>
+            </form>
+            </tr>*@
+        }
+    </tbody>
+</table>
+
+
