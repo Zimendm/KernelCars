@@ -240,7 +240,8 @@ namespace KernelCars.Controllers
         //[Authorize]
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditPost([Bind("Id","RegistrationNumber", "VinNumber", "FirstRegistrationYear","CarModelId")] Car car, string owners)
+        public IActionResult EditPost([Bind("Id","RegistrationNumber", "VinNumber", "FirstRegistrationYear","CarModelId","Fuel","LPG", "EngineCapacity",
+            "TankCapacity","Tyres")] Car car, string owners, IFormFile image1, IFormFile image2)
         {
             Car c = _context.Cars.Find(car.Id);
             
@@ -283,66 +284,49 @@ namespace KernelCars.Controllers
                 }
             }
 
-            //////////c.CarModelId = car.CarModelId;
-            //c.CarTypeId = car.CarTypeId;
+            //Проверка объёма двигателя
+            if (car.EngineCapacity != 0)
+            {
+                c.EngineCapacity = car.EngineCapacity;
+            }
+            //Проверка ёмкость бака
+            if (car.TankCapacity != 0)
+            {
+                c.TankCapacity = car.TankCapacity;
+            }
+            //Проверка наличие ГБО
+            if (c.LPG != car.LPG)
+            {
+                c.LPG = car.LPG;
+            }
+            //Проверка размер шин
+            if (car.Tyres != null)
+            {
+                c.Tyres = car.Tyres;
+            }
 
-            //var str = owners.Trim().Split(' ');
+            // Техпаспорт страница 1
+            if (image1 != null)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    image1.CopyTo(stream);
+                    c.ImagePage1 = stream.ToArray();
+                }
+            }
+            // Техпаспорт страница 2
+            if (image2 != null)
+            {
+                using (var stream = new MemoryStream())
+                {
+                    image2.CopyTo(stream);
+                    c.ImagePage2 = stream.ToArray();
+                }
+            }
 
-            //Employee owner = null;
-            //if (str.Length == 1)
-            //{
-            //    owner = (from o in _context.Employees
-            //             where o.LastName == owners
-            //             select o).FirstOrDefault();
-            //}
-            //else if (str.Length == 3)
-            //{
-            //    owner = (from o in _context.Employees
-            //             where o.LastName == str[0] && o.FirstName == str[1] && o.MiddleName == str[2]
-            //             select o).FirstOrDefault();
-            //}
-            //if (owner != null)
-            //{
-            //    c.CarOwnerId = owner.Id;
-            //}
-
-
-
-            //ownersForSearch .IndexOf()
-            //var owner = (from o in _context.Employees
-
-            //             select o).First();
-
-
-            ///
-
-            //_context.Update(car);
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));
-            //return View();
-            //var courseToUpdate = await _context.Courses
-            //    .FirstOrDefaultAsync(c => c.CourseID == id);
-
-            //if (await TryUpdateModelAsync<Course>(courseToUpdate,
-            //    "",
-            //    c => c.Credits, c => c.DepartmentID, c => c.Title))
-            //{
-            //    try
-            //    {
-            //        await _context.SaveChangesAsync();
-            //    }
-            //    catch (DbUpdateException /* ex */)
-            //    {
-            //        //Log the error (uncomment ex variable name and write a log.)
-            //        ModelState.AddModelError("", "Unable to save changes. " +
-            //            "Try again, and if the problem persists, " +
-            //            "see your system administrator.");
-            //    }
-            //    return RedirectToAction(nameof(Index));
-            //}
-            //PopulateDepartmentsDropDownList(courseToUpdate.DepartmentID);
-            //return View(courseToUpdate);
         }
 
 
