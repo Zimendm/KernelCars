@@ -1,20 +1,23 @@
 ﻿@model KernelCars.Models.Car
     <div class="card carList">
         <div class="card-body">
-            <p class="searchField"> @Model.CarModel.Manufacturer.Name @Model.CarModel.Model (<b>@Model.RegistrationNumber</b>) Владелец: <b>@Model.CarOwner.FullName</b></p>
             <p class="searchField">
+                @Model.CarModel.Manufacturer.Name @Model.CarModel.Model (<b>@Model.RegistrationNumber</b>) @*Владелец: <b>@Model.CarOwner.FullName</b>*@
+                @if (@Model.CarUserForView != "")
+                {
+                    @: Водитель: <b>@Model.CarUserForView</b>
+                }
+            </p>
+
+            @*<p class="searchField">
                 @if (@Model.DepartmentNameForView != "")
                 {
                     @:Подразделение: <b>@Model.DepartmentNameForView</b> (@Model.FullNameFirmForView)
                 }
-                @if (@Model.CarUserForView != "")
-                {
-                    @:<br />Водитель: <b>@Model.CarUserForView</b>
-                }
+            
 
-
-            </p>
-            <p>
+            </p>*@
+            @*<p>
                 <div @(Html.Raw(Model.IsRentCar ? "style=\"display:block\"" : "style=\"display:none\""))>
                     <input type="checkbox"
                            value="@Model.IsRentCar"
@@ -27,7 +30,7 @@
                            @(Html.Raw(Model.IsPrivat ? "checked=\"checked\"" : ""))
                            disabled /> Частный автомобиль
                 </div>
-            </p>
+            </p>*@
             <a class="card-link" asp-controller="Car" asp-action="Details" asp-route-id="@Model.Id">Подробно</a>
             @if (@Model.IsEnableService)
             {

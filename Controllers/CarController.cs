@@ -173,6 +173,7 @@ namespace KernelCars.Controllers
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
                 .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
                 .Where(c => c.Id == id)
                 .FirstOrDefault();
             if (car==null)
@@ -183,6 +184,7 @@ namespace KernelCars.Controllers
             if (car.CarStatuses.LastOrDefault()!=null)
             {
                 ViewData["CarStatus"] = car.CarStatuses.LastOrDefault().Status.State;
+                ViewData["CarLOcation"] = car.CarStatuses.LastOrDefault().Location.LocationName;
             }
             else
             {
@@ -238,29 +240,83 @@ namespace KernelCars.Controllers
         //[Authorize]
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public IActionResult EditPost(Car car, string owners)
+        public IActionResult EditPost([Bind("Id","RegistrationNumber", "VinNumber", "FirstRegistrationYear","CarModelId")] Car car, string owners)
         {
-            //if (id == null)
-            //{
-            //    return NotFound();
-            //}
-
-            var str = owners;
-
             Car c = _context.Cars.Find(car.Id);
-            c.CarModelId = car.CarModelId;
-            //c.CarTypeId = car.CarTypeId;
-
-            var owner = (from o in _context.Employees
-                        where o.LastName == owners
-                        select o).First();
-
-            if (owner != null)
+            
+            if (c == null)
             {
-                c.CarOwnerId = owner.Id;
+                return NotFound();
             }
 
+            // Проверка модели авто
+            if (car.CarModelId != 0)
+            {
+                c.CarModelId = car.CarModelId;
+            }
+            else
+            {
+                c.CarModelId = 1;
+            }
+            
+            //Проверка типа топлива
+            if (car.Fuel != null)
+            {
+                c.Fuel = car.Fuel;
+            }
 
+            //Проверка номера кузова
+            if (car.VinNumber != null)
+            {
+                c.VinNumber = car.VinNumber.ToUpper();
+            }
+
+            //Проверка владельца авто
+            var ownersForSearch = (from o in _context.Employees
+                                   select o).ToList();
+            foreach (var item in ownersForSearch)
+            {
+                if (item.FullName.Trim().ToUpper() == owners.Trim().ToUpper())
+                {
+                    c.CarOwnerId = item.Id;
+                    break;
+                }
+            }
+
+            //////////c.CarModelId = car.CarModelId;
+            //c.CarTypeId = car.CarTypeId;
+
+            //var str = owners.Trim().Split(' ');
+
+            //Employee owner = null;
+            //if (str.Length == 1)
+            //{
+            //    owner = (from o in _context.Employees
+            //             where o.LastName == owners
+            //             select o).FirstOrDefault();
+            //}
+            //else if (str.Length == 3)
+            //{
+            //    owner = (from o in _context.Employees
+            //             where o.LastName == str[0] && o.FirstName == str[1] && o.MiddleName == str[2]
+            //             select o).FirstOrDefault();
+            //}
+            //if (owner != null)
+            //{
+            //    c.CarOwnerId = owner.Id;
+            //}
+
+
+
+            //ownersForSearch .IndexOf()
+            //var owner = (from o in _context.Employees
+
+            //             select o).First();
+
+
+            ///
+
+            //_context.Update(car);
             _context.SaveChanges();
 
             return RedirectToAction(nameof(Index));

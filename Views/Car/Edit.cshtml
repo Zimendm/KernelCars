@@ -124,6 +124,10 @@
             </div>
             @*</div>*@
             <div class="form-group">
+                <label asp-for="FirstRegistrationYear" class="control-label"></label>
+                <input asp-for="FirstRegistrationYear" class="form-control" />
+            </div>
+            <div class="form-group">
                 <div class="row">
                     <div class="col-6">
                         <label class="control-label">Производитель</label>
@@ -158,26 +162,86 @@
                         <input asp-for="Tyres" class="form-control" />
                     </div>
                 </div>
-
             </div>
+
+            <div class="form-group">
+                <label asp-for="Fuel" class="control-label"></label>
+                <select asp-for="Fuel"
+                        class="form-control"
+                        asp-items="Html.GetEnumSelectList<TypeOfFuel>()">
+                    <option>Select fuel ...</option>
+                </select>
+                @*<span asp-validation-for="Fuel" class="text-danger"></span>*@
+            </div>
+
             <div class="form-group">
                 <label asp-for="TankCapacity" class="control-label"></label>
                 <input asp-for="TankCapacity" class="form-control" />
             </div>
-            <div class="form-group">
-                <label asp-for="LPG" class="control-label"></label>
-                <input asp-for="LPG" class="form-control" />
+            <div class="form-check">
+                <input asp-for="LPG" type="checkbox" class="form-check-input" />
+                <label class="form-check-label">LPG</label>
             </div>
-            <div class="form-group row">
-                <div class="col-md-12">
-                    <label>Техпаспорт. Сторона 1</label>
+            @*<div class="form-group row">
+        <div class="col-md-12">*@
+            <div class="card">
+                <div class="card-header">
+                    Техпаспорт.Сторона 1
+                </div>
+                <div class="card-body text-center">
+                    @{
+                        try
+                        {
+                            var base64 = Convert.ToBase64String(Model.ImagePage1);
+                            var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@imgsrc" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                        catch (Exception)
+                        {
+                            <img src="" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />
+                            //throw;
+                        }
+
+                    }
+
+                    @*<img src="@imgsrc" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />*@
+
+                </div>
+                <div class="card-footer">
                     <div class="custom-file">
                         <input type="file" class="form-control custom-file-input" asp-for="ImagePage1" />
                         <label class="custom-file-label">Choose file...</label>
                     </div>
                 </div>
             </div>
-            <div class="form-group row">
+            <div class="card">
+                <div class="card-header">
+                    Техпаспорт.Сторона 2
+                </div>
+                <div class="card-body">
+
+                </div>
+                <div class="card-footer">
+                    <div class="custom-file">
+                        <input type="file" class="form-control custom-file-input" asp-for="ImagePage2" />
+                        <label class="custom-file-label">Choose file...</label>
+                    </div>
+                </div>
+            </div>
+            @*</div>
+        </div>*@
+
+
+
+
+
+
+
+
+
+
+
+            @*<div class="form-group row">
                 <div class="col-md-12">
                     <label>Техпаспорт. Сторона 2</label>
                     <div class="custom-file">
@@ -185,12 +249,58 @@
                         <label class="custom-file-label">Choose file...</label>
                     </div>
                 </div>
-            </div>
+            </div>*@
             <script>
                 // Add the following code if you want the name of the file appear on select
                 $(".custom-file-input").on("change", function () {
+
                     var fileName = $(this).val().split("\\").pop();
                     $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+
+
+                    //var f = $(this).val(); // files[0];
+
+                    var props = $(this).prop('files');//,
+                    file = props[0];
+
+
+
+                    //var input =  document.getElementById('fileinput');
+
+                    //function showpreview(input) {
+
+                    //if (input.files && input.files[0])
+                    //{
+
+                        //alert('HHHHH');
+                            var reader = new FileReader();
+                            reader.onload = function (e) {
+                                $('#image').css('visibility', 'visible');
+                                $('#image').attr('src', e.target.result);
+                            }
+                        reader.readAsDataURL(file);
+                    //}
+
+                    //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 });
             </script>
             <div>
@@ -198,29 +308,79 @@
                 <datalist id="owners"></datalist>
             </div>
 
-            <div class="container">
-                <div class="row">
-                    <div style="height:600px">
-                        @{
-                            try
-                            {
-                                var base64 = Convert.ToBase64String(Model.ImagePage1);
-                                var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
-                                <img src="@imgsrc" class="img-thumbnail" id="image" style="width:200px;height:200px" />
-                            }
-                            catch (Exception)
-                            {
-                                //throw;
-                            }
-
+            <div class="row">
+                <div class="col-sm text-center">
+                    @*<div style="height:600px">*@
+                    @{
+                        try
+                        {
+                            var base64 = Convert.ToBase64String(Model.ImagePage1);
+                            var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@imgsrc" class="img-thumbnail" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                        catch (Exception)
+                        {
+                            //throw;
                         }
 
+                    }
+                </div>
+                <div class="col-sm text-center">
+                    @{
+                        try
+                        {
+                            var base64 = Convert.ToBase64String(Model.ImagePage1);
+                            var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@imgsrc" class="img-thumbnail" id="image1" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                        catch (Exception)
+                        {
+                            //throw;
+                        }
 
+                    }
+                </div>
+                <div class="col-sm">
 
-                        @Html.ActionLink("Download", "DownloadFile")
-                    </div>
                 </div>
             </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            @*<div class="container">
+        <div class="row">
+            <div style="height:600px">
+                @{
+                    try
+                    {
+                        var base64 = Convert.ToBase64String(Model.ImagePage1);
+                        var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                        <img src="@imgsrc" class="img-thumbnail" id="image" style="width:200px;height:200px" />
+                    }
+                    catch (Exception)
+                    {
+                        //throw;
+                    }
+
+                }*@
+            @*@Html.ActionLink("Download", "DownloadFile")*@
+            @*</div>
+            </div>
+        </div>*@
 
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

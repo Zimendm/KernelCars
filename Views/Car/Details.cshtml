@@ -179,11 +179,6 @@
                 </dl>
             </div>
 
-
-
-
-
-
             <div class="col-sm">
                 <dl>
                     <dt>
@@ -196,6 +191,8 @@
                     {
                         <dt>Подразделение:</dt>
                         <dd>@Model.DepartmentNameForView (@Model.FullNameFirmForView)</dd>
+                        <dt>Размещение:</dt>
+                        <dd>@ViewBag.CarLocation</dd>
                     }
 
                     @if (@Model.CarUserForView != "")
@@ -213,6 +210,8 @@
                         @:<dt>Частный авто</dt>
                         @:<dd><input type="checkbox" value="@Model.IsRentCar" @(Html.Raw(Model.IsPrivat ? "checked=\"checked\"" : "")) disabled /><b style="color:white">.</b></dd>
                     }
+                    
+
                 </dl>
             </div>
         </div>
