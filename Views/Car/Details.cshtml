@@ -248,7 +248,7 @@
                         @{
                             try
                             {
-                                var base64 = Convert.ToBase64String(Model.ImagePage1);
+                                var base64 = Convert.ToBase64String(Model.ImagePage2);
                                 var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
                                 <img src="@imgsrc" class="img-thumbnail" id="image1" style="width:auto;height:400px;transform-origin:center center" />
                             }

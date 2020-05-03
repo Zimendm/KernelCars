@@ -11,6 +11,7 @@ using KernelCars.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using KernelCars.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace KernelCars.Controllers
 {
@@ -121,6 +122,15 @@ namespace KernelCars.Controllers
             }
            // _context.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public JsonResult GetCarDriversList(int excludeId)
+        {
+            var employees = _context.Employees.ToList().Where(e => e.IsFirm == false).OrderBy(e=>e.LastName);
+
+            var driverlist = new SelectList(employees, "Id", "FullName");
+            return Json(driverlist);
         }
 
         static DataTable ReadExcelasJSON(string fileName)

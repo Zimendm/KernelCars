@@ -207,7 +207,10 @@
         <div class="col-sm"></div>
     </div>
     <div class="row">
-
+        <div>
+            <input asp-for="CarOwner.FullName" list="owners" class="form-control" name="owners" id="ownerList" />
+            <datalist id="owners"></datalist>
+        </div>
     </div>
     <div class="row">
         <div class="col-sm text-center">

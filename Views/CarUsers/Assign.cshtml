@@ -1,35 +1,35 @@
-﻿@model IEnumerable<KernelCars.Models.Employee>
+﻿@model KernelCars.Models.CarUser
 
 @{
     ViewData["Title"] = "Assing";
 }
 
 <h1>Assing</h1>
-<table class="table">
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @item.LastName
-                </td>
-                <td>
-                    <a asp-action="Assign">Выбрать</a>
-                </td>
-            </tr>
-            @*<tr>
-            <form id="@item.Id">
-                
-                <td>
-                    <button type="submit"
-                            class="btn btn-success btn-sm pull-right" style="float:right">
-                        Выбрать
-                    </button>
-                </td>
-            </form>
-            </tr>*@
-        }
-    </tbody>
-</table>
+
+<script>
+    $(document).ready(function ()
+    {
+        var url = "/Employee/GetCarDriversList";
+        var manufacturerId = 1;
+        $.getJSON(url, { ManufacturerId: manufacturerId }, function (data) {
+            $.each(data, function (i, driver) {
+                $("#drivers").append($("<option>").text(driver.text));
+            });
+        });
+    });
+</script>
 
 
+<form asp-action="Assign" method="post">
+    <input asp-for="@Model.CarId" hidden/>
+    <div class="form-group">
+        <label asp-for="@Model.StartUsingDate" class="control-label"></label>
+        <input asp-for="@Model.StartUsingDate" class="form-control"/>
+    </div>
+    <div>
+        <input list="drivers" class="form-control" name="drivers" id="driverList" />
+        <datalist id="drivers"></datalist>
+    </div>
+
+    <button type="submit">Сохранить</button>
+</form>
