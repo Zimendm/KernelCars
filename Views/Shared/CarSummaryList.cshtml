@@ -32,7 +32,7 @@
                 </div>
             </p>*@
             <a class="card-link" asp-controller="Car" asp-action="Details" asp-route-id="@Model.Id">Подробно</a>
-            <a class="card-link" href="#">Статус авто</a>
+            <a class="card-link" asp-controller="CarStatus" asp-action="CarStatuses" asp-route-carId="@Model.Id">Статус авто</a>
             <a class="card-link" asp-controller="CarUsers" asp-action="List" asp-route-carId="@Model.Id">Водитель</a>
             @if (@Model.IsEnableService)
             {

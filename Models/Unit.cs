@@ -15,6 +15,16 @@ namespace KernelCars.Models
         public Department Department { get; set; }
         public List<CarStatus> CarStatuses { get; set; }
 
+        public string UnitPrintName 
+        {
+            get
+            {
+                string retValue = Firm.Employee.FullName + " " + Department.Name;
+                if (IsAgriBusiness)
+                    retValue += " (Агробизнес)";
+                return retValue;
+            }
+        }
 
     }
 }

@@ -27,6 +27,7 @@ namespace KernelCars.Data
         public DbSet<TypeOfService> TypeOfServices { get; set; }
         public DbSet<ServiceStation> ServiceStations { get; set; }
         public DbSet<CarUser> CarUsers { get; set; }
+        public DbSet<Location> Locations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

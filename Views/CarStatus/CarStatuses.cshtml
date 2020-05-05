@@ -1,0 +1,28 @@
+﻿@model List<KernelCars.Models.CarStatus>
+
+@{
+    ViewData["Title"] = "CarStatuses";
+}
+
+<h1>CarStatuses</h1>
+
+<div class="card">
+    <div class="card-header">
+        <p>Гос.номер: <b>@ViewBag.RegistrationNumber</b></p>
+        <h6>Текущий статус: <span class="badge badge-pill badge-success">@ViewBag.CurrentState</span> @ViewBag.From</h6>
+        <p><a asp-action="Assign" asp-route-carId="@ViewBag.carId" class="card-link">Новый статус</a></p>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead></thead>
+            <tbody>
+                @foreach (var item in @Model)
+                {
+                    <tr>
+                        <td>@item.Status.State</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -43,6 +43,8 @@
     <Compile Remove="Migrations\20200418052525_UpdateCarStatusModel.Designer.cs" />
     <Compile Remove="Migrations\20200426082512_AddAmmountToService.cs" />
     <Compile Remove="Migrations\20200426082512_AddAmmountToService.Designer.cs" />
+    <Compile Remove="Migrations\20200503143714_AddUnitPrintName.cs" />
+    <Compile Remove="Migrations\20200503143714_AddUnitPrintName.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,6 +28,31 @@ namespace KernelCars.Controllers
             return View(await dataContext.ToListAsync());
         }
 
+        public ViewResult CarStatuses(long? carId)
+        {
+
+            List<CarStatus> statuses = _context.CarStatuses.Include(s=>s.Status).Include(s=>s.Car).Where(s => s.CarId == carId).ToList();
+
+            ViewData["RegistrationNumber"] = _context.Cars.Where(c => c.Id == carId).FirstOrDefault().RegistrationNumber;
+            var cState = statuses.LastOrDefault();
+            if (cState!=null)
+            { 
+                ViewData["CurrentState"] = statuses.LastOrDefault().Status.State;
+                ViewData["From"] = "c: "+statuses.LastOrDefault().BeginDate.ToShortDateString();
+            }
+            else
+            {
+                ViewData["CurrentState"] = "Не устанавливался";
+                ViewData["From"] = "";
+            }
+
+            //ViewData["CurrentState"] = statuses.LastOrDefault().Status.State;
+            //ViewData["From"] = statuses.LastOrDefault().BeginDate.ToShortDateString();// .bState;
+            ViewData["carId"] = carId;
+
+            return View(statuses);
+        }
+
         public ViewResult List(string status="In Use", int carPage = 1)
         {
             List<CarStatus> cs;
@@ -214,6 +239,19 @@ namespace KernelCars.Controllers
             _context.CarStatuses.Remove(carStatus);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Assign(long? carId)
+        {
+
+            ViewData["CarId"] = carId;
+            ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusID", "State");
+            ViewData["UnitId"] = new SelectList(_context.Units.Include(u=>u.Firm).ThenInclude(u=>u.Employee).Include(u=>u.Department), "UnitId", "UnitPrintName");
+            ViewData["LocationId"] = new SelectList(_context.Locations, "ID", "LocationName");
+
+            int carID = (int)carId;
+
+            return View(new CarStatus { CarId= carID, BeginDate=DateTime.Now });
         }
 
         private bool CarStatusExists(int id)

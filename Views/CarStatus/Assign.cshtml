@@ -1,0 +1,30 @@
+﻿@model KernelCars.Models.CarStatus
+
+@{
+    ViewData["Title"] = "Assign";
+}
+
+<h1>Assign</h1>
+
+<form>
+    <input asp-for="@Model.CarId"  hidden/>
+    <div class="form-group">
+        <label asp-for="StatusId" class="control-label"></label>
+        <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
+    </div>
+    <div class="form-group">
+        <label asp-for="UnitId" class="control-label"></label>
+        <select asp-for="UnitId" class="form-control" asp-items="ViewBag.UnitId">
+            <option>Выберите подразделение ...</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label asp-for="LocationId" class="control-label"></label>
+        <select asp-for="LocationId" class="form-control" asp-items="ViewBag.LocationId">
+            <option>Выберите расположение ...</option>
+        </select>
+    </div>
+</form>
+<div>
+    <a asp-action="CarStatuses" asp-route-carId="@Model.CarId" class="card-link">Назад к списку</a>
+</div>
