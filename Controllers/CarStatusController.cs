@@ -243,15 +243,57 @@ namespace KernelCars.Controllers
 
         public IActionResult Assign(long? carId)
         {
-
             ViewData["CarId"] = carId;
             ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusID", "State");
             ViewData["UnitId"] = new SelectList(_context.Units.Include(u=>u.Firm).ThenInclude(u=>u.Employee).Include(u=>u.Department), "UnitId", "UnitPrintName");
             ViewData["LocationId"] = new SelectList(_context.Locations, "ID", "LocationName");
 
             int carID = (int)carId;
-
             return View(new CarStatus { CarId= carID, BeginDate=DateTime.Now });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Assign(int id, [Bind("ID,BeginDate,EndDate,CarId,StatusId,UnitId,Comment,IsEnableService,LocationId")] CarStatus carStatus)
+        {
+            if (id != carStatus.ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(carStatus);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CarStatusExists(carStatus.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            //ViewData["CarId"] = new SelectList(_context.Cars, "Id", "Id", carStatus.CarId);
+            //ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusID", "StatusID", carStatus.StatusId);
+            //ViewData["UnitId"] = new SelectList(_context.Units, "UnitId", "UnitId", carStatus.UnitId);
+
+            ViewData["CarId"] = carStatus.CarId;
+            ViewData["StatusId"] = new SelectList(_context.Statuses, "StatusID", "State");
+            ViewData["UnitId"] = new SelectList(_context.Units.Include(u => u.Firm).ThenInclude(u => u.Employee).Include(u => u.Department), "UnitId", "UnitPrintName");
+            ViewData["LocationId"] = new SelectList(_context.Locations, "ID", "LocationName");
+            
+
+            return View(carStatus);
         }
 
         private bool CarStatusExists(int id)

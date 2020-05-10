@@ -1,0 +1,56 @@
+﻿@model Dictionary<string, int>
+
+
+<h1>CarService</h1>
+
+
+<form asp-action="CarService" method="get">
+    <div class="form-actions no-color">
+        <p>
+
+            Период:  <input type="date" value="@ViewData["FromDate"]" name="fromDate" /> - <input type="date" value="@ViewData["ToDate"]" name="toDate" />
+            @*Поиск по номеру: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />*@
+            <input type="submit" value="Filter" class="btn-primary" /> @*|*@
+            @*<a asp-action="Index">Back to Full List</a>*@
+        </p>
+    </div>
+</form>
+
+
+<span>Период: </span>
+@if (@ViewData["FromDate"]!=null)
+{
+<span>c </span>
+}@ViewData["FromDate"] по @ViewData["ToDate"]
+<p>
+    @ViewData["Odometr"]
+</p>
+@*@if (@ViewData["Odometr"]!=null)
+{
+    <p>
+        Пробег: @ViewData["Odometr"]
+    </p>
+}*@
+
+
+<table>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Key</td>
+                <td>@item.Value</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td>Итого:</td>
+            <td>@(((float)ViewBag.TotalAmmount).ToString("C2"))</td>
+        </tr>
+    </tfoot>
+</table>
+
+
+
+

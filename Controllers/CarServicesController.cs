@@ -103,6 +103,7 @@ namespace KernelCars.Controllers
             Car car = _context.Cars.Where(c => c.Id == carId).FirstOrDefault();
             ViewData["RegistrationNumber"] = car.RegistrationNumber.ToString();
             ViewData["CarId"] = (long) car.Id;
+           
             return View(service);
         }
         // GET: CarServices/Create
@@ -129,6 +130,7 @@ namespace KernelCars.Controllers
                 });
             }
             ViewData["Services"] = viewModel;
+            ViewData["StationId"] = new SelectList(_context.ServiceStations.OrderBy(s=>s.Name), "ID", "Name");
             //var car = (from c in _context.Cars
             //          where c.Id == carId
             //          select c).FirstOrDefault();
@@ -149,7 +151,7 @@ namespace KernelCars.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,OpenDate,CompleteDate,ServiceDescription,CarId")] CarService carService, string[] selectedWorks)
+        public async Task<IActionResult> Create([Bind("ID,OpenDate,CompleteDate,ServiceDescription,CarId,ServiceStationID")] CarService carService, string[] selectedWorks)
         {
             if (ModelState.IsValid)
             {

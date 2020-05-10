@@ -1,6 +1,6 @@
 ﻿@model List<KernelCars.Models.CarService>
 
-<div class="row"></div>
+@*<div class="row"></div>*@
 <table class="servicelist table table-hover">
     <thead>
         <tr>
@@ -53,6 +53,12 @@
             </tr>
         }
     </tbody>
+    <tfoot>
+        <tr>
+            <th></th>
+            <th></th>
+            <th>Итого</th>
+            <th>@(((decimal)ViewBag.Total).ToString("C2"))</th>
+        </tr>
+    </tfoot>
 </table>
-<div>
-</div>

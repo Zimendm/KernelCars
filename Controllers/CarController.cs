@@ -190,7 +190,12 @@ namespace KernelCars.Controllers
             {
                 ViewData["CarStatus"] = "Undefined";
             }
-            
+
+            ViewData["Total"] = (from c in car.CarSevices
+                         select c.Ammount).Sum();
+
+            //ViewData["Total"] = 555;
+
             return View(car);
         }
         public IActionResult Create()

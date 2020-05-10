@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200505102556_UpdateServiceStation")]
+    partial class UpdateServiceStation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,14 +143,9 @@ namespace KernelCars.Migrations
                     b.Property<string>("ServiceDescription")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ServiceStationID")
-                        .HasColumnType("int");
-
                     b.HasKey("ID");
 
                     b.HasIndex("CarId");
-
-                    b.HasIndex("ServiceStationID");
 
                     b.ToTable("CarServices");
                 });
@@ -465,12 +462,6 @@ namespace KernelCars.Migrations
                     b.HasOne("KernelCars.Models.Car", "Car")
                         .WithMany("CarSevices")
                         .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KernelCars.Models.ServiceStation", "ServiceStation")
-                        .WithMany("CarServices")
-                        .HasForeignKey("ServiceStationID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

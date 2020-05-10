@@ -19,7 +19,7 @@ namespace KernelCars.Models
         {
             get
             {
-                string retValue = Firm.Employee.FullName + " " + Department.Name;
+                string retValue = Department.Name + " [" + Firm.Employee.FullName + "]";
                 if (IsAgriBusiness)
                     retValue += " (Агробизнес)";
                 return retValue;

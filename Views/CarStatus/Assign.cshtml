@@ -6,11 +6,15 @@
 
 <h1>Assign</h1>
 
-<form>
-    <input asp-for="@Model.CarId"  hidden/>
+<form asp-action="Assign" method="post">
+    <input asp-for="@Model.CarId" hidden />
     <div class="form-group">
         <label asp-for="StatusId" class="control-label"></label>
         <select asp-for="StatusId" class="form-control" asp-items="ViewBag.StatusId"></select>
+    </div>
+    <div class="form-group">
+        <label asp-for="BeginDate" class="control-label"></label>
+        <input asp-for="BeginDate" class="form-control" />
     </div>
     <div class="form-group">
         <label asp-for="UnitId" class="control-label"></label>
@@ -24,6 +28,16 @@
             <option>Выберите расположение ...</option>
         </select>
     </div>
+    <div class="form-group">
+        <div class="form-check">
+            <input asp-for="IsEnableService" type="checkbox" class="form-check-input" />
+            <label class="form-check-label">Обслуживание</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Сохранить" class="btn btn-primary btn-lg" />
+    </div>
+    
 </form>
 <div>
     <a asp-action="CarStatuses" asp-route-carId="@Model.CarId" class="card-link">Назад к списку</a>

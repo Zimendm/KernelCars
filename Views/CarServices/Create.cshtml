@@ -21,7 +21,10 @@
             @*<label asp-for="Car.RegistrationNumber" class="control-label"></label>
         <input asp-for="Car.RegistrationNumber" class="form-control" disabled />*@
             Автомобиль: @Model.Car.CarModel.Manufacturer.Name @Model.Car.CarModel.Model (<b>@Model.Car.RegistrationNumber</b>)
-
+        </div>
+        <div class="form-group">
+            @*<select asp-for=""></select>*@
+            <select asp-for="ServiceStationID" class="form-control" asp-items="ViewBag.StationId"></select>
         </div>
             <div class="form-group col-md-6">
                 <label asp-for="OpenDate" class="control-label"></label>

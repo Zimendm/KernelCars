@@ -47,7 +47,6 @@ namespace KernelCars.Models
         public List<CarUser> CarUsers { get; set; }
         public List<CarService> CarSevices { get; set; }
 
-
         public bool IsPrivat 
         {
             get 
@@ -153,8 +152,6 @@ namespace KernelCars.Models
                 return "";
             }
         }
-
-
 
         //Вспомогательные временные поля
         public string TempUser { get; set; }

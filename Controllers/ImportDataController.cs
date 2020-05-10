@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using KernelCars.Models;
 using KernelCars.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace KernelCars.Controllers
 {
@@ -32,6 +33,214 @@ namespace KernelCars.Controllers
         public IActionResult CarYears()
         {
             return View();
+        }
+
+        public IActionResult ReadKT()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public void ReadKT(IFormFile file)
+        {
+            var path = Path.Combine(
+              Directory.GetCurrentDirectory(), @"wwwroot/InFiles",
+              file.FileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                file.CopyTo (stream);
+            }
+
+            DataTable dataTable = ReadExcelKT(path);
+
+            for (int i = 1; i < dataTable.Rows.Count - 1; i++)
+            {
+                string[] fio = ((string)dataTable.Rows[i]["ФИО Водителя"]).Split(' ');
+
+                // Проверка водителей
+                var emplCount = (from e in _context.Employees
+                                 where e.LastName.ToLower() == fio[0].ToLower() && e.FirstName.ToLower() == fio[1].ToLower() && e.MiddleName.ToLower() == fio[2].ToLower()
+                                 select e).FirstOrDefault();
+                if (emplCount == null)
+                {
+                    Employee emp = new Employee
+                    {
+                        LastName = fio[0],
+                        FirstName = fio[1],
+                        MiddleName = fio[2]
+                    };
+                    _context.Employees.Add(emp);
+                }
+            }
+            _context.SaveChanges();
+
+            for (int i = 1; i < dataTable.Rows.Count - 1; i++)
+            {
+                string regNumber = ((string)dataTable.Rows[i][0]).CheckNumber();
+
+
+                var car = _context.Cars.Include(c=>c.CarUsers).ThenInclude(c=>c.Employee).ToList().Where(c=>c.RegistrationNumber.CheckNumber() == regNumber).ToList();
+
+                if (car.Count!=0)
+                {
+                    string[] fio = ((string)dataTable.Rows[i]["ФИО Водителя"]).Split(' ');
+                    
+                    if (fio.Length == 3)
+                    {
+                        var emp = _context.Employees.Where(e => e.LastName.ToLower() == fio[0].ToLower() && e.FirstName.ToLower() == fio[1].ToLower() && e.MiddleName.ToLower() == fio[2].ToLower()).First();
+                        if (emp!=null)
+                        {
+                            if (car[0].CarUsers.Count == 0)
+                            {
+                                car[0].CarUsers.Add(new CarUser
+                                {
+                                    StartUsingDate = DateTime.Now,
+                                    Employee = emp
+                                });
+                            }
+                            else
+                            {
+                                var lastDriver = from d in car[0].CarUsers
+                                                  where d.EndUsingDate == null
+                                                  select d;
+                                if (lastDriver != null)
+                                {
+                                    if (lastDriver.Count() == 1)
+                                    {
+                                        var curdriver = lastDriver.First();
+                                        if (curdriver.Employee.LastName.ToLower() != fio[0].ToLower() || curdriver.Employee.FirstName.ToLower() != fio[1].ToLower() || curdriver.Employee.MiddleName.ToLower() != fio[2].ToLower())
+                                        {
+                                            curdriver.EndUsingDate = DateTime.Now.AddMinutes(-10);
+                                            car[0].CarUsers.Add(new CarUser
+                                            {
+                                                StartUsingDate = DateTime.Now,
+                                                Employee = emp
+                                            });
+                                        }
+                                    }
+                                    else if (lastDriver.Count() > 1)
+                                    {
+                                        foreach (var item in lastDriver)
+                                        {
+                                            item.EndUsingDate = DateTime.Now.AddMinutes(-10);
+                                        }
+                                        car[0].CarUsers.Add(new CarUser
+                                        {
+                                            StartUsingDate = DateTime.Now,
+                                            Employee = emp
+                                        });
+                                    }
+                                    else
+                                    {
+                                        car[0].CarUsers.Add(new CarUser
+                                        {
+                                            StartUsingDate = DateTime.Now,
+                                            Employee = emp
+                                        });
+                                    }
+                                }
+                                else
+                                {
+                                    car[0].CarUsers.Add(new CarUser
+                                    {
+                                        StartUsingDate = DateTime.Now,
+                                        Employee = emp
+                                    });
+                                }
+
+
+
+                                //if (lastDriver!=null)
+                                //{
+
+
+                                //}
+
+                                //car[0].CarUsers[car[0].CarUsers.Count - 1].EndUsingDate = DateTime.Now.AddHours(-1);
+                                //car[0].CarUsers.Add(new CarUser
+                                //{
+                                //    StartUsingDate = DateTime.Now,
+                                //    Employee = emp
+                                //});
+                            }
+
+                            //var driver = car. (from d in _context.CarUsers.Include(c => c.Employee)
+                            //              where d.CarId == car.First().Id && d.EndUsingDate == null
+                            //              select d).LastOrDefault();
+                            //if (driver != null)
+                            //{
+                            //    int zq = 0;
+                            //}
+                            //else
+                            //{
+                           
+                            int zq = 1;
+                            //}
+                        }
+                    }
+
+                        
+
+                    int j = 0;
+                }
+                    //(from c in _context.Cars
+                    //       where c.RegistrationNumber.CheckNumber() == regNumber
+                    //       select c).FirstOrDefault();
+                
+                //if (car!=null)
+                //{
+                //    string[] fio = ((string)dataTable.Rows[i]["ФИО Водителя"]).Split(' ');
+                //    if (fio.Length == 3)
+                //    {
+                //        var driver = (from d in _context.CarUsers.Include(c => c.Employee)
+                //                      where d.CarId == car.Id && d.EndUsingDate == null
+                //                      select d).LastOrDefault();
+                //        if (driver != null)
+                //        {
+                //            int zq = 0;
+                //        }
+                //    }
+
+                //}
+            }
+            _context.SaveChanges();
+
+            //
+
+            //if (car!=null)
+            //{
+
+            //    if (fio.Length==3)
+            //    {
+            //        var driver = (from d in _context.CarUsers.Include(c=>c.Employee)
+            //                 where d.CarId == car.Id && d.EndUsingDate == null
+            //                 select d).LastOrDefault();
+
+            //        if (driver!=null)
+            //        {
+            //            if (driver.Employee.LastName.ToLower()!=fio[0].ToLower() || driver.Employee.FirstName.ToLower() != fio[1].ToLower() || driver.Employee.LastName.ToLower() != fio[2].ToLower())
+            //            {
+            //                driver.EndUsingDate = DateTime.Now.AddMinutes(-10);
+            //                CarUser carUser = new CarUser
+            //                {
+            //                    StartUsingDate = DateTime.Now
+
+            //                };
+            //            }
+            //        }
+            //        else
+            //        {
+
+
+            //        }
+            //    }
+            //}
+            //  }
+
+
+            int z = 0;
+
         }
 
         [HttpPost]
@@ -111,6 +320,8 @@ namespace KernelCars.Controllers
             
             UpdateEmployees(_context,dataTable);
 
+
+
             UpdateCars(dataTable, 0);
             //UpdateCars(dataTable);            
 
@@ -155,6 +366,279 @@ namespace KernelCars.Controllers
                 }
             }
             return id;
+        }
+
+        static DataTable ReadExcelKT(string fileName)
+        {
+            DataTable dtTable = new DataTable();
+
+            try
+            {
+                using (SpreadsheetDocument doc = SpreadsheetDocument.Open(fileName, false))
+                {
+                    WorkbookPart workbookPart = doc.WorkbookPart;
+                    Sheets thesheetcollection = workbookPart.Workbook.GetFirstChild<Sheets>();
+
+                    string sheetId = "";
+                    foreach (Sheet thesheet in thesheetcollection)
+                    {
+                        if (thesheet.Name == "Исходник")
+                        {
+                            sheetId = thesheet.Id;
+                            break;
+                        }
+                    }
+
+                    Worksheet theWorksheet = ((WorksheetPart)workbookPart.GetPartById(sheetId)).Worksheet;
+                    SheetData thesheetdata = theWorksheet.GetFirstChild<SheetData>();
+                    IEnumerable<Row> rows = thesheetdata.Descendants<Row>();
+
+                    //Выделяет все символы из строки
+                    Regex regex = new Regex(@"\D+");
+
+                    //Выделяет все цифры из строки
+                    Regex regex1 = new Regex(@"\d+");
+
+                    //Поиск колонки с признаком классификатора ОС
+                    string[] rowHeaders = new string[] { "Код" };
+
+                    int? startRowIndex = null;
+                    int ozColumnIndex = 0;
+
+                    //string[] vechicleType = new string[] { "Легкові", "Автобуси", "Вантажопасажирські" };
+
+                    List<string> passengerCellValue = new List<string>();
+                    List<int> rowsToProc = new List<int>();
+
+
+                    //Поиск первой строки с данными
+                    for (int rCnt = 0; rCnt < thesheetdata.ChildElements.Count(); rCnt++)
+                    {
+                        for (int rCnt1 = 0; rCnt1 < thesheetdata.ElementAt(rCnt).ChildElements.Count(); rCnt1++)
+                        {
+                            Cell thecurrentcell = (Cell)thesheetdata.ElementAt(rCnt).ChildElements.ElementAt(rCnt1);
+
+                            int id;
+                            if (Int32.TryParse(thecurrentcell.InnerText, out id))
+                            {
+                                SharedStringItem item = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
+                                if (item.Text != null)
+                                {
+                                    if (Array.IndexOf(rowHeaders, item.Text.Text) > -1)
+                                    {
+                                        startRowIndex = rCnt;
+                                        ozColumnIndex = rCnt1;
+                                        rowsToProc.Add(rCnt);
+                                        //passengerCellValue = thecurrentcell.InnerText;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (startRowIndex != null)
+                        {
+                            break;
+                        }
+                    }
+
+
+
+
+                    rowHeaders = new string[] { "Гос. номер ТС", "ФИО Водителя" };
+                    SharedStringTablePart stringTablePart = workbookPart.SharedStringTablePart;
+                    List<string> columns = new List<string>();
+
+                    //Поиск номеров колонок для получения данных
+                    int idx = 0;
+                    foreach (Cell c in rows.ElementAt((int)startRowIndex).Elements<Cell>())
+                    {
+
+                        if (c.CellValue != null)
+                        {
+                            if (c.DataType != null && c.DataType.Value == CellValues.SharedString)
+                            {
+                                if (Array.IndexOf(rowHeaders, stringTablePart.SharedStringTable.ChildElements[Int32.Parse(c.CellValue.InnerXml)].InnerText) > -1)
+                                {
+                                    columns.Add(regex.Match(c.CellReference).Value);// regex.Match(c.CellReference).Value);
+                                }
+                            }
+                        }
+                        idx++;
+                    }
+
+
+
+                    for (int rCnt = 0; rCnt < thesheetdata.ChildElements.Count(); rCnt++)
+                    {
+                        try
+                        {
+                            Cell thecurrentcell = (Cell)thesheetdata.ElementAt(rCnt).ChildElements.ElementAt(ozColumnIndex);
+
+                            int id;
+                            if (Int32.TryParse(thecurrentcell.InnerText, out id))
+                            {
+                                SharedStringItem item = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
+                                //if (Array.IndexOf(vechicleType.ToArray(), item.Text.Text) > -1)
+                                //{
+                                rowsToProc.Add(rCnt);
+                                //passengerCellValue.Add(thecurrentcell.InnerText);
+                                //}
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            //throw;
+                        }
+
+                    }
+
+                    //for (int rCnt = 0; rCnt < thesheetdata.ChildElements.Count(); rCnt++)
+                    //{
+                    //    try
+                    //    {
+                    //        Cell thecurrentcell = (Cell)thesheetdata.ElementAt(rCnt).ChildElements.ElementAt(ozColumnIndex);
+                    //        //if (thecurrentcell.InnerText == passengerCellValue)
+                    //        //    {
+                    //        //    rowsToProc.Add(rCnt);  
+                    //        //    }
+                    //    }
+                    //    catch (Exception)
+                    //    {
+                    //        //throw;
+                    //    }
+
+                    //}
+
+
+
+
+                    //int kejkej = 0;
+                    //if (c.CellValue != null)
+                    //{
+                    //    if (c.DataType != null && c.DataType.Value == CellValues.SharedString)
+                    //    {
+                    //        if (Array.IndexOf(rowHeaders, stringTablePart.SharedStringTable.ChildElements[Int32.Parse(c.CellValue.InnerXml)].InnerText) > -1)
+                    //        {
+                    //            columns.Add(stringTablePart.SharedStringTable.ChildElements[Int32.Parse(c.CellValue.InnerXml)].InnerText, regex.Match(c.CellReference).Value);
+                    //        }
+                    //    }
+                    //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    for (int rCnt = 0; rCnt < rowsToProc.Count(); rCnt++)
+                    {
+                        try
+                        {
+                            if (rCnt == 1826)
+                            {
+                                int lskdls = 0;
+                            }
+
+
+                            List<string> rowList = new List<string>();
+
+
+                            //for (int i = 0; i < thesheetdata.ElementAt(rowsToProc[rCnt]).Descendants<Cell>().Count(); i++)
+                            //{
+                            //    Cell cell = thesheetdata.ElementAt(rowsToProc[rCnt]).Descendants<Cell>().ElementAt(i);
+                            //    int actualCellIndex = CellReferenceToIndex(cell);
+                            //    tempRow[actualCellIndex] = GetCellValue(spreadSheetDocument, cell);
+                            //}
+
+
+                            // for (int c = 0; c < columns.Count(); c++)
+                            for (int c = 0; c < columns.Count(); c++)
+                            {
+                                Cell cell = thesheetdata.ElementAt(rowsToProc[0]).Descendants<Cell>().ElementAt(0);//columns[c]);
+                                int actualCellIndex = CellReferenceToIndex(cell);
+
+                                int? actualCellIdx = rows.ElementAt(rowsToProc[rCnt]).GetSellIndexFromColumnLetter(columns[c]);
+
+
+
+                                //thesheetdata.ElementAt(rowsToProc[rCnt])
+
+                                if (actualCellIdx == null)
+                                {
+                                    rowList.Add("");
+                                    continue;
+                                }
+
+
+
+                                Cell thecurrentcell = (Cell)thesheetdata.ElementAt(rowsToProc[rCnt]).ChildElements.ElementAt((int)actualCellIdx);
+                                string currentcellvalue = string.Empty;
+                                if (thecurrentcell.DataType != null)
+                                {
+                                    if (thecurrentcell.DataType == CellValues.SharedString)
+                                    {
+                                        int id;
+                                        if (Int32.TryParse(thecurrentcell.InnerText, out id))
+                                        {
+                                            SharedStringItem item = workbookPart.SharedStringTablePart.SharedStringTable.Elements<SharedStringItem>().ElementAt(id);
+                                            if (item.Text != null)
+                                            {
+                                                //first row will provide the column name.
+                                                if (rCnt == 0)
+                                                {
+                                                    dtTable.Columns.Add(item.Text.Text);
+                                                }
+                                                else
+                                                {
+                                                    rowList.Add(item.Text.Text);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                rowList.Add("");
+                                            }
+                                        }
+                                    }
+                                    else if (thecurrentcell.DataType == CellValues.Number)
+                                    {
+                                        rowList.Add(thecurrentcell.CellValue.InnerText);
+                                    }
+                                }
+                                else
+                                {
+                                    if (rCnt != 0)//reserved for column values
+                                    {
+                                        rowList.Add(thecurrentcell.InnerText);
+                                    }
+                                }
+                            }
+                            if (rCnt != 0)//reserved for column values
+                            {
+                                dtTable.Rows.Add(rowList.ToArray());
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            int hhh = 0;
+                            //throw;
+                        }
+
+                    }
+                    //  return JsonConvert.SerializeObject(dtTable);
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return dtTable;
         }
 
         static DataTable ReadExcelasJSONYears(string fileName)
@@ -482,7 +966,6 @@ namespace KernelCars.Controllers
             }
             return dtTable;
         }
-
 
         static DataTable ReadExcelasJSON(string fileName)
         {
@@ -818,7 +1301,6 @@ namespace KernelCars.Controllers
         }
 
 
-
         //int GetColumnIndexByName(GridViewRow row, string columnName)
         //{
         //    int columnIndex = 0;
@@ -939,8 +1421,6 @@ namespace KernelCars.Controllers
                 }
             }
         }
-
-
         void UpdateCars(DataTable dataTable, int z)
         {
             DataTable dt = new DataTable();
@@ -1231,11 +1711,5 @@ namespace KernelCars.Controllers
         }
 
        
-        //public ActionResult GetImage()
-        //{
-        //    /MemoryStream ms = new MemoryStream();
-
-        //    return null;
-        //}
     }
 }
