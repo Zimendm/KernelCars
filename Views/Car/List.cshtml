@@ -15,17 +15,8 @@
     {
         $("#searchString").keyup(function ()
         {
-            //alert("Helle");
             var datasearch = $(this).val().toLowerCase();
             $(".carList").each(function () {
-
-                //alert($(this).find(".searchField").text());
-
-                //$(this).filter(".searchField").each(function ()
-                //{
-                //    alert($(this).text());
-                //});
-
                 if ($(this).find(".searchField").text().toLowerCase().indexOf(datasearch)<0)
                 {
                     $(this).hide();

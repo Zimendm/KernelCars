@@ -71,7 +71,7 @@ namespace KernelCars
             services.AddDbContext<AppIdentityDbContext>(options =>
                 options.UseSqlServer(Configuration["KernelCarsIdentity:ConnectionString"]));
             
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<AppUser, IdentityRole>()
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
 
@@ -87,14 +87,15 @@ namespace KernelCars
             app.UseStatusCodePages();
             app.UseStaticFiles();
 
-
-
+            
             app.UseRouting();
 
             app.UseAuthentication();
             //app.UseAuthorization();
             app.UseAuthorization();
             //app.UseMvcWithDefaultRoute();
+
+
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapControllers();
@@ -111,6 +112,9 @@ namespace KernelCars
 
                 //endpoints.MapFallbackToController("Blazor", "Home");
             });
+
+           //app.UseAuthentication();
+
 
             //IdentitySeedData.EnsurePopulated(app);
 

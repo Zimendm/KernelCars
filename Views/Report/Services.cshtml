@@ -1,0 +1,13 @@
+﻿
+@{
+    ViewData["Title"] = "Services";
+}
+
+<h1>Services</h1>
+<form asp-action="Services" method="post">
+    <p>
+        Период:  <input type="date" value="@ViewData["FromDate"]" name="fromDate" /> - <input type="date" value="@ViewData["ToDate"]" name="toDate" />
+    </p>
+    <button type="submit" class="btn btn-primary">Загрузить отчёт</button>
+</form>
+

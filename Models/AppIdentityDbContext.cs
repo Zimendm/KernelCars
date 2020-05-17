@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace KernelCars.Models
 {
-    public class AppIdentityDbContext :  IdentityDbContext<IdentityUser>
+    public class AppIdentityDbContext :  IdentityDbContext<AppUser>
     {
         public AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options)
             :base(options) {}
