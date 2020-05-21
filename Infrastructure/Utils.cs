@@ -12,6 +12,11 @@ namespace KernelCars.Infrastructure
 {
     public static class Utils
     {
+        public static Dictionary<string, string> carStatus = new Dictionary<string, string>()
+        {
+                { "In Use","Эксплуатируется" }
+        };
+
         public static string CheckNumber(this String str)
         {
             Dictionary<string, string> latToRus = new Dictionary<string, string>()
@@ -29,6 +34,7 @@ namespace KernelCars.Infrastructure
                 { "T","Т" }
             };
 
+            
 
             string inString = str.Replace(" ", "").ToUpper();
             string outString = "";

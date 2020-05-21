@@ -15,4 +15,5 @@ namespace KernelCars.Models.ViewModels
         public string Password { get; set; }
         public string ReturnUrl { get; set; } = "/";
     }
+
 }

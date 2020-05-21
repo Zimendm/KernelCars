@@ -1,0 +1,27 @@
+﻿@model List<KernelCars.Models.CarService>
+
+
+<table class="table table-responsive">
+    <thead>
+        <tr>
+            <th>Модель</th>
+            <th>Гос.номер</th>
+            <th>Водитель</th>
+            <th>Дата</th>
+            <th>СТО</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(c => item.Car.CarModel.Manufacturer.Name) @Html.DisplayFor(c => item.Car.CarModel.Model) </td>
+                <td>@Html.DisplayFor(c => item.Car.RegistrationNumber)</td>
+                <td>@Html.DisplayFor(c => item.Car.CarUsers.LastOrDefault().Employee.FullName)</td>
+                <td>@(((DateTime) item.OpenDate).ToShortDateString())</td>
+                <td>@Html.DisplayFor(c => item.ServiceStation.Name)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

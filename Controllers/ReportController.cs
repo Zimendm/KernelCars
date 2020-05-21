@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using KernelCars.Infrastructure;
 using KernelCars.Pages.Cars;
 using DocumentFormat.OpenXml.Office2013.PowerPoint.Roaming;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace KernelCars.Controllers
 {
@@ -109,7 +112,6 @@ namespace KernelCars.Controllers
             return View();
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Services (DateTime? fromDate, DateTime? toDate)
         {
@@ -117,10 +119,6 @@ namespace KernelCars.Controllers
             dates = new List<DateTime>();
             System.Data.DataTable dtServices=new System.Data.DataTable();
             var servicesCount = new Dictionary<string, int>();
-            
-
-            //dtServices.Columns.Add(nameof());
-
             var typeOfServices = _context.TypeOfServices.ToList();
 
             dtServices.Columns.Add("Гос.номер");
@@ -131,10 +129,6 @@ namespace KernelCars.Controllers
             }
             dtServices.Columns.Add("Итого");
 
-
-
-
-
             fromDate = DateTime.Now.AddMonths(-1);
             toDate = DateTime.Now;
 
@@ -142,22 +136,10 @@ namespace KernelCars.Controllers
             {
                 dates.Add((DateTime)fromDate);
                 dates.Add((DateTime)toDate);
-
                 var carList = _context.CarServices.ToList();// .GroupBy(
-         
                 var cars = from car in carList
                            group car by car.CarId into ids
                            select ids;
-
-                               //car => car.CarId,
-                               //(carId) => new
-                               //{
-                               //    Key = carId
-                               //});
-
-                               //s => s.CarId);// _1_Pages_Cars_Index from car in _context.CarServices
-                               // group car by car.CarId into ids
-                               // select ids;
 
                 foreach (var id in cars)
                 {
@@ -198,19 +180,11 @@ namespace KernelCars.Controllers
                 }
 
 
-
-
                 var outpathLocal = Path.Combine(
                 Directory.GetCurrentDirectory(), @"wwwroot/OutFiles",
                 "Report.xlsx");
 
-               
-
-
                 dtServices.CreateServiceReport(outpathLocal,dates);
-
-               
-
             }
 
             var memory = new MemoryStream();
@@ -225,6 +199,180 @@ namespace KernelCars.Controllers
             memory.Position = 0;
 
             return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Path.GetFileName(outpath));
+        }
+
+        public async Task<IActionResult> CarsBase ()
+        {
+            string outFileName = "CarBase_" + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString() + ".xlsx";
+            DataTable dtServices = new System.Data.DataTable();
+
+
+            var outpathLocal = Path.Combine(
+                Directory.GetCurrentDirectory(), @"wwwroot/OutFiles",
+                outFileName);
+
+            //CreateCarsBaseReport(dtServices);
+
+
+            // Формирование табличной части
+            dtServices.Columns.Add("Модель");
+            dtServices.Columns.Add("Гос.номер");
+            dtServices.Columns.Add("Эксплуатирует");
+            dtServices.Columns.Add("Подразделение");
+            dtServices.Columns.Add("Владелец");
+            dtServices.Columns.Add("Закрепление");
+            dtServices.Columns.Add("Размещение");
+            dtServices.Columns.Add("Статус");
+
+            var cars = _context.Cars
+                .Include(c=>c.CarModel).ThenInclude(c=>c.Manufacturer)
+                .Include(c=>c.CarOwner)
+                .Include(c=>c.CarUsers).ThenInclude(c => c.Employee)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+                .ToList();
+            //var cars = _context.Cars.Include(c => c.CarOwner).ToList();
+            foreach (var item in cars)
+            {
+                DataRow row = dtServices.NewRow();
+                row["Модель"] = item.CarModel.Manufacturer.Name+" "+item.CarModel.Model;
+                row["Гос.номер"] = item.RegistrationNumber;
+                
+                row["Владелец"] = item.CarOwner.FullName;
+                row["Закрепление"] = item.CarUserForView;
+
+                if (item.CarStatuses.Count > 0 )
+                {
+                    row["Эксплуатирует"] = item.CarStatuses.LastOrDefault().Unit.Firm.Employee.FullName;
+                    row["Подразделение"] = item.CarStatuses.LastOrDefault().Unit.Department.Name;
+                    row["Размещение"] = item.CarStatuses.LastOrDefault().Location.LocationName;
+                    //row["Статус"] = item.CarStatuses.LastOrDefault().Status.State;
+
+
+                    string _outStat = String.Empty;
+                    if (KernelCars.Infrastructure.Utils.carStatus.TryGetValue(item.CarStatuses.LastOrDefault().Status.State,out _outStat))
+                    {
+                        row["Статус"] = _outStat;
+                    }
+                }
+                dtServices.Rows.Add(row);
+            }
+
+
+
+
+
+            SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.
+                Create(outpathLocal, SpreadsheetDocumentType.Workbook);
+
+            //Add a WorkbookPart to the document.
+            WorkbookPart workbookpart = spreadsheetDocument.AddWorkbookPart();
+            workbookpart.Workbook = new Workbook();
+
+            var sheetData = new SheetData();
+
+            // Add a WorksheetPart to the WorkbookPart.
+            WorksheetPart worksheetPart = workbookpart.AddNewPart<WorksheetPart>();
+            worksheetPart.Worksheet = new Worksheet(sheetData);
+
+            // Add Sheets to the Workbook.
+            Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.
+                AppendChild<Sheets>(new Sheets());
+
+            // Append a new worksheet and associate it with the workbook.
+            Sheet sheet = new Sheet()
+            {
+                Id = spreadsheetDocument.WorkbookPart.
+                GetIdOfPart(worksheetPart),
+                SheetId = 1,
+                Name = "Автомобили"
+            };
+            sheets.Append(sheet);
+
+            Row firstRow = new Row();
+
+            Cell headerCell = new Cell();
+
+            headerCell.DataType = CellValues.String;
+            headerCell.CellValue = new CellValue("Список легковых авто по состоянию на " + DateTime.Now.ToShortDateString());
+            firstRow.AppendChild(headerCell);
+            sheetData.AppendChild(firstRow);
+
+
+            Row headerRow = new Row();
+
+            List<String> columns = new List<string>();
+            foreach (System.Data.DataColumn column in dtServices.Columns)
+            {
+                columns.Add(column.ColumnName);
+
+                Cell cell = new Cell();
+                cell.DataType = CellValues.String;
+                cell.CellValue = new CellValue(column.ColumnName);
+                headerRow.AppendChild(cell);
+            }
+            sheetData.AppendChild(headerRow);
+
+
+
+            foreach (DataRow dsrow in dtServices.Rows)
+            {
+                Row newRow = new Row();
+                foreach (String col in columns)
+                {
+                    Cell cell = new Cell();
+                    //if (col == "Гос.номер" || col == "Модель")
+                    //{
+                        cell.DataType = CellValues.String;
+                    //}
+                    //else
+                    //{
+                    //    cell.DataType = CellValues.Number;
+                    //}
+                    cell.CellValue = new CellValue(dsrow[col].ToString());//.Replace(",", "."));
+                    newRow.AppendChild(cell);
+
+                }
+
+                sheetData.AppendChild(newRow);
+            }
+
+            workbookpart.Workbook.Save();
+
+            // Close the document.
+            spreadsheetDocument.Close();
+
+
+
+
+
+            var memory = new MemoryStream();
+            //var outpath = Path.Combine(
+            //    Directory.GetCurrentDirectory(), @"wwwroot/OutFiles",
+            //    outFileName);
+
+            using (var stream = new FileStream(outpathLocal, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+
+            return File(memory, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", Path.GetFileName(outpathLocal));
+        }
+
+        //private void CreateCarsBaseReport(DataTable dataTable)
+        //{
+        //    dataTable.Columns.Add("Автомобиль");
+
+        //    .throw new NotImplementedException();
+        //}
+
+        public IActionResult OpenServices()
+        {
+            var openService = _context.CarServices.Include(s=>s.Car).ThenInclude(c=>c.CarUsers).ThenInclude(u=>u.Employee).Include(s=>s.ServiceStation).Include(c=>c.Car.CarModel).ThenInclude(c=>c.Manufacturer).Where(s => s.CompleteDate == null).ToList();
+            return View(openService);
         }
 
         public IActionResult Index()
