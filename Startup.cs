@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using KernelCars.Models;
@@ -69,8 +68,9 @@ namespace KernelCars
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDbContext<AppIdentityDbContext>(options =>
-                options.UseSqlServer(Configuration["KernelCarsIdentity:ConnectionString"]));
-            
+                //options.UseSqlServer(Configuration["KernelCarsIdentity:ConnectionString"]));
+                options.UseSqlServer(Configuration.GetConnectionString("KernelCarsIdentity")));
+
             services.AddIdentity<AppUser, IdentityRole>()
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();

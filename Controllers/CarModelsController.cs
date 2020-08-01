@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using KernelCars.Data;
 using KernelCars.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KernelCars.Controllers
 {
@@ -19,6 +20,7 @@ namespace KernelCars.Controllers
             _context = context;
         }
 
+        [Authorize]
         // GET: CarModels
         public async Task<IActionResult> Index()
         {

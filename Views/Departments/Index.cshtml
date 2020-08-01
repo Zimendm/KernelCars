@@ -1,8 +1,8 @@
 ﻿@model IEnumerable<KernelCars.Models.Department>
 
-@{
+@*@{
     Layout = null;
-}
+}*@
 
 <!DOCTYPE html>
 
@@ -30,11 +30,11 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            @*<td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsAgriBusines)
+                @Html.DisplayFor(modelItem => @item.Name)
+            </td>
+            @*<td>
+                @Html.DisplayFor(modelItem => @item.IsAgriBusines)
             </td>*@
             <td>
                 <a asp-action="Edit" asp-route-id="@item.DepartmentId">Edit</a> |
