@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using KernelCars.Data;
 using KernelCars.Models;
 using KernelCars.Models.ViewModels;
+using DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace KernelCars.Controllers
 {
@@ -28,8 +29,9 @@ namespace KernelCars.Controllers
             return View(await dataContext.ToListAsync());
         }
 
-        public ViewResult CarStatuses(long? carId)
+        public ViewResult CarStatuses(long? id)
         {
+            long? carId = id;
 
             List<CarStatus> statuses = _context.CarStatuses.Include(s=>s.Status).Include(s=>s.Car).Where(s => s.CarId == carId).ToList();
 

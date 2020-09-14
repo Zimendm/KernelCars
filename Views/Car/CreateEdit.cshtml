@@ -1,0 +1,286 @@
+﻿@model KernelCars.Models.Car
+
+<h1>Edit</h1>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var url = "/Car/GetCarOwnerList";
+        var manufacturerId = 1;
+        $.getJSON(url, { ManufacturerId: manufacturerId }, function (data) {
+            $.each(data, function (i, cartype) {
+                //alert("Hello");
+                //$.each(data, function (i, item) {
+                //$("#owners").append($("<option>").attr('value', cartype.value).text(cartype.text));
+                //$("#owners").append($("<option>").attr('value',cartype.value).text(cartype.text));
+                $("#owners").append($("<option>").text(cartype.text));
+                //});
+            });
+        });
+        //var url = "/Car/GetCarTypeList";
+        //$.getJSON(url, { ManufacturerId: "3" }, function (data) {
+        //    $.each(data, function (i, cartype) {
+        //        alert(cartype.text);
+        //    });
+        //});
+        //$.getJSON(url1, { ManufacturerId: manufacturerId }, function (data) {
+        //$("#carTypeList").empty();
+        //var item = "<option value='0'>-- Выберите модель --</option>";
+        //$.each(data, function (i, cartype) {
+        //    item += '<option value="' + cartype.text + '">' + '</option>'
+        //});
+        //$("#owners").html(item);
+        //// se.show();
+        // se[0].clientHeight = 2;
+
+        //Поворот картинки но 90 градусов по клику
+        $('img').click(function () {
+            var angle = ($(this).data('angle') + 90) || 90;
+            $(this).css({ 'transform': 'rotate(' + angle + 'deg)' });
+            $(this).data('angle', angle);
+            $(this).css({ 'margin-top': 0 });
+        });
+
+        $("#manufacturerList").change(function () {
+            var manufacturerId = $("#manufacturerList").val();
+            //$("#carTypeList").simulate('mousedown');
+            var url = "/Car/GetCarTypeList";
+            $.getJSON(url, { ManufacturerId: manufacturerId }, function (data) {
+                $("#carTypeList").empty();
+                var item = "<option value='0'>-- Выберите модель --</option>";
+                $.each(data, function (i, cartype) {
+
+                    item += '<option value="' + cartype.value + '">' + cartype.text + '</option>'
+
+                });
+                $("#carTypeList").html(item);
+
+                //var nameArray = ["Rick Bross", "Madison Smith", "Jack Johnson"];
+
+                //                Add options to the datalist.
+                //- "attr" helps if you need an i.d to identify each option.
+                //- "text" is the content to be displayed.
+
+                //$.each(data, function (i, item) {
+                //    $("#owners").append($("<option>").attr('value', i.value).text(item.text));
+                //});
+
+                // se.show();
+                // se[0].clientHeight = 2;
+
+            });
+            //$("#carTypeList").trigger('mousedown');
+
+
+
+
+
+
+
+        });
+
+        $(".custom-file-input").on("change", function () {
+
+            var fileName = $(this).val().split("\\").pop();
+            $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+
+            //var f = $(this).val(); // files[0];
+
+            var props = $(this).prop('files');//,
+            var name = $(this).prop('name');
+            file = props[0];
+
+
+
+            //var input =  document.getElementById('fileinput');
+
+            //function showpreview(input) {
+
+            //if (input.files && input.files[0])
+            //{
+
+            //alert('HHHHH');
+            if (name.indexOf('2') > -1) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#image2').css('visibility', 'visible');
+                    $('#image2').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+
+            }
+            else {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#image').css('visibility', 'visible');
+                    $('#image').attr('src', e.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
+
+<form enctype="multipart/form-data" asp-action="Edit">
+    <input type="hidden" asp-for="Id" />
+    <div class="row">
+        <div class="col-sm">
+            <div class="form-group">
+                <label asp-for="RegistrationNumber" class="control-label"></label>
+                <input asp-for="RegistrationNumber" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="FirstRegistrationYear" class="control-label"></label>
+                <input asp-for="FirstRegistrationYear" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Владелец</label>
+                <input asp-for="CarOwner.FullName" list="owners" class="form-control" name="owners" id="ownerList" />
+                <datalist id="owners"></datalist>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label asp-for="Fuel" class="control-label"></label>
+                            <select asp-for="Fuel"
+                                    class="form-control"
+                                    asp-items="Html.GetEnumSelectList<TypeOfFuel>()">
+                                <option>Select fuel ...</option>
+                            </select>
+                            @*<span asp-validation-for="Fuel" class="text-danger"></span>*@
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label asp-for="TankCapacity" class="control-label"></label>
+                            <input asp-for="TankCapacity" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="control-label">Газ</label>
+                            <div class="form-check">
+                                <input asp-for="LPG" type="checkbox" class="form-check-input" />
+                                <label class="form-check-label">LPG</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="control-label">Производитель</label>
+                        <select asp-for="CarModel.ManufacturerId" class="form-control" asp-items="ViewBag.ManufacturerId" id="manufacturerList">
+                            <option value="">-- Выберите --</option>
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <label lass="control-label">Модель</label>
+                        <select asp-for="CarModelId" class="form-control" asp-items="ViewBag.CarModelId" id="carTypeList">
+                            <option value="">-- Выберите --</option>
+                        </select>
+                    </div>
+                    @*<span asp-validation-for="DepartmentID" class="text-danger" />*@
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="VinNumber" class="control-label"></label>
+                <input asp-for="VinNumber" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="EngineCapacity" class="control-label"></label>
+                <input asp-for="EngineCapacity" class="form-control" />
+            </div>
+            <div class="form-group">
+                <div class="row">
+
+                    <div class="col-6">
+                        <label asp-for="Tyres" class="control-label"></label>
+                        <input asp-for="Tyres" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm"></div>
+    </div>
+    <div class="row">
+        <div>
+            <input asp-for="CarOwner.FullName" list="owners" class="form-control" name="owners" id="ownerList" />
+            <datalist id="owners"></datalist>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm text-center">
+            <div class="card">
+                <div class="card-header">
+                    Техпаспорт.Сторона 1
+                </div>
+                <div class="card-body text-center">
+                    @{
+                        try
+                        {
+                            var base64 = Convert.ToBase64String(Model.ImagePage1);
+                            var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@imgsrc" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                        catch (Exception)
+                        {
+                            <img src="" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="custom-file">
+                        <input type="file" class="form-control custom-file-input" asp-for="ImagePage1" name="image1" />
+                        <label class="custom-file-label">Choose file...</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @* Изменить на вторую сторону техпаспорта *@
+        <div class="col-sm text-center">
+            <div class="card">
+                <div class="card-header">
+                    Техпаспорт.Сторона 2
+                </div>
+                <div class="card-body text-center">
+                    @{
+                        try
+                        {
+                            var base64 = Convert.ToBase64String(Model.ImagePage2);
+                            var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@imgsrc" class="img-thumbnail" id="image2" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                        catch (Exception)
+                        {
+                            <img src="" class="img-thumbnail" id="image2" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="custom-file">
+                        <input type="file" class="form-control custom-file-input" asp-for="ImagePage2" name="image2" />
+                        <label class="custom-file-label">Choose file...</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm"></div>
+    </div>
+    <div class="row">
+        @*<div class="col-sm"></div>*@
+        <div class="col-sm-8">
+            <div class="form-group text-center m-1 p-1">
+                <input type="submit" value="Сохранить" class="btn btn-primary btn-lg" />
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </div>
+        @*<div class="col-sm"></div>*@
+    </div>
+</form>
+<div>
+    <a asp-action="Index">Назад к списку</a>
+</div>

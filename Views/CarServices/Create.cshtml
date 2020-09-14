@@ -9,23 +9,24 @@
 <h4>CarService</h4>
 <hr />
 <div class="row">
-    <div class="col-md-8">
+
+    <div class="col-md-9">
         <form asp-action="Create">
-            <input asp-for="CarId" />
+            <input asp-for="CarId" hidden />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             @*<div class="form-group">
-                <label asp-for="CarId" class="control-label"></label>
-                <input asp-for="CarId" class="form-control" disabled />
-            </div>*@
-        <div class="form-group col-md-12">
-            @*<label asp-for="Car.RegistrationNumber" class="control-label"></label>
-        <input asp-for="Car.RegistrationNumber" class="form-control" disabled />*@
-            Автомобиль: @Model.Car.CarModel.Manufacturer.Name @Model.Car.CarModel.Model (<b>@Model.Car.RegistrationNumber</b>)
-        </div>
-        <div class="form-group">
-            @*<select asp-for=""></select>*@
-            <select asp-for="ServiceStationID" class="form-control" asp-items="ViewBag.StationId"></select>
-        </div>
+                    <label asp-for="CarId" class="control-label"></label>
+                    <input asp-for="CarId" class="form-control" disabled />
+                </div>*@
+            <div class="form-group col-md-12">
+                @*<label asp-for="Car.RegistrationNumber" class="control-label"></label>
+                    <input asp-for="Car.RegistrationNumber" class="form-control" disabled />*@
+                <label>Автомобиль: @Model.Car.CarModel.Manufacturer.Name @Model.Car.CarModel.Model (<b>@Model.Car.RegistrationNumber</b>)</label>
+            </div>
+            <div class="form-group col-md-12">
+                @*<select asp-for=""></select>*@
+                <select asp-for="ServiceStationID" class="form-control" asp-items="ViewBag.StationId"></select>
+            </div>
             <div class="form-group col-md-6">
                 <label asp-for="OpenDate" class="control-label"></label>
                 <input asp-for="OpenDate" class="form-control" />
@@ -56,10 +57,10 @@
                                            @*@(Html.Raw(course.Assigned ? "checked=\"checked\"" : ""))*@ />
                                     @service.Service @* @:  @course.Title*@
                                 @:</td>
-                                                /**/
-                                                /**/
-                                            }
-                                        @:</tr>
+                                /**/
+                                /**/
+                            }
+                        @:</tr>
                         }
                     </table>
                 </div>
@@ -67,8 +68,13 @@
                     <input type="submit" value="Записать" class="btn btn-primary" />
                 </div>
             </form>
+        </div>
+    <div class="col-md-3">
+        @*История ТО за весь период (в разработке)*@
+        @*@await Component.InvokeAsync("ServiceSummary")*@
+        <vc:service-summary car-id="@Model.Car.Id"/>
     </div>
-</div>
+    </div>
 
 <div>
     <a asp-action="CarSeviceList" asp-route-carId="@Model.Car.Id">Back to List</a>

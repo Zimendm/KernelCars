@@ -16,6 +16,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml;
+using KernelCars.Infrastructure;
 
 namespace KernelCars.Controllers
 {
@@ -206,7 +207,7 @@ namespace KernelCars.Controllers
                                     select m;
             ViewBag.ManufacturerID = new SelectList(manufacturerQuery.AsNoTracking(), "ManufacturerId", "Name",null);
 
-            return View();
+            return View("CreateEdit",new Car());
         }
 
         //[Authorize]
@@ -249,8 +250,17 @@ namespace KernelCars.Controllers
         public IActionResult EditPost([Bind("Id","RegistrationNumber", "VinNumber", "FirstRegistrationYear","CarModelId","Fuel","LPG", "EngineCapacity",
             "TankCapacity","Tyres")] Car car, string owners, IFormFile image1, IFormFile image2)
         {
-            Car c = _context.Cars.Find(car.Id);
-            
+            Car c;
+            if (car.Id==0)
+            {
+                c = new Car();
+                c.RegistrationNumber = car.RegistrationNumber.CheckNumber();
+            }
+            else
+            { 
+                c = _context.Cars.Find(car.Id);
+            }
+
             if (c == null)
             {
                 return NotFound();
@@ -328,6 +338,10 @@ namespace KernelCars.Controllers
                     image2.CopyTo(stream);
                     c.ImagePage2 = stream.ToArray();
                 }
+            }
+            if (c.Id==0)
+            {
+                _context.Cars.Add(c);
             }
 
             _context.SaveChanges();

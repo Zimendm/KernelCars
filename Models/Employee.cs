@@ -14,7 +14,7 @@ namespace KernelCars.Models
         public string FullName {
             get
             {
-                return LastName + " " + FirstName + " " + MiddleName;
+                return (LastName + " " + FirstName + " " + MiddleName).Trim();
             }
         }
         public bool IsFirm { 
