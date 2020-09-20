@@ -9,6 +9,10 @@
     {
       "library": "jquery@3.4.1",
       "destination": "wwwroot/lib/jquery"
+    },
+    {
+      "library": "open-iconic@1.1.1",
+      "destination": "wwwroot/CSS/open-iconic/"
     }
   ]
 }
