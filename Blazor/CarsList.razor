@@ -1,0 +1,44 @@
+﻿@page "/"
+@page "/cars"
+
+<h3>CarsList from Blazor Folder</h3>
+
+<h4 class="bg-primary text-white text-center p-2">Автомобили</h4>
+
+<SelectFilter Values="@Numbers" Title="Sort Order"/>
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Гос.номер</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Car c in Cars)
+        {
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.RegistrationNumber</td>
+                @*<td>@c.CarModel.Manufacturer.Name @c.CarModel.Model</td>*@
+                @*@if (@c.CarStatuses.LastOrDefault() == null)
+                {
+                    <td>Не установлен</td>
+                }
+                else
+                {
+                    <td>@c.CarStatuses.LastOrDefault().Status.State</td>
+                }*@
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Inject]
+    public KernelCars.Data.DataContext Context { get; set; }
+
+    public IEnumerable<KernelCars.Models.Car> Cars => Context.Cars;
+
+    public List<string> Numbers => new List<string> { "Acs", "Des" };
+
+}

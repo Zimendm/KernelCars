@@ -75,8 +75,10 @@ namespace KernelCars
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
 
-            services.AddMvc();
-            //services.AddControllersWithViews();
+            //services.AddMvc();
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
 
         }
 
@@ -104,12 +106,16 @@ namespace KernelCars
                     pattern: "Cars/Page{carPage}",
                     defaults: new { Controller = "Car", action = "Index" });
 
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Car}/{action=List}/{id?}");// .MapControllers();
-                //endpoints.MapRazorPages();
-                //endpoints.MapBlazorHub();
-
+                //endpoints.MapControllerRoute(
+                //    name: "default",
+                //    pattern: "{controller=Car}/{action=List}/{id?}");// .MapControllers();
+                
+                endpoints.MapControllerRoute("controllers",
+                    "controllers/{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
+                endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
                 //endpoints.MapFallbackToController("Blazor", "Home");
             });
 

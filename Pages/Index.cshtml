@@ -1,0 +1,65 @@
+﻿@page "/pages"
+@model IndexModel
+
+<h4 class="bg-primary text-white text-center p-2">Автомобили</h4>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Гос.номер</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (Car c in Model.Cars)
+        {
+        <tr>
+            <td>@c.Id</td>
+            <td>@c.RegistrationNumber</td>
+            <td>@c.CarModel.Manufacturer.Name @c.CarModel.Model</td>
+            @if (@c.CarStatuses.LastOrDefault()==null)
+            {
+                <td>Не установлен</td>
+            }
+            else
+            {
+                <td>@c.CarStatuses.LastOrDefault().Status.State</td>
+            }
+        </tr>
+        }
+    </tbody>
+</table>
+
+@functions{
+    public class IndexModel : PageModel
+    {
+        private DataContext context;
+
+        public IndexModel(DataContext dbContext)
+        {
+            context = dbContext;
+        }
+
+        public IEnumerable<Car> Cars { get; set; }
+
+        public void OnGet()
+        {
+            var carsQuery = context.Cars
+                .Include(c=>c.CarModel).ThenInclude(c=>c.Manufacturer)
+                .Include(c=>c.CarStatuses).ThenInclude(c=>c.Status);
+
+            List<Car> cars = new List<Car>();
+
+            foreach (var item in carsQuery)
+            {
+                if (item.CarStatuses.Count>0)
+                {
+                    cars.Add(item);
+                }
+            }
+
+            Cars = cars;
+            int jehj = 0;
+        }
+    }
+}
