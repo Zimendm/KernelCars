@@ -153,6 +153,23 @@ namespace KernelCars.Models
             }
         }
 
+        public string CarCurrentStatus 
+        {
+            get 
+            {
+                var carStatus = (from s in CarStatuses
+                                 select s).LastOrDefault();
+                if (carStatus!=null)
+                {
+                    if (carStatus.Status.State!=null)
+                    {
+                        return carStatus.Status.State;
+                    }
+                }
+                return "Undef";
+            }
+        }
+
         //Вспомогательные временные поля
         public string TempUser { get; set; }
         public string TempModel { get; set; }

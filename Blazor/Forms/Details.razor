@@ -1,0 +1,34 @@
+﻿@page  "/forms/details/{id:long}"
+@layout EmptyLayout
+@inherits OwningComponentBase<DataContext>
+
+<h4 class="bg-info text-center text-white p-2">Details</h4>
+<div class="form-group">
+    <label>ID</label>
+    <input class="form-control" value="@CarData.Id" disabled />
+</div>
+<div class="form-group">
+    <label>Гос.номер</label>
+    <input class="form-control" value="@CarData.RegistrationNumber" disabled />
+</div>
+<div class="text-center">
+    <NavLink class="btn btn-info" href="@EditUrl">Edit</NavLink>
+    <NavLink class="btn btn-secondary" href="/forms">Back</NavLink>
+</div>
+
+
+@code {
+
+    DataContext Context => Service;
+
+    public Car CarData { get; set; } = new Car();
+
+    [Parameter]
+    public long Id { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        CarData = await Context.Cars.FirstOrDefaultAsync(c => c.Id == Id);
+    }
+    public string EditUrl => $"/forms/edit/{Id}";
+}

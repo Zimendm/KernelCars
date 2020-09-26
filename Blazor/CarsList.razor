@@ -11,24 +11,43 @@
         <tr>
             <th>ID</th>
             <th>Гос.номер</th>
+            <th>Марка,Модель</th>
+            <th>Водитель</th>
+            <td></td>
         </tr>
     </thead>
     <tbody>
         @foreach (Car c in Cars)
         {
-            <tr>
-                <td>@c.Id</td>
-                <td>@c.RegistrationNumber</td>
-                @*<td>@c.CarModel.Manufacturer.Name @c.CarModel.Model</td>*@
-                @*@if (@c.CarStatuses.LastOrDefault() == null)
-                {
-                    <td>Не установлен</td>
-                }
-                else
-                {
-                    <td>@c.CarStatuses.LastOrDefault().Status.State</td>
-                }*@
-            </tr>
+        <tr>
+            <td>@c.Id</td>
+            <td>@c.RegistrationNumber</td>
+            <td>@c.CarModel.Manufacturer.Name @c.CarModel.Model</td>
+            @*<td>@c.CarStatuses?.LastOrDefault()</td>
+            <td>@c.CarUsers?.LastOrDefault().Employee.FullName</td>*@
+
+            @*@if (@c.CarStatuses.LastOrDefault() == null)
+        {
+            <td>Не установлен</td>
+        }
+        else
+        {
+            <td>@c.CarStatuses.LastOrDefault().Status.State</td>
+        }*@
+            @if (@c.CarUsers.LastOrDefault() == null)
+            {
+                <td>Не закреплён</td>
+            }
+            else
+            {
+                <td>@c.CarUsers.LastOrDefault().Employee.FullName</td>
+            }
+            <td>
+                <NavLink class="btn btn-sm btn-info" href="@GetEditUrl(c.Id)">
+                    Edit
+                </NavLink>
+            </td>
+        </tr>
         }
     </tbody>
 </table>
@@ -37,8 +56,12 @@
     [Inject]
     public KernelCars.Data.DataContext Context { get; set; }
 
-    public IEnumerable<KernelCars.Models.Car> Cars => Context.Cars;
+    public IEnumerable<KernelCars.Models.Car> Cars => Context.Cars
+        .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+        .Include(c=>c.CarUsers).ThenInclude(c=>c.Employee);
 
     public List<string> Numbers => new List<string> { "Acs", "Des" };
+
+    public string GetEditUrl(long id) => $"/car/{id}";
 
 }
