@@ -113,9 +113,9 @@ namespace KernelCars
                 endpoints.MapControllerRoute("controllers",
                     "controllers/{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapDefaultControllerRoute();
-                endpoints.MapRazorPages();
-                endpoints.MapBlazorHub();
-                endpoints.MapFallbackToPage("/_Host");
+                //endpoints.MapRazorPages();
+                //endpoints.MapBlazorHub();
+                //endpoints.MapFallbackToPage("/_Host");
                 //endpoints.MapFallbackToController("Blazor", "Home");
             });
 
