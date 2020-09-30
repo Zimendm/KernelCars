@@ -109,10 +109,12 @@ namespace KernelCars
                 //endpoints.MapControllerRoute(
                 //    name: "default",
                 //    pattern: "{controller=Car}/{action=List}/{id?}");// .MapControllers();
-                
-                endpoints.MapControllerRoute("controllers",
-                    "controllers/{controller=Home}/{action=Index}/{id?}");
-                endpoints.MapDefaultControllerRoute();
+
+                endpoints.MapControllerRoute("default",
+                    "/{controller=Car}/{action=Index}/{id?}");
+                //endpoints.MapControllerRoute("controllers",
+                //    "controllers/{controller=Home}/{action=Index}/{id?}");
+                //endpoints.MapDefaultControllerRoute();
                 //endpoints.MapRazorPages();
                 //endpoints.MapBlazorHub();
                 //endpoints.MapFallbackToPage("/_Host");

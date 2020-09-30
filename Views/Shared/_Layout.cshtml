@@ -85,6 +85,9 @@
                             <a class="dropdown-item" asp-controller="Car" asp-action="WorkWithData">Авто</a>
                         </div>
                     </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-area="" asp-controller="CarServices" asp-action="Index" asp-route-carId="975">Тех.обслуживание</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Автомобілі
@@ -104,8 +107,8 @@
                             <a class="dropdown-item" asp-controller="Report" asp-action="OpenServices">Открытые ТО</a>
                             <a class="dropdown-item" asp-controller="Report" asp-action="Services">ТО за период</a>
                             @*<a class="dropdown-item" asp-controller="CarModels" asp-action="Index">Моделі</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>*@
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>*@
                         </div>
                     </li>
 
@@ -116,12 +119,13 @@
     <div class="container-fluid">
         <main role="main" class="pb-3">
             <div class="row m-1 p-1">
-                <div class="col-2">
-                    @await Component.InvokeAsync("NavigationMenu")
-                </div>
-                <div class="col-10">
+                <!--<div class="col-2">-->
+                    @*@await Component.InvokeAsync("NavigationMenu")*@
+                <!--</div>-->
+                <div class="col-12">
                     @RenderBody()
                 </div>
+
             </div>
         </main>
     </div>

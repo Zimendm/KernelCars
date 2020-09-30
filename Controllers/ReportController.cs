@@ -203,12 +203,12 @@ namespace KernelCars.Controllers
 
         public async Task<IActionResult> CarsBase ()
         {
-            string outFileName = "CarBase_" + DateTime.Now.ToShortDateString() + DateTime.Now.ToShortTimeString() + ".xlsx";
+            string outFileName = "CarBase_" + DateTime.Now.Year+DateTime.Now.Month+DateTime.Now.Day+DateTime.Now.Hour+DateTime.Now.Minute + ".xlsx";
             DataTable dtServices = new System.Data.DataTable();
 
 
             var outpathLocal = Path.Combine(
-                Directory.GetCurrentDirectory(), @"wwwroot/OutFiles",
+                Directory.GetCurrentDirectory(), @"wwwroot/OutFiles/CarBasesReports",
                 outFileName);
 
             //CreateCarsBaseReport(dtServices);

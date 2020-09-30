@@ -31,7 +31,7 @@ namespace KernelCars.Controllers
         {
             _context = context;
         }
-        public IActionResult Index(string currentFilter, string searchString, int carPage = 1)
+        public IActionResult Index(string status,string currentFilter, string searchString, int carPage = 1)
         {
             if (searchString != null)
             {
@@ -44,40 +44,96 @@ namespace KernelCars.Controllers
 
             ViewData["CurrentFilter"] = searchString;
 
+            var carsQuery = _context.Cars
+                .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+                .Include(c => c.CarOwner)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                .ToList();
+
+
+
             //var cars = _context.Cars
             //        .Include(c => c.CarModel)
             //        .ThenInclude(c => c.Manufacturer)
             //        .Include(c => c.CarOwner); 
-            var cars = from c in _context.Cars
-                       select c;
+            //var cars = from c in _context.Cars
+            //           select c;
 
+            List<Car> cars = new List<Car>();//carsQuery;
+
+            //var cars = _context.Cars
+            //    .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            //    .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+            //    .Include(c => c.CarOwner);
+
+            //var carsList = _context.Cars.Include(c=>c.CarStatuses);
             //        .Skip((carPage - 1) * PageSize)
             //       .Take(PageSize);
             //.ToList();
 
-            if (String.IsNullOrEmpty(searchString))
+            ////if (String.IsNullOrEmpty(searchString))
+            ////{
+            ////    //cars = cars.Skip((carPage - 1) * PageSize);
+            ////    cars = cars
+            ////        .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            ////        .Include(c => c.CarOwner)
+            ////        .Include(c=>c.CarStatuses).ThenInclude(c=>c.Status)
+            ////        .Include(c=>c.CarUsers).ThenInclude(c=>c.Employee)
+            ////    .Skip((carPage - 1) * PageSize);
+
+
+            ////}
+            ////else
+            ////{
+            ////    cars = cars
+            ////       .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            ////       .Include(c => c.CarOwner)
+            ////       .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+            ////       .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+            ////   .Where(c => c.RegistrationNumber.Contains(searchString))
+            ////   .Skip((carPage - 1) * PageSize);
+
+            ////}
+            if (status!=null)
             {
-                cars = cars.Include(c => c.CarModel)
-                .ThenInclude(c => c.Manufacturer)
-                .Include(c => c.CarOwner)
-                .Skip((carPage - 1) * PageSize);
-                
+                if (status != "Не указан")
+                {
+                    foreach (var item in carsQuery)
+                    {
+                        if (item.CarStatuses.Count >= 1)
+                        {
+                            if (item.CarStatuses.LastOrDefault().Status.State == status)
+                            {
+                                cars.Add(item);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var item in carsQuery)
+                    {
+                        if (item.CarStatuses.Count == 0)
+                        {
+                            cars.Add(item);
+                        }
+                    }
+                }
             }
             else
             {
-                cars = cars.Include(c => c.CarModel)
-                .ThenInclude(c => c.Manufacturer)
-                .Include(c => c.CarOwner)
-                .Where(c => c.RegistrationNumber.Contains(searchString))
-                .Skip((carPage - 1) * PageSize);
-                
+                cars = carsQuery;
             }
-
 
             return View(
                 new CarsListViewModel {
-                    Cars =cars
-                    .ToList().Take(PageSize),
+                    //Cars = cars
+                    //.ToList().Where(c => c.CarCurrentStatus == status).Take(PageSize),
+                    Cars = cars.Take(PageSize),
+                    //.ToList().Where(c => c.CarCurrentStatus == status).Take(PageSize),
                     PagingInfo = new PagingInfo
                     {
                         CurrentPage=carPage,
@@ -193,6 +249,7 @@ namespace KernelCars.Controllers
                 ViewData["CarStatus"] = "Undefined";
             }
 
+            ViewData["Registration"] = car.RegistrationNumber;
             ViewData["Total"] = (from c in car.CarSevices
                          select c.Ammount).Sum();
 

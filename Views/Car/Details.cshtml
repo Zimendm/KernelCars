@@ -210,7 +210,7 @@
                         @:<dt>Частный авто</dt>
                         @:<dd><input type="checkbox" value="@Model.IsRentCar" @(Html.Raw(Model.IsPrivat ? "checked=\"checked\"" : "")) disabled /><b style="color:white">.</b></dd>
                     }
-                    
+
 
                 </dl>
             </div>
@@ -266,48 +266,84 @@
                 @*</div>*@
             </div>
         </div>
-        <div @(Html.Raw(@Model.CarStatuses.Count < 2 ? "hidden" : ""))>
+        <div @*@(Html.Raw(@Model.CarStatuses.Count < 2 ? "hidden" : ""))*@>
             <p>
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseStatus" aria-expanded="false" aria-controls="collapseStatus">
-                    Статусы
-                </button>
+                <div class="col-2">
+                    <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapseStatus" aria-expanded="false" aria-controls="collapseStatus">
+                        Статусы
+                    </button>
+                </div>
             </p>
             <div class="collapse" id="collapseStatus">
                 <div class="card card-body">
-                    Список статусов авто (в разработке)
+                    <p>
+                        <a class="card-link" asp-controller="CarStatus" asp-action="Assign" asp-route-carId="@Model.Id">Новый статус</a>
+                    </p>
+                    <div class="card">
+                        <partial name="CarStatusesListPartial" model="Model.CarStatuses" view-data="@ViewData" />
+                    </div>
                 </div>
             </div>
         </div>
-        <div @(Html.Raw(@Model.CarUsers.Count < 2 ? "hidden" : ""))>
+        <div @*@(Html.Raw(@Model.CarUsers.Count >= 1 ? "" : "hidden"))*@>
             <p>
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseUser" aria-expanded="false" aria-controls="collapseUser">
-                    Пользователи
-                </button>
+                <div class="col-2">
+                    <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapseUser" aria-expanded="false" aria-controls="collapseUser">
+                        Пользователи
+                    </button>
+                </div>
             </p>
             <div class="collapse" id="collapseUser">
-                <div class="card card-body">
-                    Список пользователей авто (в разработке)
+                <p>
+                    <a class="card-link" asp-controller="CarUsers" asp-action="Assign" asp-route-carId="@Model.Id">Новое закрепление</a>
+                </p>
+                <div class="card">
+                    <partial name="CarUsersList" model="Model.CarUsers" view-data="@ViewData" />
                 </div>
             </div>
         </div>
-
-        @* Информация о техническом обслуживании авто *@
-        <div @(Html.Raw(@Model.CarSevices.Count < 1 ? "hidden" : ""))>
+        <div class="m-2"></div>
+        <div @(Html.Raw(@Model.IsRentCar != true ? "hidden" : ""))>
             <p>
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseService" aria-expanded="false" aria-controls="collapseService">
-                    Тех.обслуживание
-                </button>
+                <div class="col-2">
+                    <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapseRent" aria-expanded="false" aria-controls="collapseRent">
+                        Дог.аренды
+                    </button>
+                </div>
             </p>
-            <div class="collapse" id="collapseService">
-
+            <div class="collapse col-12" id="collapseRent">
+                <p>
+                    <a class="card-link" asp-controller="CarServices" asp-action="CarSeviceList" asp-route-carId="@Model.Id">Новый договор</a>
+                    @*<a class="card-link" asp-controller="Report" asp-action="CarService" asp-route-carId="@Model.Id">Отчёты по ТО</a>*@
+                </p>
                 <div class="card">
                     <partial name="CarServicesList" model="Model.CarSevices" view-data="@ViewData" />
                 </div>
-                <p>
-                    <a asp-controller="Report" asp-action="CarService" asp-route-carId="@Model.Id" class="card-link">Отчёты по ТО</a>
-                </p>
             </div>
-            <div >
+        </div>
+        @* Информация о техническом обслуживании авто *@
+        @*<div @(Html.Raw(@Model.CarSevices.Count < 1 ? "hidden" : ""))>*@
+        <div @(Html.Raw(@Model.IsEnableService != true ? "hidden" : ""))>
+            <p>
+                <div class="col-2">
+                    <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapseService" aria-expanded="false" aria-controls="collapseService">
+                        Тех.обслуживание
+                    </button>
+                </div>
+            </p>
+            <div class="collapse" id="collapseService">
+                <p>
+                    <a class="card-link" asp-controller="CarServices" asp-action="CarSeviceList" asp-route-carId="@Model.Id">Запись на ТО</a>
+                    <a class="card-link" asp-controller="Report" asp-action="CarService" asp-route-carId="@Model.Id">Отчёты по ТО</a>
+                </p>
+                <div class="card">
+                    <partial name="CarServicesList" model="Model.CarSevices" view-data="@ViewData" />
+                </div>
+                @*<p>
+
+                </p>*@
+            </div>
+            <div>
                 <p>
                     <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseTemp" aria-expanded="false" aria-controls="collapseTemp">
                         Временно
@@ -375,6 +411,6 @@
 
                 </div>
             </div>
-         </div>
+        </div>
     </div>
 </div>

@@ -29,12 +29,39 @@ namespace KernelCars.Controllers
         }
 
         // GET: CarServices
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string status)
         {
-            var dataContext = _context.CarServices;//.Include(c => c.Car);
-            return View(await dataContext.ToListAsync());
-            //return View();
+            List<CarService> carServices;
+            //var servicesQuery = _context.CarServices;//.Where(s=>s.CompleteDate!=null).Include(c => c.Car).Include(c => c.ServiceStation);
 
+            if (status=="Completed")
+            {
+                carServices = await _context.CarServices.Where(s => s.CompleteDate != null).Include(c => c.Car).Include(c => c.ServiceStation).ToListAsync();
+            }
+            else if (status=="Open")
+            {
+                carServices = await _context.CarServices.Where(s => s.CompleteDate == null).Include(c => c.Car).Include(c => c.ServiceStation).ToListAsync();
+            }
+            else
+            {
+                carServices = await _context.CarServices.Include(c => c.Car).Include(c => c.ServiceStation).ToListAsync();
+            }
+
+            //servicesQuery = servicesQuery.Where(s => s.CompleteDate != null);
+
+            //servicesQuery = servicesQuery.Where(s => s.CompleteDate != null);
+            //IEquatable<CarService> dataContext;// = new IEnumerable<CarService>();// _context.CarServices.Include(c => c.Car).Include(c => c.ServiceStation);
+
+            //if (status=="Completed")
+            //{
+            //    dataContext = _context.CarServices;//.Include(c => c.Car).Include(c => c.ServiceStation);//.Where(s => s.CompleteDate == null);
+            //}
+            //return View(dataContext.ToListAsync());
+            ////return View()
+            ///
+            /// ;
+            ViewBag.SelectedStatus = (HttpContext.Request.Query["status"]).ToString();
+            return View(carServices);
         }
 
         // GET: CarServices/Details/5
@@ -214,7 +241,8 @@ namespace KernelCars.Controllers
             CarCloseServiceViewModel csvm = new CarCloseServiceViewModel
             {
                 CarServiceId = carService.ID,
-                CarService = carService
+                CarService = carService,
+                RegNumber=carService.Car.RegistrationNumber
             };
 
             return View(csvm);
@@ -222,9 +250,10 @@ namespace KernelCars.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public RedirectToActionResult Close([Bind("CarServiceId", "CarService", "DocumentScan")] CarCloseServiceViewModel model)
+        public RedirectToActionResult Close([Bind("CarServiceId", "CarService", "DocumentScan","RegNumber")] CarCloseServiceViewModel model)
         {
             string uniqueFileName = null;
+            string filePath = null;
             if (ModelState.IsValid)
             {
                 try
@@ -232,9 +261,28 @@ namespace KernelCars.Controllers
                     
                     if (model.DocumentScan != null)
                     {
-                        string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, @"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\AccountingDocuments\");
+                        //string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, @"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\AccountingDocuments\");
+                        string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "AccountingDocuments");
+                        uploadFolder = Path.Combine(uploadFolder,model.RegNumber);
+
+                        try
+                        {
+                            if (!Directory.Exists(uploadFolder))
+                            {
+                                DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
+                            }
+
+                        }
+                        catch (Exception)
+                        {
+
+                            //throw;
+                        }
+                        
+
+
                         uniqueFileName = Guid.NewGuid() + "_" + model.DocumentScan.FileName;
-                        string filePath = Path.Combine(uploadFolder, uniqueFileName);
+                        filePath = Path.Combine(uploadFolder, uniqueFileName);
 
                         using (var stream = new FileStream(filePath, FileMode.Create))
                         {
@@ -267,7 +315,8 @@ namespace KernelCars.Controllers
                 }
                 if (uniqueFileName!=null)
                 {
-                    carServiceToClose.DocumentPath = uniqueFileName;
+                    //carServiceToClose.DocumentPath = uniqueFileName;
+                    carServiceToClose.DocumentPath = filePath;
                 }
 
                 _context.SaveChanges();

@@ -1,6 +1,7 @@
 ﻿@model IEnumerable<KernelCars.Models.CarService>
 
 @{
+    Layout = "_Layout";
     ViewData["Title"] = "Index";
 }
 
@@ -9,45 +10,88 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.OpenDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CompleteDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ServiceDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Car)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.OpenDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CompleteDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ServiceDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Car.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="row">
+    <div class="col-2">
+        <a class="btn btn-block
+           @((ViewBag.SelectedStatus!="Completed" && ViewBag.SelectedStatus!="Open")  ? "btn-primary": "btn-secondary")"
+           asp-action="Index"
+           asp-route-status="">
+            All
+        </a>
+        <a class="btn btn-block
+            @(ViewBag.SelectedStatus=="Completed" ? "btn-primary": "btn-secondary")" asp-action="Index" asp-route-status="Completed">Завершённые</a>
+        <a class="btn btn-block
+           @(ViewBag.SelectedStatus=="Open" ? "btn-primary": "btn-secondary")" asp-action="Index" asp-route-status="Open">Открытые</a>
+    </div>
+    <div class="col-10">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Гос.номер
+                    </th>
+                    <th>СТО</th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.OpenDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CompleteDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ServiceDescription)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Car)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Car.RegistrationNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ServiceStation.Name)
+                        </td>
+
+                        <td>
+                            @item.OpenDate.ToShortDateString()
+                            @*@Html.DisplayFor(modelItem => item.OpenDate)*@
+                        </td>
+                        <td>
+                            @if (item.CompleteDate != null)
+                            {
+                                DateTime date = (DateTime)item.CompleteDate;
+                                @date.ToShortDateString();
+
+                            }
+                            //@item.CompleteDate.ToShortDateString()
+                            @*@Html.DisplayFor(modelItem => item.CompleteDate)*@
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ServiceDescription)
+                        </td>
+                        @*<td>
+                                @Html.DisplayFor(modelItem => item.Car.Id)
+                            </td>*@
+                    <td>
+                        @if (item.CompleteDate == null)
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.ID">Edit |</a>
+                        }                        
+                        <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                        @if (item.CompleteDate == null)
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.ID">| Delete</a>
+                        }
+
+                    </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -166,7 +166,7 @@ namespace KernelCars.Models
                         return carStatus.Status.State;
                     }
                 }
-                return "Undef";
+                return "Не указан";
             }
         }
 

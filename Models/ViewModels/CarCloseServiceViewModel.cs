@@ -11,6 +11,7 @@ namespace KernelCars.Models.ViewModels
         public int CarServiceId { get; set; }
         public CarService CarService { get; set; }
         //public DateTime CloseDate { get; set; }
+        public string RegNumber { get; set; }
         public IFormFile DocumentScan { get; set; }
     }
 }
