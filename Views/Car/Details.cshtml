@@ -217,12 +217,14 @@
         </div>
 
         <div @(Html.Raw(@Model.ImagePage1 == null ? "hidden" : ""))>
-            <p>
-                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapsePhoto" aria-expanded="false" aria-controls="collapsePhoto">
-                    Техпаспорт
-                </button>
-            </p>
-            <div class="collapse" id="collapsePhoto">
+            <div class="col-2">
+                <p>
+                    <button class="btn btn-primary btn-block" type="button" data-toggle="collapse" data-target="#collapsePhoto" aria-expanded="false" aria-controls="collapsePhoto">
+                        Техпаспорт
+                    </button>
+                </p>
+            </div>
+            <div class="collapse col-12" id="collapsePhoto">
                 @*<div class="card card-body">*@
                 <div class="row">
                     <div class="col-sm text-center">
@@ -274,7 +276,7 @@
                     </button>
                 </div>
             </p>
-            <div class="collapse" id="collapseStatus">
+            <div class="collapse col-12" id="collapseStatus">
                 <div class="card card-body">
                     <p>
                         <a class="card-link" asp-controller="CarStatus" asp-action="Assign" asp-route-carId="@Model.Id">Новый статус</a>
@@ -293,7 +295,7 @@
                     </button>
                 </div>
             </p>
-            <div class="collapse" id="collapseUser">
+            <div class="collapse col-12" id="collapseUser">
                 <p>
                     <a class="card-link" asp-controller="CarUsers" asp-action="Assign" asp-route-carId="@Model.Id">Новое закрепление</a>
                 </p>
@@ -303,6 +305,7 @@
             </div>
         </div>
         <div class="m-2"></div>
+
         <div @(Html.Raw(@Model.IsRentCar != true ? "hidden" : ""))>
             <p>
                 <div class="col-2">
@@ -312,12 +315,16 @@
                 </div>
             </p>
             <div class="collapse col-12" id="collapseRent">
-                <p>
-                    <a class="card-link" asp-controller="CarServices" asp-action="CarSeviceList" asp-route-carId="@Model.Id">Новый договор</a>
-                    @*<a class="card-link" asp-controller="Report" asp-action="CarService" asp-route-carId="@Model.Id">Отчёты по ТО</a>*@
-                </p>
+                @if (ViewBag.ActiveLease == 0)
+                {
+                    <p>
+                        <a class="card-link" asp-controller="Lease" asp-action="Create" asp-route-carId="@Model.Id">Новый договор</a>
+                        @*<a class="card-link" asp-controller="Report" asp-action="CarService" asp-route-carId="@Model.Id">Отчёты по ТО</a>*@
+                    </p>
+                }
+
                 <div class="card">
-                    <partial name="CarServicesList" model="Model.CarSevices" view-data="@ViewData" />
+                    <partial name="LeaseContractListPartial" model="Model.LeaseContracts" view-data="@ViewData" />
                 </div>
             </div>
         </div>
@@ -331,7 +338,7 @@
                     </button>
                 </div>
             </p>
-            <div class="collapse" id="collapseService">
+            <div class="collapse col-12" id="collapseService">
                 <p>
                     <a class="card-link" asp-controller="CarServices" asp-action="CarSeviceList" asp-route-carId="@Model.Id">Запись на ТО</a>
                     <a class="card-link" asp-controller="Report" asp-action="CarService" asp-route-carId="@Model.Id">Отчёты по ТО</a>

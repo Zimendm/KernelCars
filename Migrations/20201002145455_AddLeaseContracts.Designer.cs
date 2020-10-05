@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201002145455_AddLeaseContracts")]
+    partial class AddLeaseContracts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -265,9 +267,6 @@ namespace KernelCars.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
@@ -328,10 +327,7 @@ namespace KernelCars.Migrations
                     b.Property<long>("CarId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("FromDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("LeaseAmmount")
@@ -340,20 +336,12 @@ namespace KernelCars.Migrations
                     b.Property<int>("LeaseCurrency")
                         .HasColumnType("int");
 
-                    b.Property<int>("ManagerId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ToDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("ID");
 
                     b.HasIndex("CarId");
-
-                    b.HasIndex("ManagerId");
 
                     b.ToTable("LeaseContracts");
                 });
@@ -377,42 +365,6 @@ namespace KernelCars.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Locations");
-                });
-
-            modelBuilder.Entity("KernelCars.Models.Manager", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("City")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LeaseProcuratory")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("LeaseProcuratoryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LeaseProcuratoryNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("MiddleName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Registration")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Manager");
                 });
 
             modelBuilder.Entity("KernelCars.Models.Manufacturer", b =>
@@ -638,14 +590,8 @@ namespace KernelCars.Migrations
             modelBuilder.Entity("KernelCars.Models.LeaseContract", b =>
                 {
                     b.HasOne("KernelCars.Models.Car", "Car")
-                        .WithMany("LeaseContracts")
+                        .WithMany()
                         .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("KernelCars.Models.Manager", "Manager")
-                        .WithMany("LeaseContracts")
-                        .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

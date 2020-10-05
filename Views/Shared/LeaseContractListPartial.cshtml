@@ -1,0 +1,74 @@
+﻿@model IEnumerable<LeaseContract>
+
+<table class="servicelist table table-hover">
+    <thead>
+        <tr>
+            <th>Начало аренды</th>
+            <th>Дата окончания</th>
+            <th>Стоимость</th>
+            <th>Валюта</th>
+            <th>Статус авто</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var contract in Model)
+        {
+        <tr>
+            @*<td>
+            @service.ID
+        </td>*@
+            <td>
+                @contract.FromDate.ToShortDateString()
+            </td>
+            <td>
+                @(((DateTime)contract.ToDate).ToShortDateString()) 
+            </td>
+            <td>
+                @Html.DisplayFor(c => contract.LeaseAmmount)
+            </td>
+            <td>
+                @Html.DisplayFor(c => contract.LeaseCurrency)
+            </td>
+            
+            @if (contract.EndDate == null)
+            {   
+                <td>
+                    <label>Эксплуатируется</label>
+                </td>
+                <td>
+                    <a asp-controller="CarServices" asp-action="Edit" asp-route-id="@contract.ID">Продлить/Расторгнуть</a> 
+                </td>
+            }
+            else
+            {
+                <td>
+                    <label>Возвращен: @(((DateTime)contract.EndDate).ToShortDateString())</label>
+                </td>
+            }
+
+            @*<td>
+            @service.Odometr
+        </td>
+        <td>
+            @service.Ammount
+        </td>
+        <td>
+            Расторгнуть | Продлить
+            @if (service.CompleteDate == null)
+            {
+                <a asp-controller="CarServices" asp-action="Edit" asp-route-id="@service.ID">Изменить</a> @:|
+            }
+            else
+            {
+                <a asp-controller="CarServices" asp-action="Details" asp-route-id="@service.ID">Просмотреть</a>
+            }
+            @if (service.CompleteDate == null)
+            {
+                <a asp-controller="CarServices" asp-action="Close" asp-route-id="@service.ID">Закрыть Акт</a>
+            }
+        </td>*@
+        </tr>
+        }
+    </tbody>
+</table>

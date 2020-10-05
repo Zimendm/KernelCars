@@ -101,10 +101,10 @@ namespace KernelCars
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapControllers();
-                endpoints.MapControllerRoute(
-                    name: "pagination",
-                    pattern: "Cars/Page{carPage}",
-                    defaults: new { Controller = "Car", action = "Index" });
+                //endpoints.MapControllerRoute(
+                //    name: "pagination",
+                //    pattern: "Cars/Page{carPage}",
+                //    defaults: new { Controller = "Car", action = "Index" });
 
                 //endpoints.MapControllerRoute(
                 //    name: "default",

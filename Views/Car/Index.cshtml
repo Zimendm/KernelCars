@@ -13,10 +13,10 @@
     <div class="col-10">
         <h1>Cars</h1>
         @*@foreach (var item in Model.Cars)
-            {
-                //@Html.Partial("CarSummary", item)
-                <partial name="CarSummary" model="item"/>
-            }*@
+        {
+            //@Html.Partial("CarSummary", item)
+            <partial name="CarSummary" model="item"/>
+        }*@
         <form asp-action="Index" method="get">
             <div class="form-actions no-color">
                 <p>
@@ -42,8 +42,8 @@
                         @*@Html.DisplayNameFor(model => model.Cars.First().RegistrationNumber)*@
                     </th>
                     @*<th>
-                            @Html.DisplayNameFor(model => model.Cars.First().FirstRegistrationYear)
-                        </th>*@
+                        @Html.DisplayNameFor(model => model.Cars.First().FirstRegistrationYear)
+                    </th>*@
                     <th>
                         Пользователь
                         @*@Html.DisplayNameFor(model => model.Cars.First().CarUsers)*@
@@ -72,23 +72,23 @@
                         @*<td>@Html.DisplayFor(c => item.CarOwner.LastName) @Html.DisplayFor(c => item.CarOwner.FirstName) @Html.DisplayFor(c => item.CarOwner.MiddleName)</td>*@
                         @*<td>@item.Capacity</td>*@
                         @*<td>@item.FullNameFirmForView</td>
-                            <td>@item.DepartmentNameForView</td>*@
+                        <td>@item.DepartmentNameForView</td>*@
                         <td>
                             <a asp-action="Details" class="btn btn-sm btn-info" asp-route-id="@item.Id">Info</a>
                             <a asp-action="Edit" class="btn btn-sm btn-warning" asp-route-id="@item.Id">Edit</a>
                         </td>
                         @*Html.Partial("CarSummary",item)*@
                         @*<td>
-                                <partial name="CarSummary" model="item">
-                            </td>*@
+                            <partial name="CarSummary" model="item">
+                        </td>*@
                     </tr>
                 }
             </tbody>
         </table>
 
+        @*page-url-values="new Dictionary<string,string>()"*@
 
-
-        <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
+        <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true" page-url-status="@Model.CurrentStatus"
              page-class="btn" page-class-normal="btn-secondary"
              page-class-selected="btn-primary" class="btn-group float-left m-1">
         </div>

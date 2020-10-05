@@ -30,7 +30,15 @@ namespace KernelCars.Components
             //}
             //else
             //{
+            if ((HttpContext.Request.Query["status"]).ToString() =="")
+            {
+                ViewBag.SelectedStatus = "Эксплуатация";
+            }
+            else
+            {
                 ViewBag.SelectedStatus = (HttpContext.Request.Query["status"]).ToString();
+            }
+                
             //}
             
 

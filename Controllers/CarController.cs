@@ -31,7 +31,7 @@ namespace KernelCars.Controllers
         {
             _context = context;
         }
-        public IActionResult Index(string status,string currentFilter, string searchString, int carPage = 1)
+        public IActionResult Index(string currentFilter, string searchString, string status = "Эксплуатация", int carPage = 1)
         {
             if (searchString != null)
             {
@@ -132,14 +132,17 @@ namespace KernelCars.Controllers
                 new CarsListViewModel {
                     //Cars = cars
                     //.ToList().Where(c => c.CarCurrentStatus == status).Take(PageSize),
-                    Cars = cars.Take(PageSize),
-                    //.ToList().Where(c => c.CarCurrentStatus == status).Take(PageSize),
+                    Cars = cars
+                     .ToList().Where(c => status==null || c.CarCurrentStatus == status)
+                     .Skip((carPage - 1) * PageSize)
+                     .Take(PageSize),
                     PagingInfo = new PagingInfo
                     {
                         CurrentPage=carPage,
                         ItemsPerPage=PageSize,
-                        TotalItems=cars.Count()
-                    }
+                        TotalItems=cars.Where(c => c.CarCurrentStatus == status).Count()
+                    },
+                    CurrentStatus=status
                 }
 
                 //_context.Cars
@@ -232,6 +235,7 @@ namespace KernelCars.Controllers
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
                 .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+                .Include(c=>c.LeaseContracts)
                 .Where(c => c.Id == id)
                 .FirstOrDefault();
             if (car==null)
@@ -253,6 +257,9 @@ namespace KernelCars.Controllers
             ViewData["Total"] = (from c in car.CarSevices
                          select c.Ammount).Sum();
 
+            ViewData["ActiveLease"] = (from c in car.LeaseContracts
+                          where c.EndDate == null
+                          select c).Count();
             //ViewData["Total"] = 555;
 
             return View(car);

@@ -19,6 +19,16 @@ namespace KernelCars.Models
 
         [DisplayName("Государственный номер")]
         public string RegistrationNumber { get; set; }
+        //Тип транспортого средства
+        public string CarType { get; set; }
+        //Данный тех.паспорта
+        //Номер тех.паспорта
+        public string RegistrationCertificate { get; set; }
+        //Дата выдачи
+        public DateTime RegistrationDate { get; set; }
+        //Сервисный центр
+        public string Color { get; set; }
+        public string TSC { get; set; }
         [DisplayName("Год выпуска")]
         public int FirstRegistrationYear { get; set; }
         [DisplayName("Номер кузова")]
@@ -46,6 +56,8 @@ namespace KernelCars.Models
         public List<CarStatus> CarStatuses { get; set; }
         public List<CarUser> CarUsers { get; set; }
         public List<CarService> CarSevices { get; set; }
+        public List<LeaseContract> LeaseContracts { get; set; }
+
 
         public bool IsPrivat 
         {
@@ -134,6 +146,22 @@ namespace KernelCars.Models
                 if (status != null)
                 {
                     return status.Unit.Firm.Employee.FullName;
+                    //return status.Unit.Firm.Name;
+                }
+                return "";
+            }
+        }
+        public string FullFirmName
+        {
+            get
+            {
+                var status = (from s in CarStatuses
+                              select s).LastOrDefault();
+
+                if (status != null)
+                {
+                    //return status.Unit.Firm.Employee.FullName;
+                    return status.Unit.Firm.Name;
                 }
                 return "";
             }
