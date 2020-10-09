@@ -1,6 +1,8 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -235,5 +237,16 @@ namespace KernelCars.Infrastructure
             spreadsheetDocument.Close();
         }
 
+        public static SelectList PopulateManagersDropDownList(KernelCars.Data.DataContext _context, object selectedManager = null)
+        {
+            var managerQuery = _context.Managers.Include(m => m.Employee);
+            return new SelectList(managerQuery.AsNoTracking(),"ID","Employee.FullName");
+        }
+
+        public static SelectList PopulateStatusesDropDownList(KernelCars.Data.DataContext _context, object selectedCarStatus = null)
+        {
+            var statusQuery = _context.Statuses;
+            return new SelectList(statusQuery.AsNoTracking(), "StatusID", "State");
+        }
     }
 }

@@ -11,8 +11,10 @@ namespace KernelCars.Models
         public bool IsAgriBusiness { get; set; } 
         public int FirmId { get; set; }
         public int DepartmentId { get; set; }
+        //public int ClasterId { get; set; }
         public Firm Firm { get; set; }
         public Department Department { get; set; }
+        //public Claster Claster { get; set; }
         public List<CarStatus> CarStatuses { get; set; }
 
         public string UnitPrintName 

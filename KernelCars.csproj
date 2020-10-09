@@ -72,6 +72,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\LeaseContracts\Zips\" />
     <Folder Include="wwwroot\OutFiles\CarBasesReports\" />
   </ItemGroup>
 

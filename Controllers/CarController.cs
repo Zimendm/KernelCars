@@ -128,7 +128,9 @@ namespace KernelCars.Controllers
                 cars = carsQuery;
             }
 
-            return View(
+            ViewBag.StatusID = Utils.PopulateStatusesDropDownList(_context);
+
+           return View(
                 new CarsListViewModel {
                     //Cars = cars
                     //.ToList().Where(c => c.CarCurrentStatus == status).Take(PageSize),

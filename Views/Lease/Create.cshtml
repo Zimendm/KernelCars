@@ -1,70 +1,108 @@
 ﻿@model LeaseContract
 
-<h3 class="bg-info text-center p-2">Договор аренды</h3>
+<form asp-action="Create" method="post">
+    <input asp-for="@Model.CarId" hidden />
+    @*<input asp-for="@Model.Car.RegistrationNumber" hidden />*@
 
-<h6 class="bg-light text-center p-2">Стороны</h6>
-<div class="row">
-    <div class="form-group col">
-        <label><b>Владелец:</b></label>
-        @Html.DisplayFor(m => @Model.Car.CarOwner.FullName)
-    </div>
-    <div class="form-group col">
-        <label><b>Арендатор:</b></label>
-        <label>ТОВ "КЕРНЕЛ-ТРЕЙД"</label>
-    </div>
-</div>
 
-<h6 class="bg-light text-center p-2">Автомобиль</h6>
-<div class="row">
-    <div class="form-group col">
-        <label><b>Автомобиль:</b></label>
-        <label>@Model.Car.CarModel.Manufacturer.Name @Model.Car.CarModel.Model</label>
+
+    <h3 class="bg-info text-center p-2">Договор аренды</h3>
+
+    <h6 class="bg-light text-center p-2">Стороны</h6>
+    <div class="row">
+        <div class="form-group col">
+            <label><b>Владелец:</b></label>
+            @Html.DisplayFor(m => @Model.Car.CarOwner.FullName)
+        </div>
+        <div class="form-group col">
+            <label><b>Арендатор:</b></label>
+            <label>ТОВ "КЕРНЕЛ-ТРЕЙД"</label>
+        </div>
     </div>
-    <div class="form-group col">
-        <label><b>VIN:</b></label>
-        @Html.DisplayFor(c => Model.Car.VinNumber)
+
+    <h6 class="bg-light text-center p-2">Автомобиль</h6>
+    <div class="row">
+        <div class="form-group col">
+            <label><b>Автомобиль:</b></label>
+            <label>@Model.Car.CarModel.Manufacturer.Name @Model.Car.CarModel.Model</label>
+        </div>
+        <div class="form-group col">
+            <label><b>VIN:</b></label>
+            @*<input asp-for="@Model.Car.VinNumber" hidden/>*@
+
+
+
+            @*@Html.DisplayFor(c => Model.Car.VinNumber)*@
+        </div>
+        <div class="form-group col">
+            <label><b>Цвет:</b></label>
+            @Html.DisplayFor(c => Model.Car.VinNumber)
+        </div>
+        <div class="form-group col">
+            <label><b>Гос.Номер:</b></label>
+            @Html.DisplayFor(c => Model.Car.VinNumber)
+        </div>
     </div>
-    <div class="form-group col">
-        <label><b>Цвет:</b></label>
-        @Html.DisplayFor(c => Model.Car.VinNumber)
+    <h6 class="bg-light text-center p-2">Условия</h6>
+    <div class="row">
+        <div class="form-group col-3">
+            <label><b>Договор аренды с:</b></label>
+            <input type="date" asp-for="@Model.FromDate" />
+            @*@Html.EditorFor(c=>Model.FromDate, new { @class = "date form-control" })*@
+        </div>
+        <div class="form-group col-2">
+            <label><b>по:</b></label>
+            <input type="date" asp-for="@Model.ToDate" />
+        </div>
+        @*<div class="form-group col">
+                <label><b>Арендная плата:</b></label>
+                <input class="text-right" asp-for="@Model.LeaseAmmount" />
+                <select class="browser-default custom-select" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
+            </div>*@
+        @*<div class="form-group col">
+                <label><b>валюта:</b></label>
+                <select class="browser-default custom-select" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
+            </div>*@
+        <div class="col-4">
+            <div class="row">
+                <div class="col">
+                    <label class="text-right"><b>Арендная плата:</b></label>
+                </div>
+                <div class="col">
+                    <input class="form-control  text-right" asp-for="@Model.LeaseAmmount" />
+                </div>
+                <div class="col">
+                    <select class="browser-default custom-select" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
+                </div>
+            </div>
+
+        </div>
     </div>
-    <div class="form-group col">
-        <label><b>Гос.Номер:</b></label>
-        @Html.DisplayFor(c => Model.Car.VinNumber)
-    </div>
-</div>
-<h6 class="bg-light text-center p-2">Условия</h6>
-<div class="row">
-    <div class="form-group col-3">
-        <label><b>Договор аренды с:</b></label>
-        <input type="date" value="@Model.FromDate" />
-        @*@Html.EditorFor(c=>Model.FromDate, new { @class = "date form-control" })*@
-    </div>
-    <div class="form-group col-2">
-        <label><b>по:</b></label>
-        <input type="date" asp-for="@Model.ToDate" />
-    </div>
-    @*<div class="form-group col">
-            <label><b>Арендная плата:</b></label>
-            <input class="text-right" asp-for="@Model.LeaseAmmount" />
-            <select class="browser-default custom-select" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
-        </div>*@
-    @*<div class="form-group col">
-            <label><b>валюта:</b></label>
-            <select class="browser-default custom-select" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
-        </div>*@
-    <div class="col-4">
+
+    <h6 class="bg-light text-center">Акты приёма/передачи</h6>
+
+    <div class="col-7">
         <div class="row">
             <div class="col">
-                <label class="text-right"><b>Арендная плата:</b></label>
+                <b>Автомобиль принят:</b><input type="date" asp-for="@Model.StartDate" class="form-control" />
             </div>
             <div class="col">
-                <input class="form-control  text-right" asp-for="@Model.LeaseAmmount" />
+                <p>
+                    <b>Менеджер:</b> <select asp-for="ManagerId" class="form-control" asp-items="ViewBag.ManagerID">
+                        <option value="">-- Select Manager --</option>
+                    </select>
+                </p>
             </div>
-            <div class="col">
-                <select class="browser-default custom-select" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
-            </div>
-        </div>
 
+        </div>
     </div>
+
+    <input type="submit" class="btn btn-primary @(Model.ID != 0 ? "d-none":"")" value="Сохранить" />
+    <a asp-action="Acts" class="btn btn-info" asp-route-id="@Model.ID" asp-route-mode="1">Распечатать</a>
+    <a asp-action="Acts" class="btn btn-info">Пролонгировать</a>
+    <a asp-action="Acts" class="btn btn-info">Расторгнуть</a>
+
+</form>
+<div>
+    <a asp-controller="Car" asp-action="Details" asp-route-id="@Model.Car.Id">Назад к автомобилю</a>
 </div>

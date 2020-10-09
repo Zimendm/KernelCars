@@ -25,7 +25,7 @@ namespace KernelCars.Models
         public DateTime? EndDate { get; set; } 
 
         
-        [Column(TypeName = "decimal(5, 2)")]
+        [Column(TypeName = "decimal(7, 2)")]
         public decimal LeaseAmmount { get; set; }
 
         public Currency LeaseCurrency { get; set; }

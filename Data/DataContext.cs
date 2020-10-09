@@ -30,6 +30,8 @@ namespace KernelCars.Data
         public DbSet<Location> Locations { get; set; }
         public DbSet<LeaseContract> LeaseContracts { get; set; }
 
+        public DbSet<Manager> Managers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<Car>()

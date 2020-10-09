@@ -37,7 +37,9 @@
                     <label>Эксплуатируется</label>
                 </td>
                 <td>
-                    <a asp-controller="CarServices" asp-action="Edit" asp-route-id="@contract.ID">Продлить/Расторгнуть</a> 
+                    <a asp-controller="Lease" asp-action="Edit" asp-route-id="@contract.ID">Изменить</a> |
+                    <a asp-controller="CarServices" asp-action="Extend" asp-route-id="@contract.ID">Продлить</a> |
+                    <a asp-controller="CarServices" asp-action="Close" asp-route-id="@contract.ID">Расторгнуть</a>
                 </td>
             }
             else

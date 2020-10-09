@@ -19,6 +19,7 @@ namespace KernelCars.Models
         }
 
         public string Address { get; set; }
+        public string TaxNumber { get; set; }
 
         public bool IsFirm { 
             get

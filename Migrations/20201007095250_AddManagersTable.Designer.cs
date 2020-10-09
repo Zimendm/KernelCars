@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201007095250_AddManagersTable")]
+    partial class AddManagersTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,9 +279,6 @@ namespace KernelCars.Migrations
                     b.Property<string>("MiddleName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TaxNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Employees");
@@ -338,7 +337,7 @@ namespace KernelCars.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal>("LeaseAmmount")
-                        .HasColumnType("decimal(7, 2)");
+                        .HasColumnType("decimal(5, 2)");
 
                     b.Property<int>("LeaseCurrency")
                         .HasColumnType("int");
@@ -392,8 +391,11 @@ namespace KernelCars.Migrations
                     b.Property<string>("City")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LeaseProcuratory")
                         .HasColumnType("nvarchar(max)");
@@ -404,9 +406,13 @@ namespace KernelCars.Migrations
                     b.Property<string>("LeaseProcuratoryNumber")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("ID");
+                    b.Property<string>("MiddleName")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("EmployeeId");
+                    b.Property<string>("Registration")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
 
                     b.ToTable("Managers");
                 });
@@ -644,13 +650,6 @@ namespace KernelCars.Migrations
                         .HasForeignKey("ManagerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("KernelCars.Models.Manager", b =>
-                {
-                    b.HasOne("KernelCars.Models.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId");
                 });
 
             modelBuilder.Entity("KernelCars.Models.Unit", b =>

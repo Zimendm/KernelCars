@@ -5,6 +5,37 @@
  }
 
 
+<script>
+    $(document).ready(function ()
+    {
+        //$("#carstatusfilter").keyup(function ()
+        //{
+        //    var datasearch = $(this).val().toLowerCase();
+        //    $(".carList").each(function () {
+        //        if ($(this).find(".searchField").text().toLowerCase().indexOf(datasearch)<0)
+        //        {
+        //            $(this).hide();
+        //        }
+        //        else
+        //        {
+        //            $(this).show();
+        //        }
+        //    });
+        //});
+        $("#carstatusfilter").change(function ()
+        {
+            $(".carList").each(function ()
+            {
+                $(this).hide();
+            });
+
+        });
+    });
+</script>
+
+
+
+
 
 <div class="row">
     <div class="col-2">
@@ -26,6 +57,12 @@
                 </p>
             </div>
         </form>
+
+        <div class="col-3">
+            <b>Статус авто:</b> <select class="form-control" asp-items="ViewBag.StatusID" id="carstatusfilter">
+                <option value="">-- Выберите статус --</option>
+            </select>
+        </div>
 
         <a asp-action="Create">Create New</a>
         <table class="table table-sm table-striped">
@@ -54,7 +91,7 @@
                 @foreach (var item in Model.Cars)
                 {
 
-                    <tr>
+                    <tr class="carList">
                         <td>
                             <input type="hidden" asp-for="@item.Id" />
                         </td>
