@@ -1,42 +1,31 @@
 ﻿@model KernelCars.Models.Car
-    <div class="card carList">
-        <div class="card-body">
-            <p class="searchField">
-                @Model.CarModel.Manufacturer.Name @Model.CarModel.Model (<b>@Model.RegistrationNumber</b>) @*Владелец: <b>@Model.CarOwner.FullName</b>*@
-                @if (@Model.CarUserForView != "")
-                {
-                    @: Водитель: <b>@Model.CarUserForView</b>
-                }
-            </p>
-
-            @*<p class="searchField">
-                @if (@Model.DepartmentNameForView != "")
-                {
-                    @:Подразделение: <b>@Model.DepartmentNameForView</b> (@Model.FullNameFirmForView)
-                }
+    <div class="card carList m-2">
+        <div class="card-header">
+            <p class="searchField">Автомобиль: <b>@Model.CarModel.Manufacturer.Name @Model.CarModel.Model</b> Гос.номер: <b>@Model.RegistrationNumber </b><span class="badge badge-pill  @(Model.CarCurrentStatus=="Эксплуатация" ? "badge-success":"") @(Model.CarCurrentStatus=="Тех.обслуживание" ? "badge-warning":"") @((Model.CarCurrentStatus != "Тех.обслуживание" && Model.CarCurrentStatus !="Эксплуатация") ? "badge-danger":"")">@Model.CarCurrentStatus</span></p>
             
-
-            </p>*@
-            @*<p>
-                <div @(Html.Raw(Model.IsRentCar ? "style=\"display:block\"" : "style=\"display:none\""))>
-                    <input type="checkbox"
-                           value="@Model.IsRentCar"
-                           @(Html.Raw(Model.IsRentCar ? "checked=\"checked\"" : ""))
-                           disabled /> Арендованный автомобиль
-                </div>
-                <div @(Html.Raw(Model.IsPrivat ? "style=\"display:block\"" : "style=\"display:none\""))>
-                    <input type="checkbox" class="custom-checkbox"
-                           value="@Model.IsPrivat"
-                           @(Html.Raw(Model.IsPrivat ? "checked=\"checked\"" : ""))
-                           disabled /> Частный автомобиль
-                </div>
-            </p>*@
-            <a class="card-link" asp-controller="Car" asp-action="Details" asp-route-id="@Model.Id">Подробно</a>
-            <a class="card-link" asp-controller="CarStatus" asp-action="CarStatuses" asp-route-id="@Model.Id">Статус авто</a>
-            <a class="card-link" asp-controller="CarUsers" asp-action="List" asp-route-carId="@Model.Id">Водитель</a>
+            <a class="card-link btn btn-info" asp-controller="Car" asp-action="Details" asp-route-id="@Model.Id">Подробно</a>
+            @*<a class="card-link" asp-controller="CarStatus" asp-action="CarStatuses" asp-route-id="@Model.Id">Статус авто</a>*@
+            @*<a class="card-link" asp-controller="CarUsers" asp-action="List" asp-route-carId="@Model.Id">Водитель</a>*@
             @if (@Model.IsEnableService)
             {
-                <a class="card-link" asp-controller="CarServices" asp-action="CarSeviceList" asp-route-carId="@Model.Id">Запись на ТО</a>
+                <a class="card-link btn btn-warning" asp-controller="CarServices" asp-action="CarSeviceList" asp-route-carId="@Model.Id">Запись на ТО</a>
             }
+        </div>
+        <div class="card-body">
+
+            @if (@Model.CarUserForView != "")
+            {
+                <p class="searchField"> Водитель: <b>@Model.CarUserForView</b></p>
+            }
+            @if (@Model.LocationForView != "")
+            {
+                <p class="searchField">Размещение: <b>@Model.LocationForView</b></p>
+            }
+
+            @if (@Model.CarStatuses.Count >= 1)
+            {
+                <p>Юр.лицо: <b>@Model.FullNameFirmForView (@Model.DepartmentNameForView)</b></p>
+            }
+
         </div>
     </div>

@@ -51,6 +51,7 @@ namespace KernelCars.Controllers
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
                 .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
                 .ToList();
 
 
@@ -168,6 +169,7 @@ namespace KernelCars.Controllers
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
                 .Include(c=>c.CarUsers).ThenInclude(c=>c.Employee)
                 .Include(c=>c.CarStatuses).ThenInclude(c=>c.Status)
+                .Include(c=>c.CarStatuses).ThenInclude(c=>c.Location)
                 .ToList();
 
             List<Car> cars = new List<Car>();

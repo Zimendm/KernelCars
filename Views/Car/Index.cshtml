@@ -2,7 +2,7 @@
 @model CarsListViewModel
 @{
     Layout = "_Layout";
- }
+}
 
 
 <script>
@@ -24,10 +24,41 @@
         //});
         $("#carstatusfilter").change(function ()
         {
-            $(".carList").each(function ()
-            {
-                $(this).hide();
+            var url = "/Car/Index?status=" + $('#carstatusfilter option:selected').text(); /*etails?NestId=" + NestId;
+             * 
+             * 
+*/
+
+            alert(url);
+            window.location.href = url; 
+
+            //var options = {};
+            //options.url = "/Section/Search?" + $.param({ SearchResults: $("#search").val() });
+            //options.url = "/Car/List";
+            //options.type = "GET";
+            //options.contentType = "application/json";
+            //options.dataType = "json";
+            @*$.ajax(
+                {
+                    type: "GET",
+                    url:"/home/index"
             });
+
+            alert('hello');
+
+
+            $.get("/Car/Index", null, function (data) {
+                alert(data);
+            });  
+
+
+            var url = "@Url.Action("List")";
+            $.get(url);*@
+            //$.get("cars/list");
+            //$(".carList").each(function ()
+            //{
+            //    $(this).hide();
+            //});
 
         });
     });
@@ -44,10 +75,10 @@
     <div class="col-10">
         <h1>Cars</h1>
         @*@foreach (var item in Model.Cars)
-        {
-            //@Html.Partial("CarSummary", item)
-            <partial name="CarSummary" model="item"/>
-        }*@
+            {
+                //@Html.Partial("CarSummary", item)
+                <partial name="CarSummary" model="item"/>
+            }*@
         <form asp-action="Index" method="get">
             <div class="form-actions no-color">
                 <p>
@@ -79,8 +110,8 @@
                         @*@Html.DisplayNameFor(model => model.Cars.First().RegistrationNumber)*@
                     </th>
                     @*<th>
-                        @Html.DisplayNameFor(model => model.Cars.First().FirstRegistrationYear)
-                    </th>*@
+                            @Html.DisplayNameFor(model => model.Cars.First().FirstRegistrationYear)
+                        </th>*@
                     <th>
                         Пользователь
                         @*@Html.DisplayNameFor(model => model.Cars.First().CarUsers)*@
@@ -109,15 +140,15 @@
                         @*<td>@Html.DisplayFor(c => item.CarOwner.LastName) @Html.DisplayFor(c => item.CarOwner.FirstName) @Html.DisplayFor(c => item.CarOwner.MiddleName)</td>*@
                         @*<td>@item.Capacity</td>*@
                         @*<td>@item.FullNameFirmForView</td>
-                        <td>@item.DepartmentNameForView</td>*@
+                            <td>@item.DepartmentNameForView</td>*@
                         <td>
                             <a asp-action="Details" class="btn btn-sm btn-info" asp-route-id="@item.Id">Info</a>
                             <a asp-action="Edit" class="btn btn-sm btn-warning" asp-route-id="@item.Id">Edit</a>
                         </td>
                         @*Html.Partial("CarSummary",item)*@
                         @*<td>
-                            <partial name="CarSummary" model="item">
-                        </td>*@
+                                <partial name="CarSummary" model="item">
+                            </td>*@
                     </tr>
                 }
             </tbody>

@@ -136,6 +136,20 @@ namespace KernelCars.Models
                 return "";
             }
         }
+        public string LocationForView
+        {
+            get
+            {
+                var status = (from s in CarStatuses
+                              select s).LastOrDefault();
+
+                if (status != null && status.Location!=null)
+                {
+                    return status.Location.LocationName;
+                }
+                return "";
+            }
+        }
         public string FullNameFirmForView 
         {
             get
