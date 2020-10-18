@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using KernelCars.Models;
 using Microsoft.AspNetCore.Identity;
+using System.Net.Http;
 
 //using System.Configuration;
 
@@ -47,22 +48,28 @@ namespace KernelCars
             //services.AddControllers().AddNewtonsoftJson(options =>
             //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-           //.AddJsonOptions(opt=>opt.JsonSerializerOptions.MaxDepth=255);//.AddNewtonsoftJson();
+            //.AddJsonOptions(opt=>opt.JsonSerializerOptions.MaxDepth=255);//.AddNewtonsoftJson();
 
             //services.AddControllers().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
             //services.AddControllersWithViews().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
             //services.AddRazorPages().AddJsonOptions(opt => opt.JsonSerializerOptions.MaxDepth = 255);
-//            services.AddControllers().AddNewtonsoftJson(options =>
-//    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-//);
+            //            services.AddControllers().AddNewtonsoftJson(options =>
+            //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            //);
 
-//            services.AddControllersWithViews()
-//    .AddNewtonsoftJson(options =>
-//    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
-//);
+            //            services.AddControllersWithViews()
+            //    .AddNewtonsoftJson(options =>
+            //    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            //);
 
 
             //services.AddServerSideBlazor();
+
+            //services.AddScoped(sp => new HttpClient
+            //{
+            //    BaseAddress = new Uri("http://localhost")
+            //});
+            services.AddScoped(sp => new HttpClient());
 
             services.AddDbContext<DataContext>(options=>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -115,9 +122,9 @@ namespace KernelCars
                 //endpoints.MapControllerRoute("controllers",
                 //    "controllers/{controller=Home}/{action=Index}/{id?}");
                 //endpoints.MapDefaultControllerRoute();
-                //endpoints.MapRazorPages();
-                //endpoints.MapBlazorHub();
-                //endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapRazorPages();
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
                 //endpoints.MapFallbackToController("Blazor", "Home");
             });
 
