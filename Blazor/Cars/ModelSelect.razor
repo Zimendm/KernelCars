@@ -1,0 +1,132 @@
+﻿@*@typeparam TValue*@
+@inherits InputBase<int>
+
+<div class="form-group">
+    <label>Производитель</label>
+    <select class="form-control" value="@CurrentManufacturer" @onchange="@modelFilter">
+        @foreach (KeyValuePair<string, int> kvp in Manufacturers)
+        {
+            <option value="@kvp.Value">@kvp.Key</option>
+        }
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Модель</label>
+    <select class="form-control @CssClass" value="@CurrentValueAsString"
+            @onchange="@(ev => CurrentValueAsString = ev.Value as string)">
+        @*@ChildContent*@
+        @foreach (KeyValuePair<string, int> kvp in Values)
+        {
+            <option value="@kvp.Value">@kvp.Key</option>
+        }
+    </select>
+</div>
+
+@code {
+    [Inject]
+    DataContext Context { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    //[Parameter]
+    public IDictionary<string, int> Values { get; set; } = new Dictionary<string, int>();
+
+    //[Parameter]
+    public IDictionary<string, int> Manufacturers { get; set; } = new Dictionary<string, int>();
+
+    [Parameter]
+    public Func<string, int> Parser { get; set; }
+
+    [Parameter]
+    public string CurrentManufacturer { get; set; }
+
+    //[Parameter]
+    //public int CurrentModelId { get; set; }
+
+    //public IDictionary<string, int> Manufacturers { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Manufacturers = Context.Manufacturers.ToDictionary(m => m.Name, m => m.ManufacturerId);
+        Values = Context.CarModels.ToDictionary(m => m.Model, m => m.CarModelId);
+        //base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        int tempInt;
+
+        if (CurrentValueAsString != "1")
+        {
+            int.TryParse(CurrentValueAsString, out tempInt);
+            CurrentManufacturer = Context.CarModels.Find(tempInt).ManufacturerId.ToString();
+
+
+            int.TryParse(CurrentManufacturer, out tempInt);
+
+            Values = Context.CarModels.Where(cm => cm.ManufacturerId == tempInt).ToDictionary(m => m.Model, m => m.CarModelId);
+            //int.TryParse(CurrentManufacturer, out tempInt);
+
+            //Values = Context.CarModels.Where(cm => cm.ManufacturerId == tempInt).ToDictionary(m => m.Model, m => m.CarModelId);
+
+        }
+        //else
+        //{
+        //    CurrentManufacturer = 1.ToString();
+        //}
+
+
+        //Values= Context.CarModels(cm => cm.ManufacturerId == CarData.CarModel.ManufacturerId).ToDictionaryAsync(m => m.Model, m => m.CarModelId);
+
+        //CurrentManufacturer = 2.ToString();
+        //CarData = await Context.Cars.Include(c => c.CarModel).ThenInclude(c => c.Manufacturer).FirstOrDefaultAsync(c => c.Id == Id);
+        //Manufacturers = await Context.Manufacturers.ToDictionaryAsync(m => m.Name, m => m.ManufacturerId);
+        //CarModels = await Context.CarModels(cm => cm.ManufacturerId == CarData.CarModel.ManufacturerId).ToDictionaryAsync(m => m.Model, m => m.CarModelId);
+    }
+
+
+    protected override bool TryParseValueFromString(string value, out int result,
+out string validationErrorMessage)
+    {
+        try
+        {
+            result = Parser(value);
+            validationErrorMessage = null;
+            return true;
+        }
+        catch
+        {
+            result = default(int);
+            validationErrorMessage = "The value is not valid";
+            return false;
+        }
+    }
+    private void modelFilter(ChangeEventArgs e)
+    {
+        CurrentValueAsString = 1.ToString();// null;
+
+        int manid;
+        int.TryParse(e.Value.ToString(), out manid);
+
+
+        var values = Context.CarModels.Where(cm => cm.ManufacturerId == manid).ToDictionary(m => m.Model, m => m.CarModelId);
+        //CurrentValueAsString = null;
+
+        Values = new Dictionary<string, int>();
+        Values.Add("Не определена", 1);
+        StateHasChanged();
+        foreach (var item in values)
+        {
+            Values.Add(item);
+        }
+
+
+
+
+        ////CurrentValueAsString = 1.ToString();
+
+        //StateHasChanged();
+    }
+}

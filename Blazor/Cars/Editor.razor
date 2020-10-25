@@ -1,0 +1,87 @@
+﻿@page "/cars/edit/{id:long}"
+@layout EmptyLayout
+@inherits OwningComponentBase<DataContext>
+
+<link href="~/CSS/blazorValidation.css" rel="stylesheet" />
+<h4 class="bg-primary text-center text-white p-2">Edit</h4>
+<h6 class="bg-info text-center text-white p-2">@FormSubmitMessage</h6>
+
+<FormSpy CarData="CarData">
+    <EditForm Model="CarData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label>Car ID</label>
+            <InputNumber class="form-control" @bind-Value="CarData.Id" disabled />
+        </div>
+        <div class="form-group">
+            <label>Гос.номер</label>
+            <ValidationMessage For="@(() => CarData.RegistrationNumber)" />
+            <InputText class="form-control" @bind-Value="CarData.RegistrationNumber"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label>Тип топлива</label>
+            <select class="form-control" value="@CarData.Fuel" @onchange="@SelectFuelChanged">
+                <option disabled>Select type of fuel...</option>
+                @foreach (var fuel in Enum.GetValues(typeof(TypeOfFuel)))
+                {
+                    <option>@fuel</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Выбор модели авто</label>
+            <ModelSelect TValue="int"
+                         Parser="@(str => int.Parse(str))"
+                         @bind-Value="CarData.CarModelId">
+                @*<option selected disabled value="0">Выберите модель ....</option>*@
+            </ModelSelect>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+        </div>
+    </EditForm>
+</FormSpy>
+
+@code {
+        [Inject]
+        public NavigationManager NavManager { get; set; }
+
+        //[Inject]
+        DataContext Context => Service; // { get; set; }
+
+    [Parameter]
+    public long Id { get; set; }
+
+    public Car CarData { get; set; } = new Car() { CarModel = new CarModel() };
+
+    public string FormSubmitMessage { get; set; } = "Form Data Not Submitted";
+    public void HandleValidSubmit() => FormSubmitMessage = "Valid Data Submitted";
+    public void HandleInvalidSubmit() =>
+    FormSubmitMessage = "Invalid Data Submitted";
+
+
+    //public IDictionary<string, int> CarModels { get; set; } = new Dictionary<string, int>();
+    //public IDictionary<string, int> Manufacturers { get; set; } = new Dictionary<string, int>();
+
+    protected override void OnParametersSet()
+    {
+        //CarData = await Context.Cars.Include(c => c.CarModel).ThenInclude(c=>c.Manufacturer).FirstOrDefaultAsync(c => c.Id == Id);
+        CarData = Context.Cars.Find(Id);
+        //        Manufacturers = await Context.Manufacturers.ToDictionaryAsync(m => m.Name, m => m.ManufacturerId);
+        ////        CarModels = await Context.CarModels.Where(cm=>cm.ManufacturerId==CarData.CarModel.ManufacturerId).ToDictionaryAsync(m => m.Model, m => m.CarModelId);
+        //        CarModels = await Context.CarModels.ToDictionaryAsync(m => m.Model, m => m.CarModelId);
+
+    }
+
+    void SelectFuelChanged(ChangeEventArgs e)
+    {
+        TypeOfFuel tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        CarData.Fuel = tof;
+    }
+}
