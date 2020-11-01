@@ -361,10 +361,7 @@ namespace KernelCars.Controllers
                     IsAssigned = currentServices.Contains(service.ID)
                 });
             }
-
             ViewBag.Works = viewModel;
-            
-            //throw new NotImplementedException();
         }
 
         // POST: CarServices/Edit/5

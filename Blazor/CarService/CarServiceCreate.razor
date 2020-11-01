@@ -1,0 +1,291 @@
+﻿@page "/service/create/{carid:long}"
+@using KernelCars.Blazor.Cars
+@using KernelCars.Models.ViewModels
+@using System.Globalization
+@inherits OwningComponentBase<DataContext>
+
+<div>
+    <label class="m-2"><b>Автомобиль:</b> @carModel</label>
+</div>
+<div>
+    <label class="m-2"><b>Гос.номер:</b> @carRegistration</label>
+</div>
+<div>
+    <label class="m-2"><b>Водитель:</b> @carUser</label>
+</div>
+<div class="m-2">
+
+</div>
+
+
+<h4 class="bg-primary text-white text-center p-2">Запись на сервисное обслуживание</h4>
+
+
+<EditForm Model="carService" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+
+    <div class="form-row">
+        <div class="col-8">
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Планируемая дата ТО</label>
+                        <input class="form-control" type="date" @bind="carService.OpenDate" @bind:culture="Culture" />
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Текущие показания одометра</label>
+                        <InputNumber class="form-control" @bind-Value="carService.Odometr"></InputNumber>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-row">
+                <div class="col-10">
+                    <div class="form-group">
+                        <label>Станция тех.обслуживания</label>
+                        <CustomSelect TValue="int" Values="ServiceStations"
+                                      Parser="@(str=>int.Parse(str))"
+                                      @bind-Value="carService.ServiceStationID">
+                            <option selected disabled value="0">Выберите СТО ...</option>
+                        </CustomSelect>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col-7">
+                    <div class="form-group">
+                        <label>Виды работ</label>
+                        <div class="col-md-offset-2 col-md-10">
+                            <table class="table table-sm">
+                                @{
+                                    int cnt = 0;
+
+                                    foreach (var item in assignedTOF)
+                                    {
+                                        if (cnt++ % 2 == 0)
+                                        {
+                                            @:<tr>
+                                            }
+                                            @:<td>
+                                                <div>
+                                                    <input type="checkbox"
+                                                           name="selectedWorks"
+                                                           value="item.TypeOfServiceID"
+                                                           checked="@item.IsAssigned"
+                                                           @onchange="@((e)=>WorkAssigment(e,item))"/>
+                                                    <label>@item.Service</label>
+                                                </div>
+                                            @:</td>
+                                        }
+                                        if (cnt++ % 3 == 0)
+                                        {
+                                        @:</tr>
+                                    }
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="form-group">
+                        <label>Комментарии</label>
+                        <InputTextArea class="form-control" @bind-Value="carService.ServiceDescription"></InputTextArea>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-1"></div>
+        <div class="col-3">
+            <label>История обслуживания с: @fromDate.ToShortDateString() </label>
+            <table class="table table-sm">
+                <tbody>
+                    @foreach (var item in services)
+                    {
+                        <tr>
+                            <td>@item.Key</td>
+                            <td>@item.Value</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>Итого:</td>
+                        <td>@(totalAmmount.ToString("C2"))</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <label>@odometrDisp</label>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <NavLink class="btn btn-secondary" href="/service">Back</NavLink>
+    </div>
+
+
+
+
+
+
+
+</EditForm>
+
+@code {
+
+    [Inject]
+    public NavigationManager NavManager { get; set; }
+
+    [Parameter]
+    public long carid { get; set; }
+
+    System.Uri uri;
+
+
+    public CultureInfo Culture { get; set; } = CultureInfo.GetCultureInfo("ru-RU");
+
+
+    List<AssignedTypeOfService> assignedTOF = new List<AssignedTypeOfService>();
+
+    DataContext _context => Service;
+
+    Dictionary<string, int> services = new Dictionary<string, int>();
+    List<int> odometr = new List<int>();
+    List<DateTime> dates = new List<DateTime>();
+    DateTime fromDate;
+
+    string odometrDisp;
+    float totalAmmount = 0;
+
+    string carModel;
+    string carRegistration;
+    string carUser;
+
+
+    private CarService carService = new CarService()
+    {
+        WorkAssigments = new List<WorkAssigment>(),
+        OpenDate = DateTime.Now
+    };
+
+    public IDictionary<string, int> ServiceStations { get; set; } = new Dictionary<string, int>();
+
+
+
+    protected async override Task OnParametersSetAsync()
+    {
+        carService.CarId = this.carid;
+        uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+
+        ServiceStations = await _context.ServiceStations.OrderBy(st => st.Name).ToDictionaryAsync(s => s.Name, s => s.ID);
+
+        var tmpCar = await _context.Cars
+            .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+            .Include(c=>c.CarModel).ThenInclude(c=>c.Manufacturer).FirstAsync(c => c.Id == carid);
+        carUser = tmpCar.CarUserForView;
+        carModel = tmpCar.CarModel.Manufacturer.Name +" "+ tmpCar.CarModel.Model;
+        carRegistration = tmpCar.RegistrationNumber;
+
+
+        assignedTOF = PopulateAssignedWorks(carService);
+
+        var serviceData = _context.CarServices.Include(s => s.WorkAssigments).ThenInclude(s => s.TypeOfService).Where(c => c.CarId == this.carid);
+
+
+        if (serviceData.Count() > 0)
+        {
+            foreach (var item in serviceData)
+            {
+                var serDetails = from sd in item.WorkAssigments
+                                 group sd by sd.TypeOfService.Service into dsl
+                                 select dsl;
+                totalAmmount += item.Ammount;
+                odometr.Add(item.Odometr);
+                dates.Add(item.OpenDate);
+
+                foreach (var serv in serDetails)
+                {
+                    if (services.ContainsKey(serv.Key))
+                    {
+                        services[serv.Key]++;
+                    }
+                    else
+                    {
+                        services.Add(serv.Key, 1);
+                    }
+                }
+            }
+
+            odometrDisp = "Последнее ТО (одометр): " + odometr.Max().ToString();
+            fromDate = dates.Min();
+        }
+
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        UpdateCarServiceWorks();
+        _context.Add(carService);
+        await _context.SaveChangesAsync();
+        NavManager.NavigateTo("/service");
+    }
+
+    //private void UpdateCarServiceWorks(string[] selectedWorks, CarService serviceToUpdate)
+    private void UpdateCarServiceWorks()
+    {
+        if (carService.WorkAssigments==null)
+        {
+            carService.WorkAssigments = new List<WorkAssigment>();
+        }
+
+        foreach (var item in assignedTOF)
+        {
+            if (item.IsAssigned)
+            {
+                carService.WorkAssigments.Add(new Models.WorkAssigment { TypeOfServiceId=item.TypeOfServiceID,CarServiceID=carService.ID });
+            }
+        }
+    }
+
+    private void WorkAssigment(ChangeEventArgs e,AssignedTypeOfService item)
+    {
+        if ((bool) e.Value == true)
+        {
+            item.IsAssigned = true;
+        }
+        else
+        {
+            item.IsAssigned = false;
+        }
+    }
+
+
+
+    private List<AssignedTypeOfService> PopulateAssignedWorks(CarService carService)
+    {
+        var allServices = _context.TypeOfServices;
+        var currentServices = new HashSet<int>(carService.WorkAssigments.Select(c => c.TypeOfServiceId));
+        var viewModel = new List<AssignedTypeOfService>();
+        foreach (var service in allServices)
+        {
+            viewModel.Add(new AssignedTypeOfService
+            {
+                TypeOfServiceID = service.ID,
+                Service = service.Service,
+                IsAssigned = currentServices.Contains(service.ID)
+            });
+        }
+
+        return viewModel;
+    }
+}

@@ -1,0 +1,44 @@
+﻿@using KernelCars.Models.ViewModels
+
+<h3>PopulateAssignedWorks</h3>
+
+<div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+        <table>
+            @{
+                int cnt = 0;
+
+                foreach (var item in assignedTOF)
+                {
+                    if (cnt++ % 2 == 0)
+                    {
+                        @:<tr>
+                        }
+                        @:<td>
+                            <div>
+                                <input type="checkbox"
+                                       name="selectedWorks"
+                                       value="item.TypeOfServiceID"
+                                       checked="@item.IsAssigned" />
+                                <label>@item.Service</label>
+                            </div>
+                        @:</td>
+                    }
+                    if (cnt++ % 3 == 0)
+                    {
+                    @:</tr>
+                }
+            }
+        </table>
+    </div>
+</div>
+
+
+
+@code {
+
+    List<AssignedTypeOfService> assignedTOF = new List<AssignedTypeOfService>();
+
+
+
+}

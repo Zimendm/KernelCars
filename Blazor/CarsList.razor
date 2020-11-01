@@ -120,7 +120,7 @@
     public List<string> Numbers => new List<string> { "Acs", "Des" };
 
     public string GetEditUrl(long id) => $"/cars/edit/{id}";
-    public string GetServiceUrl(long id) => $"/service/{id}";
+    public string GetServiceUrl(long id) => $"/service/create/{id}";
 
     public int PageNumber { get; set; } = 1;
     public int TotalPages { get; set; } = 10;
