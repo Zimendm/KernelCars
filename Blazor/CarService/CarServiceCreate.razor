@@ -1,8 +1,15 @@
 ﻿@page "/service/create/{carid:long}"
+@page "/service/edit/{id:int}"
 @using KernelCars.Blazor.Cars
 @using KernelCars.Models.ViewModels
 @using System.Globalization
+@using BlazorInputFile
 @inherits OwningComponentBase<DataContext>
+@inject IJSRuntime JsInterop
+@inject HttpClient client
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment environment
+@*@using System.Drawing*@
+
 
 <div>
     <label class="m-2"><b>Автомобиль:</b> @carModel</label>
@@ -17,8 +24,11 @@
 
 </div>
 
-
 <h4 class="bg-primary text-white text-center p-2">Запись на сервисное обслуживание</h4>
+
+@*<KernelCars.Components.Modal @ref="Modal" filePath=@filePath></KernelCars.Components.Modal>
+
+<button @onclick="() => Modal.Open()">Open Modal</button>*@
 
 
 <EditForm Model="carService" OnValidSubmit="HandleValidSubmit">
@@ -35,19 +45,25 @@
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label>Текущие показания одометра</label>
-                        <InputNumber class="form-control" @bind-Value="carService.Odometr"></InputNumber>
+                        <label>Дата окончания ТО</label>
+                        <input class="form-control" type="date" @bind="carService.CompleteDate" @bind:culture="Culture" />
                     </div>
                 </div>
             </div>
 
 
             <div class="form-row">
-                <div class="col-10">
+                <div class="col-3">
+                    <div class="form-group">
+                        <label>Текущие показания одометра</label>
+                        <InputNumber class="form-control" @bind-Value="carService.Odometr"></InputNumber>
+                    </div>
+                </div>
+                <div class="col-9">
                     <div class="form-group">
                         <label>Станция тех.обслуживания</label>
                         <CustomSelect TValue="int" Values="ServiceStations"
-                                      Parser="@(str=>int.Parse(str))"
+                                      Parser="@(str => int.Parse(str))"
                                       @bind-Value="carService.ServiceStationID">
                             <option selected disabled value="0">Выберите СТО ...</option>
                         </CustomSelect>
@@ -76,7 +92,7 @@
                                                            name="selectedWorks"
                                                            value="item.TypeOfServiceID"
                                                            checked="@item.IsAssigned"
-                                                           @onchange="@((e)=>WorkAssigment(e,item))"/>
+                                                           @onchange="@((e) => WorkAssigment(e, item))" />
                                                     <label>@item.Service</label>
                                                 </div>
                                             @:</td>
@@ -96,6 +112,20 @@
                         <InputTextArea class="form-control" @bind-Value="carService.ServiceDescription"></InputTextArea>
                     </div>
                 </div>
+                @*<div class="form-row">
+                        <div class="form-group">
+                            <label for="exampleFormControlFile1">Example file input</label>
+                            <input type="file" class="form-control-file" id="exampleFormControlFile1" @onchange="OnInputFileChange">
+                        </div>
+                    </div>*@
+
+                <p>
+                    <InputFile OnChange="HandleSelection"></InputFile>
+                </p>
+                <p>@status</p>
+
+                @*<input type="file" onchange="@UploadFile" id="fileUpload" />*@
+
             </div>
 
 
@@ -125,8 +155,15 @@
     </div>
 
 
+    @*<img src="IMG-8c41e13a064e53302494a836dec45900-V.jpg" @onclick="RotateImage" />*@
+    @*<img src=@imgSrc  @onclick="RotateImage"/>*@
+    <iframe src=@filePath width="600" height="200"></iframe>
 
+    @*<iframe src="/AccountingDocuments/АХ1938ВР/0bbe5c6b-b874-4d55-8251-53b1fa60b547_Август.pdf"></iframe>*@
 
+    @*<embed src=@filePath width="100%" height="2100px" />*@
+
+    @*<embed width="100%" height="100%" src=@filePath/>*@
 
     <div class="text-center">
         <button type="submit" class="btn btn-primary">Save</button>
@@ -134,8 +171,7 @@
     </div>
 
 
-
-
+    @*<img src="~/IMG-8c41e13a064e53302494a836dec45900-V.jpg" />*@
 
 
 
@@ -146,11 +182,19 @@
     [Inject]
     public NavigationManager NavManager { get; set; }
 
+    private KernelCars.Components.Modal Modal { get; set; }
+
+
     [Parameter]
     public long carid { get; set; }
 
+    [Parameter]
+    public int Id { get; set; }
+
     System.Uri uri;
 
+
+    string imgSrc;
 
     public CultureInfo Culture { get; set; } = CultureInfo.GetCultureInfo("ru-RU");
 
@@ -158,6 +202,10 @@
     List<AssignedTypeOfService> assignedTOF = new List<AssignedTypeOfService>();
 
     DataContext _context => Service;
+
+    public string Mode => Id == 0 ? "Create" : "Edit";
+
+    string filePath;
 
     Dictionary<string, int> services = new Dictionary<string, int>();
     List<int> odometr = new List<int>();
@@ -171,6 +219,11 @@
     string carRegistration;
     string carUser;
 
+    string status;
+
+
+
+    //System.Drawing.Bitmap bitmap;
 
     private CarService carService = new CarService()
     {
@@ -181,25 +234,133 @@
     public IDictionary<string, int> ServiceStations { get; set; } = new Dictionary<string, int>();
 
 
+    //protected void RotateImage(MouseEventArgs e)
+    //{
+    //    //String path = Server.MapPath(Image1.ImageUrl);
+    //    //System.Drawing.Image img = System.Drawing.Image.FromFile(path);
+    //    //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
+    //    //img.Save(path);
+    //    //Response.Redirect(Request.Url.AbsoluteUri);
+
+    //    bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+    //    ImageConverter converter = new ImageConverter();
+    //    byte[] vs = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+
+
+    //    imgSrc = $"data:image/bmp;base64,{Convert.ToBase64String(vs)}";
+
+    //    //StateHasChanged();
+
+    //}
+
 
     protected async override Task OnParametersSetAsync()
     {
-        carService.CarId = this.carid;
-        uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        //WebImage photo = new WebImage(@"~\Images\Photo2.jpg");
+        //if (photo != null)
+        //{
+        //    imagePath = @"images\Photo2.jpg";
+        //    photo.FlipVertical();
+        //    photo.Save(@"~\" + imagePath);
+
+
+
+
+
+        //System.Drawing.Bitmap bitmap1 = new Bitmap(Path.Combine(environment.WebRootPath,"IMG-8c41e13a064e53302494a836dec45900-V.jpg"));
+
+        //bitmap = new System.Drawing.Bitmap(Path.Combine(environment.WebRootPath,"IMG-8c41e13a064e53302494a836dec45900-V.jpg"));//
+
+        //ImageConverter converter = new ImageConverter();
+        //byte[] vs = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
+
+
+        //imgSrc = $"data:image/bmp;base64,{Convert.ToBase64String(vs)}";
+
+
+
+        //bitmap =(System.Drawing.Bitmap) System.Drawing.Bitmap.FromFile(@"C:\Users\dzime\source\repos\KernelCars\wwwroot\IMG - 8c41e13a064e53302494a836dec45900 - V.jpg");
+
+        //bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
+
+
+
+        //using (MemoryStream ms = new MemoryStream())
+        //{
+        //    image.Save(ms, format);
+        //    return ms.ToArray();
+        //}
+
+
+
+
+        //using (var stream = new MemoryStream())
+        //{
+        //    bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+        //    imgSrc = $"data:image/bmp;base64,{Convert.ToBase64String((byte[])converter.ConvertTo(img, typeof(byte[])))}";
+        //    //stream.ToArray();
+        //}
+
+
+
+
+
+
+
+
+
+
+
+        if (Id != 0)
+        {
+            carService = _context.CarServices.Include(cs => cs.ServiceStation).Include(cs => cs.WorkAssigments).Where(cs => cs.ID == Id).First();
+            if (carService != null)
+            {
+                carid = carService.CarId;
+            }
+        }
+        else
+        {
+            carService.CarId = this.carid;
+        }
+        //carService.CarId = this.carid;
+        //uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+        //if (uri.ToString().IndexOf(@"/edit") > -1)
+        //{
+        //    mode = "Edit";
+        //}
+        //else
+        //{
+        //    mode = "Create";
+        //}
 
         ServiceStations = await _context.ServiceStations.OrderBy(st => st.Name).ToDictionaryAsync(s => s.Name, s => s.ID);
 
         var tmpCar = await _context.Cars
             .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
-            .Include(c=>c.CarModel).ThenInclude(c=>c.Manufacturer).FirstAsync(c => c.Id == carid);
+            .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer).FirstAsync(c => c.Id == carid);
         carUser = tmpCar.CarUserForView;
-        carModel = tmpCar.CarModel.Manufacturer.Name +" "+ tmpCar.CarModel.Model;
+        carModel = tmpCar.CarModel.Manufacturer.Name + " " + tmpCar.CarModel.Model;
         carRegistration = tmpCar.RegistrationNumber;
+
+
+        if (Id != 0)
+        {
+            string uploadFolder = Path.Combine("AccountingDocuments", carRegistration);
+            if (carService.DocumentPath!=null)
+            {
+                filePath = Path.Combine(uploadFolder, carService.DocumentPath);
+            }
+
+        }
 
 
         assignedTOF = PopulateAssignedWorks(carService);
 
         var serviceData = _context.CarServices.Include(s => s.WorkAssigments).ThenInclude(s => s.TypeOfService).Where(c => c.CarId == this.carid);
+
 
 
         if (serviceData.Count() > 0)
@@ -234,32 +395,37 @@
 
     public async Task HandleValidSubmit()
     {
+        if (Mode=="Create")
+        {
+            _context.Add(carService);
+        }
+
         UpdateCarServiceWorks();
-        _context.Add(carService);
         await _context.SaveChangesAsync();
         NavManager.NavigateTo("/service");
     }
 
     //private void UpdateCarServiceWorks(string[] selectedWorks, CarService serviceToUpdate)
-    private void UpdateCarServiceWorks()
+    void UpdateCarServiceWorks()
     {
-        if (carService.WorkAssigments==null)
-        {
-            carService.WorkAssigments = new List<WorkAssigment>();
-        }
+        //if (carService.WorkAssigments == null)
+        //{
+        carService.WorkAssigments = new List<WorkAssigment>();
+        //}
 
         foreach (var item in assignedTOF)
         {
             if (item.IsAssigned)
             {
-                carService.WorkAssigments.Add(new Models.WorkAssigment { TypeOfServiceId=item.TypeOfServiceID,CarServiceID=carService.ID });
+                carService.WorkAssigments.Add(new Models.WorkAssigment { TypeOfServiceId = item.TypeOfServiceID, CarServiceID = carService.ID });
             }
         }
+        //await _context.SaveChangesAsync();
     }
 
-    private void WorkAssigment(ChangeEventArgs e,AssignedTypeOfService item)
+    private void WorkAssigment(ChangeEventArgs e, AssignedTypeOfService item)
     {
-        if ((bool) e.Value == true)
+        if ((bool)e.Value == true)
         {
             item.IsAssigned = true;
         }
@@ -288,4 +454,165 @@
 
         return viewModel;
     }
+
+
+    //async Task
+    //private void OnInputFileChange(ChangeEventArgs e)
+    //{
+
+
+
+    //    int z = 0;
+
+    //    //var ms = new MemoryStream();
+    //    //await file.Data.CopyToAsync(ms);
+
+    //    ////status = $"Finished loading {file.Size} bytes from {file.Name}";
+
+    //    //var content = new MultipartFormDataContent {
+    //    //        { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
+    //    //    };
+    //    //await client.PostAsync("upload", content);
+
+
+
+
+
+
+    //    //string uniqueFileName = null;
+    //    //string filePath = null;
+    //    //if (true)
+    //    //{
+    //    //    try
+    //    //    {
+
+    //    //        if (true)
+    //    //        {
+    //    //            //string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, @"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\AccountingDocuments\");
+    //    //            string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "AccountingDocuments");
+    //    //            uploadFolder = Path.Combine(uploadFolder, model.RegNumber);
+
+    //    //            try
+    //    //            {
+    //    //                if (!Directory.Exists(uploadFolder))
+    //    //                {
+    //    //                    DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
+    //    //                }
+
+    //    //            }
+    //    //            catch (Exception)
+    //    //            {
+
+    //    //                //throw;
+    //    //            }
+
+
+
+    //    //            uniqueFileName = Guid.NewGuid() + "_" + model.DocumentScan.FileName;
+    //    //            filePath = Path.Combine(uploadFolder, uniqueFileName);
+
+    //    //            using (var stream = new FileStream(filePath, FileMode.Create))
+    //    //            {
+    //    //                model.DocumentScan.CopyTo(stream);
+    //    //            }
+
+    //    //            string z1 = (string)RouteData.Values["id"];
+    //    //        }
+    //    //    }
+    //    //    catch (Exception)
+    //    //    {
+
+    //    //        //throw;
+    //    //    }
+
+    //    //return NotFound();
+    //    //var carServiceToClose = _context.CarServices.Where(cs => cs.ID == model.CarServiceId).FirstOrDefault();
+
+    //    //if (model.CarService.CompleteDate != null)
+    //    //{
+    //    //    carServiceToClose.CompleteDate = model.CarService.CompleteDate;
+    //    //}
+    //    //if (model.CarService.Odometr != 0)
+    //    //{
+    //    //    carServiceToClose.Odometr = model.CarService.Odometr;
+    //    //}
+    //    //if (model.CarService.Ammount > 0)
+    //    //{
+    //    //    carServiceToClose.Ammount = model.CarService.Ammount;
+    //    //}
+    //    //if (uniqueFileName != null)
+    //    //{
+    //    //    //carServiceToClose.DocumentPath = uniqueFileName;
+    //    //    carServiceToClose.DocumentPath = filePath;
+    //    //}
+
+    //    //_context.SaveChanges();
+    //}
+
+
+
+    async Task HandleSelection(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+        string uniqueFileName;
+
+        if (file != null)
+        {
+            //= file.RelativePath;
+            // Just load into .NET memory to show it can be done
+            // Alternatively it could be saved to disk, or parsed in memory, or similar
+            var ms = new MemoryStream();
+            await file.Data.CopyToAsync(ms);
+
+            status = $"Finished loading {file.Size} bytes from {file.Name}";
+
+
+
+
+
+
+
+
+            var content = new MultipartFormDataContent
+{
+                { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
+            };
+
+
+            filePath = $"data:application/pdf;base64,{Convert.ToBase64String(ms.ToArray())}";
+
+
+
+            string uploadFolder = Path.Combine(environment.WebRootPath, "AccountingDocuments");
+            uploadFolder = Path.Combine(uploadFolder, carRegistration);
+
+            try
+            {
+                if (!Directory.Exists(uploadFolder))
+                {
+                    DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
+                }
+
+            }
+            catch (Exception)
+            {
+
+                //throw;
+            }
+
+
+
+            uniqueFileName = Guid.NewGuid() + "_" + file.Name;
+            //filePath = Path.Combine(uploadFolder, uniqueFileName);
+
+
+
+
+            await client.PostAsync($"api/upload?registrationNumber={Path.Combine(uploadFolder, uniqueFileName)}", content);
+            carService.DocumentPath = uniqueFileName;
+            status = $"Finished loading {file.Size} bytes from {file.Name}";
+        }
+    }
+
+
 }

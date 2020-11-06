@@ -1,0 +1,81 @@
+﻿@page "/forms"
+@page "/forms/list"
+@layout EmptyLayout
+@inherits OwningComponentBase<DataContext>
+
+<h5 class="bg-primary text-white text-center p-2">Cars</h5>
+<NavLink class="btn btn-primary" href="/forms/create">Create</NavLink>
+<table class="table table-sm table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Dept</th>
+            <th>Location</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Cars.Count() == 0)
+        {
+            <tr><th colspan="5" class="p-4 text-center">Loading Data...</th></tr>
+        }
+        else
+        {
+            @foreach (Car c in Cars)
+            {
+                <tr>
+                    <td>@c.Id</td>
+                    <td>@c.CarCurrentStatus</td>
+                    @*<td>@p.Surname, @p.Firstname</td>
+                        <td>@p.Department.Name</td>
+                        <td>@p.Location.City</td>*@
+                <td>
+                    <NavLink class="btn btn-sm btn-info"
+                             href="@GetDetailsUrl(c.Id)">
+                        Details
+                    </NavLink>
+                    <NavLink class="btn btn-sm btn-warning"
+                             href="@GetEditUrl(c.Id)">
+                        Edit
+                    </NavLink>
+                    <button class="btn btn-sm btn-danger"
+                            @onclick="@(() => HandleDelete(c))">
+                        Delete
+                    </button>
+                </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@code {
+    //[Inject]
+    //public DataContext Context { get; set; }
+    public DataContext Context => Service;
+
+    public IEnumerable<Car> Cars { get; set; } = Enumerable.Empty<Car>();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await UpdateData();
+        //Cars = Context.Cars.Include(c => c.CarStatuses).ThenInclude(c => c.Status);// People.Include(p => p.Department).Include(p => p.Location);
+    }
+
+    private IQueryable<Car> Query => Context.Cars.Include(c => c.CarStatuses).ThenInclude(c => c.Status);
+
+
+    private async Task UpdateData(IQueryable<Car> query = null) =>
+    Cars = await (query ?? Query).ToListAsync<Car>();
+
+    string GetEditUrl(long id) => $"/forms/edit/{id}";
+
+    string GetDetailsUrl(long id) => $"/forms/details/{id}";
+
+    public async Task HandleDelete(Car c)
+    {
+        Context.Remove(c);
+        await Context.SaveChangesAsync();
+        await UpdateData();
+    }
+}

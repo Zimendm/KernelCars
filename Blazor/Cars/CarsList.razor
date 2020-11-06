@@ -1,0 +1,205 @@
+﻿
+@page "/cars"
+@using KernelCars.Components
+@using System.Text.Json
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@*<h3>CarsList from Blazor Folder</h3>*@
+
+<h4 class="bg-primary text-white text-center p-2">Автомобили</h4>
+
+<div class="form-group">
+    <label class="form-text">Поиск авто</label>
+    <input class="form-control" placeholder="Введите номер или фамилию ...." @oninput="@SearchChanged" />
+</div>
+
+<Pagination TotalPagesQuantity="totalPageQuantity" CurrentPage="@currentPage" Radius="10"
+            SelectedPage="SelectedPages"></Pagination>
+
+<table class="table table-sm table-bordered table-striped">
+    <thead>
+        <tr>
+            @*<th>ID</th>*@
+            <th>Status</th>
+            <th>Гос.номер</th>
+            <th>Марка,Модель</th>
+            <th>Водитель</th>
+            <th>Организация</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (KernelCars.Models.ViewModels.CarsDisplayViewModel c in Cars)
+        {
+        <tr>
+            <td>@c.Id</td>
+            <td>@c.RegistrationNumber</td>
+            <td>@c.CarModel</td>
+            <td>@c.CarUser</td>
+            <td>@c.Firm</td>
+            @*<td hidden>@c.Id</td>
+        <td>@c.CarCurrentStatus</td>
+        <td>@c.RegistrationNumber</td>
+        <td>@c.CarModel.Manufacturer.Name @c.CarModel.Model</td>*@
+            @*<td>@c.CarStatuses?.LastOrDefault()</td>
+        <td>@c.CarUsers?.LastOrDefault().Employee.FullName</td>*@
+
+            @*@if (@c.CarStatuses.LastOrDefault() == null)
+        {
+            <td>Не установлен</td>
+        }
+        else
+        {
+            <td>@c.CarStatuses.LastOrDefault().Status.State</td>
+        }*@
+            @*@if (@c.CarUsers.LastOrDefault() == null)
+        {
+            <td>Не закреплён</td>
+        }
+        else
+        {
+            <td>@c.CarUsers.LastOrDefault().Employee.FullName</td>
+        }*@
+        <td>
+
+            @*<div class="row">
+        <div class="@(!c.EnableService ? "d-none":null)">*@
+            <span class="@(!c.EnableService ? "d-none":null)">
+                <NavLink class="btn btn-sm btn-success" href="@GetServiceUrl(c.Id)">
+                    Сервис
+                </NavLink>
+            </span>
+            @*</div>
+        <div>*@
+
+            <span>
+                <NavLink class="btn btn-sm btn-info" href="@GetEditUrl(c.Id)">
+                    Подробно
+                </NavLink>
+            </span>
+            <span>
+                <NavLink class="btn btn-sm btn-info" href="@GetEditUrl(c.Id)">
+                    Edit
+                </NavLink>
+            </span>
+            @*</div>
+        </div>*@
+        </td>
+        
+        </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Inject]
+    public KernelCars.Data.DataContext Context { get; set; }
+
+    //[Inject]
+    //HttpClient Http { get; set; }
+
+    public int currentPage { get; set; } = 1;
+    public string SearchString { get; set; } = null;
+
+    public IEnumerable<KernelCars.Models.ViewModels.CarsDisplayViewModel> Cars = new List<KernelCars.Models.ViewModels.CarsDisplayViewModel>();
+    private int totalPageQuantity;
+    //private int currentPage = 1;
+
+
+    //=> Context.Cars
+    //    .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+    //    .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+    //    .Include(c => c.CarStatuses).ThenInclude(c => c.Status);
+
+
+
+    public List<string> Numbers => new List<string> { "Acs", "Des" };
+
+    public string GetEditUrl(long id) => $"/cars/edit/{id}";
+    public string GetServiceUrl(long id) => $"/service/create/{id}";
+
+    public int PageNumber { get; set; } = 1;
+    public int TotalPages { get; set; } = 10;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Http.BaseAddress ??= new Uri(NavigationManager.BaseUri);
+        await LoadCars();
+    }
+
+    ////protected override async Task OnAfterRenderAsync(bool firstRender)
+    ////{
+    ////    //return base.OnAfterRenderAsync(firstRender);
+    ////    await LoadCars();
+    ////}
+
+    private async Task SelectedPages(int page)
+    {
+        currentPage = page;
+        await LoadCars(page,searchString: SearchString);
+    }
+
+    async Task LoadCars(int page=1,int quantityPerPage = 25,string searchString = null)
+    {
+
+
+        //Cars = await Http.GetJsonAsync<List<KernelCars.Models.ViewModels.CarsDisplayViewModel>>($"api/carapi?page={page}&quantityPerPage={quantityPerPage}");
+        //StateHasChanged();
+
+        var httpResponse = await Http.GetAsync($"api/carapi?page={page}&quantityPerPage={quantityPerPage}&searchString={searchString}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            totalPageQuantity = int.Parse(httpResponse.Headers.GetValues("pagesQuantity").FirstOrDefault());
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            Cars=JsonSerializer.Deserialize<List<KernelCars.Models.ViewModels.CarsDisplayViewModel>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            //StateHasChanged();
+        }
+        else
+        {
+            // handle error
+        }
+    }
+
+    async Task SearchChanged(ChangeEventArgs e)
+    {
+        //Cars = Context.Cars
+        //.Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+        //.Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+        //.Include(c => c.CarStatuses).ThenInclude(c => c.Status).ToList().Where(c => c.RegistrationNumber.IndexOf(e.Value.ToString()) > -1);
+
+        //if (SearchString=="")
+        //{
+        currentPage = 1;
+        //}
+        SearchString = e.Value.ToString();
+        await LoadCars(currentPage, searchString: SearchString);
+
+        //int z = 0;
+    }
+
+    public async void PageIndexChanged(int newPageNumber)
+    {
+        if (newPageNumber < 1 || newPageNumber > TotalPages)
+        {
+            return;
+        }
+        //pageNumber = newPageNumber;
+        //paginatedList = await service.GetPagedResult(pageNumber, currentSortField, currentSortOrder);
+        //toDoList = paginatedList.Items;
+
+        IEnumerable<KernelCars.Models.Car> cars = Context.Cars
+        .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+        .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+        .Include(c => c.CarStatuses).ThenInclude(c => c.Status).ToList().Skip((newPageNumber - 1) * 10).Take(10);
+
+        // Cars = cars;
+
+
+        PageNumber = newPageNumber;
+        StateHasChanged();
+    }
+}
