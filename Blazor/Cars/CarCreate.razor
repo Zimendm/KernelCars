@@ -1,640 +1,90 @@
-﻿@*@page "/service/create/{carid:long}"
-@page "/service/edit/{id:int}"*@
-@using KernelCars.Blazor.Cars
-@using KernelCars.Models.ViewModels
-@using System.Globalization
-@using BlazorInputFile
+﻿@page "/cars/create"
 @inherits OwningComponentBase<DataContext>
-@inject IJSRuntime JsInterop
-@inject HttpClient client
-@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment environment
-@using System.Drawing
 
 
-<div>
-    <label class="m-2"><b>Автомобиль:</b> @carModel</label>
-</div>
-<div>
-    <label class="m-2"><b>Гос.номер:</b> @carRegistration</label>
-</div>
-<div>
-    <label class="m-2"><b>Водитель:</b> @carUser</label>
-</div>
-<div class="m-2">
 
-</div>
-
-
-<h4 class="bg-primary text-white text-center p-2">Запись на сервисное обслуживание</h4>
-
-
-<EditForm Model="carService" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-
+<h4 class="bg-primary text-white text-center p-2">Регистрация нового автомобиля</h4>
+<EditForm Model="car">
     <div class="form-row">
-        <div class="col-8">
+        @*Первая сторона техпаспорта*@
+        <div class="col">
             <div class="form-row">
                 <div class="col">
                     <div class="form-group">
-                        <label>Планируемая дата ТО</label>
-                        <input class="form-control" type="date" @bind="carService.OpenDate" @bind:culture="Culture" />
+                        <label>Регистрационный номер</label>
+                        <InputText class="form-control" @bind-Value="car.RegistrationNumber"></InputText>
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
-                        <label>Дата окончания ТО</label>
-                        <input class="form-control" type="date" @bind="carService.CompleteDate" @bind:culture="Culture" />
+                        <label>Год выпуска</label>
+                        <InputNumber class="form-control" @bind-Value="car.FirstRegistrationYear"></InputNumber>
                     </div>
                 </div>
             </div>
-
-
+            
             <div class="form-row">
-                <div class="col-3">
+                <div class="col">
                     <div class="form-group">
-                        <label>Текущие показания одометра</label>
-                        <InputNumber class="form-control" @bind-Value="carService.Odometr"></InputNumber>
+                        <label>Тип топлива</label>
+                        <select class="form-control" value="@car.Fuel" @onchange="@SelectFuelChanged">
+                            <option disabled>Select type of fuel...</option>
+                            @foreach (var fuel in Enum.GetValues(typeof(TypeOfFuel)))
+                            {
+                                <option>@fuel</option>
+                            }
+                        </select>
                     </div>
                 </div>
-                <div class="col-9">
-                    <div class="form-group">
-                        <label>Станция тех.обслуживания</label>
-                        <CustomSelect TValue="int" Values="ServiceStations"
-                                      Parser="@(str=>int.Parse(str))"
-                                      @bind-Value="carService.ServiceStationID">
-                            <option selected disabled value="0">Выберите СТО ...</option>
-                        </CustomSelect>
-                    </div>
+                <div class="col">
+                    <label>Ёмкось бака</label>
+                    <InputNumber class="form-control" @bind-Value="car.TankCapacity"></InputNumber>
                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="col-7">
+                <div class="col">
                     <div class="form-group">
-                        <label>Виды работ</label>
-                        <div class="col-md-offset-2 col-md-10">
-                            <table class="table table-sm">
-                                @{
-                                    int cnt = 0;
-
-                                    foreach (var item in assignedTOF)
-                                    {
-                                        if (cnt++ % 2 == 0)
-                                        {
-                                            @:<tr>
-                                            }
-                                            @:<td>
-                                                <div>
-                                                    <input type="checkbox"
-                                                           name="selectedWorks"
-                                                           value="item.TypeOfServiceID"
-                                                           checked="@item.IsAssigned"
-                                                           @onchange="@((e)=>WorkAssigment(e,item))" />
-                                                    <label>@item.Service</label>
-                                                </div>
-                                            @:</td>
-                                        }
-                                        if (cnt++ % 3 == 0)
-                                        {
-                                        @:</tr>
-                                    }
-                                }
-                            </table>
+                        <label class="control-label">Установлено ГБО</label>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="car.LPG"></InputCheckbox>
+                            @*<label class="form-check-label">LPG</label>*@
                         </div>
                     </div>
                 </div>
-                <div class="col-5">
-                    <div class="form-group">
-                        <label>Комментарии</label>
-                        <InputTextArea class="form-control" @bind-Value="carService.ServiceDescription"></InputTextArea>
-                    </div>
-                </div>
-                @*<div class="form-row">
-                        <div class="form-group">
-                            <label for="exampleFormControlFile1">Example file input</label>
-                            <input type="file" class="form-control-file" id="exampleFormControlFile1" @onchange="OnInputFileChange">
-                        </div>
-                    </div>*@
-
-                <p>
-                    <InputFile OnChange="HandleSelection"></InputFile>
-                </p>
-                <p>@status</p>
-
-                @*<input type="file" onchange="@UploadFile" id="fileUpload" />*@
-
             </div>
-
-
+            <CarOwnerSelect></CarOwnerSelect>
         </div>
-        <div class="col-1"></div>
-        <div class="col-3">
-            <label>История обслуживания с: @fromDate.ToShortDateString() </label>
-            <table class="table table-sm">
-                <tbody>
-                    @foreach (var item in services)
-                    {
-                        <tr>
-                            <td>@item.Key</td>
-                            <td>@item.Value</td>
-                        </tr>
-                    }
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td>Итого:</td>
-                        <td>@(totalAmmount.ToString("C2"))</td>
-                    </tr>
-                </tfoot>
-            </table>
-            <label>@odometrDisp</label>
+        @*Вторая сторона техпаспорта*@
+    <div class="col">
+        <div class="form-group">
+            <ModelSelect TValue="int"
+                         Parser="@(str => int.Parse(str))"
+                         @bind-Value=@car.CarModelId>
+                <option selected disabled value="0">Выберите модель ....</option>
+            </ModelSelect>
         </div>
+        
     </div>
-
-
-    @*<img src="IMG-8c41e13a064e53302494a836dec45900-V.jpg" @onclick="RotateImage" />*@
-    <img src=@imgSrc @onclick="RotateImage" />
-    <iframe src=@filePath width="600" height="200"></iframe>
-
-
-    @*<embed width="100%" height="100%" src=@filePath/>*@
-
-    <div class="text-center">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <NavLink class="btn btn-secondary" href="/service">Back</NavLink>
     </div>
-
-
-    @*<img src="~/IMG-8c41e13a064e53302494a836dec45900-V.jpg" />*@
-
-
-
-
 </EditForm>
+
+
 
 @code {
 
-    [Inject]
-    public NavigationManager NavManager { get; set; }
-
-
-
-
-    [Parameter]
-    public long carid { get; set; }
-
-    [Parameter]
-    public int Id { get; set; }
-
-    System.Uri uri;
-
-
-    string imgSrc;
-
-    public CultureInfo Culture { get; set; } = CultureInfo.GetCultureInfo("ru-RU");
-
-
-    List<AssignedTypeOfService> assignedTOF = new List<AssignedTypeOfService>();
-
     DataContext _context => Service;
 
-    public string Mode => Id == 0 ? "Create" : "Edit";
-
-    string filePath;
-
-    Dictionary<string, int> services = new Dictionary<string, int>();
-    List<int> odometr = new List<int>();
-    List<DateTime> dates = new List<DateTime>();
-    DateTime fromDate;
-
-    string odometrDisp;
-    float totalAmmount = 0;
-
-    string carModel;
-    string carRegistration;
-    string carUser;
-
-    string status;
-
-
-
-    System.Drawing.Bitmap bitmap;
-
-    private CarService carService = new CarService()
+    private Car car = new Car
     {
-        WorkAssigments = new List<WorkAssigment>(),
-        OpenDate = DateTime.Now
+        FirstRegistrationYear=DateTime.Now.Year,
+        CarModelId=1
     };
 
-    public IDictionary<string, int> ServiceStations { get; set; } = new Dictionary<string, int>();
 
 
-    protected void RotateImage(MouseEventArgs e)
+
+    void SelectFuelChanged(ChangeEventArgs e)
     {
-        //String path = Server.MapPath(Image1.ImageUrl);
-        //System.Drawing.Image img = System.Drawing.Image.FromFile(path);
-        //img.RotateFlip(RotateFlipType.Rotate90FlipNone);
-        //img.Save(path);
-        //Response.Redirect(Request.Url.AbsoluteUri);
-
-        bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
-
-        ImageConverter converter = new ImageConverter();
-        byte[] vs = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-
-
-        imgSrc = $"data:image/bmp;base64,{Convert.ToBase64String(vs)}";
-
-        //StateHasChanged();
-
+        TypeOfFuel tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        car.Fuel = tof;
     }
-
-
-    protected async override Task OnParametersSetAsync()
-    {
-        //WebImage photo = new WebImage(@"~\Images\Photo2.jpg");
-        //if (photo != null)
-        //{
-        //    imagePath = @"images\Photo2.jpg";
-        //    photo.FlipVertical();
-        //    photo.Save(@"~\" + imagePath);
-
-
-
-
-
-        //System.Drawing.Bitmap bitmap1 = new Bitmap();
-
-        bitmap = new System.Drawing.Bitmap(@"C:\Users\dzime\source\repos\KernelCars\wwwroot\IMG-8c41e13a064e53302494a836dec45900-V.jpg");
-
-        ImageConverter converter = new ImageConverter();
-        byte[] vs = (byte[])converter.ConvertTo(bitmap, typeof(byte[]));
-
-
-        imgSrc = $"data:image/bmp;base64,{Convert.ToBase64String(vs)}";
-
-
-
-        //bitmap =(System.Drawing.Bitmap) System.Drawing.Bitmap.FromFile(@"C:\Users\dzime\source\repos\KernelCars\wwwroot\IMG - 8c41e13a064e53302494a836dec45900 - V.jpg");
-
-        //bitmap.RotateFlip(RotateFlipType.Rotate90FlipNone);
-
-
-
-        //using (MemoryStream ms = new MemoryStream())
-        //{
-        //    image.Save(ms, format);
-        //    return ms.ToArray();
-        //}
-
-
-
-
-        //using (var stream = new MemoryStream())
-        //{
-        //    bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-        //    imgSrc = $"data:image/bmp;base64,{Convert.ToBase64String((byte[])converter.ConvertTo(img, typeof(byte[])))}";
-        //    //stream.ToArray();
-        //}
-
-
-
-
-
-
-
-
-
-
-
-
-        if (Id != 0)
-        {
-            carService = _context.CarServices.Include(cs => cs.ServiceStation).Include(cs => cs.WorkAssigments).Where(cs => cs.ID == Id).First();
-            if (carService != null)
-            {
-                carid = carService.CarId;
-            }
-        }
-        else
-        {
-            carService.CarId = this.carid;
-        }
-        //carService.CarId = this.carid;
-        //uri = NavManager.ToAbsoluteUri(NavManager.Uri);
-        //if (uri.ToString().IndexOf(@"/edit") > -1)
-        //{
-        //    mode = "Edit";
-        //}
-        //else
-        //{
-        //    mode = "Create";
-        //}
-
-        ServiceStations = await _context.ServiceStations.OrderBy(st => st.Name).ToDictionaryAsync(s => s.Name, s => s.ID);
-
-        var tmpCar = await _context.Cars
-            .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
-            .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer).FirstAsync(c => c.Id == carid);
-        carUser = tmpCar.CarUserForView;
-        carModel = tmpCar.CarModel.Manufacturer.Name + " " + tmpCar.CarModel.Model;
-        carRegistration = tmpCar.RegistrationNumber;
-
-
-        assignedTOF = PopulateAssignedWorks(carService);
-
-        var serviceData = _context.CarServices.Include(s => s.WorkAssigments).ThenInclude(s => s.TypeOfService).Where(c => c.CarId == this.carid);
-
-
-        if (serviceData.Count() > 0)
-        {
-            foreach (var item in serviceData)
-            {
-                var serDetails = from sd in item.WorkAssigments
-                                 group sd by sd.TypeOfService.Service into dsl
-                                 select dsl;
-                totalAmmount += item.Ammount;
-                odometr.Add(item.Odometr);
-                dates.Add(item.OpenDate);
-
-                foreach (var serv in serDetails)
-                {
-                    if (services.ContainsKey(serv.Key))
-                    {
-                        services[serv.Key]++;
-                    }
-                    else
-                    {
-                        services.Add(serv.Key, 1);
-                    }
-                }
-            }
-
-            odometrDisp = "Последнее ТО (одометр): " + odometr.Max().ToString();
-            fromDate = dates.Min();
-        }
-
-    }
-
-    public async Task HandleValidSubmit()
-    {
-        UpdateCarServiceWorks();
-        _context.Add(carService);
-        await _context.SaveChangesAsync();
-        NavManager.NavigateTo("/service");
-    }
-
-    //private void UpdateCarServiceWorks(string[] selectedWorks, CarService serviceToUpdate)
-    private void UpdateCarServiceWorks()
-    {
-        if (carService.WorkAssigments == null)
-        {
-            carService.WorkAssigments = new List<WorkAssigment>();
-        }
-
-        foreach (var item in assignedTOF)
-        {
-            if (item.IsAssigned)
-            {
-                carService.WorkAssigments.Add(new Models.WorkAssigment { TypeOfServiceId = item.TypeOfServiceID, CarServiceID = carService.ID });
-            }
-        }
-    }
-
-    private void WorkAssigment(ChangeEventArgs e, AssignedTypeOfService item)
-    {
-        if ((bool)e.Value == true)
-        {
-            item.IsAssigned = true;
-        }
-        else
-        {
-            item.IsAssigned = false;
-        }
-    }
-
-
-
-    private List<AssignedTypeOfService> PopulateAssignedWorks(CarService carService)
-    {
-        var allServices = _context.TypeOfServices;
-        var currentServices = new HashSet<int>(carService.WorkAssigments.Select(c => c.TypeOfServiceId));
-        var viewModel = new List<AssignedTypeOfService>();
-        foreach (var service in allServices)
-        {
-            viewModel.Add(new AssignedTypeOfService
-            {
-                TypeOfServiceID = service.ID,
-                Service = service.Service,
-                IsAssigned = currentServices.Contains(service.ID)
-            });
-        }
-
-        return viewModel;
-    }
-
-
-    //async Task
-    //private void OnInputFileChange(ChangeEventArgs e)
-    //{
-
-
-
-    //    int z = 0;
-
-    //    //var ms = new MemoryStream();
-    //    //await file.Data.CopyToAsync(ms);
-
-    //    ////status = $"Finished loading {file.Size} bytes from {file.Name}";
-
-    //    //var content = new MultipartFormDataContent {
-    //    //        { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
-    //    //    };
-    //    //await client.PostAsync("upload", content);
-
-
-
-
-
-
-    //    //string uniqueFileName = null;
-    //    //string filePath = null;
-    //    //if (true)
-    //    //{
-    //    //    try
-    //    //    {
-
-    //    //        if (true)
-    //    //        {
-    //    //            //string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, @"C:\Users\dzime\Source\Repos\Zimendm\KernelCars\wwwroot\AccountingDocuments\");
-    //    //            string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "AccountingDocuments");
-    //    //            uploadFolder = Path.Combine(uploadFolder, model.RegNumber);
-
-    //    //            try
-    //    //            {
-    //    //                if (!Directory.Exists(uploadFolder))
-    //    //                {
-    //    //                    DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
-    //    //                }
-
-    //    //            }
-    //    //            catch (Exception)
-    //    //            {
-
-    //    //                //throw;
-    //    //            }
-
-
-
-    //    //            uniqueFileName = Guid.NewGuid() + "_" + model.DocumentScan.FileName;
-    //    //            filePath = Path.Combine(uploadFolder, uniqueFileName);
-
-    //    //            using (var stream = new FileStream(filePath, FileMode.Create))
-    //    //            {
-    //    //                model.DocumentScan.CopyTo(stream);
-    //    //            }
-
-    //    //            string z1 = (string)RouteData.Values["id"];
-    //    //        }
-    //    //    }
-    //    //    catch (Exception)
-    //    //    {
-
-    //    //        //throw;
-    //    //    }
-
-    //    //return NotFound();
-    //    //var carServiceToClose = _context.CarServices.Where(cs => cs.ID == model.CarServiceId).FirstOrDefault();
-
-    //    //if (model.CarService.CompleteDate != null)
-    //    //{
-    //    //    carServiceToClose.CompleteDate = model.CarService.CompleteDate;
-    //    //}
-    //    //if (model.CarService.Odometr != 0)
-    //    //{
-    //    //    carServiceToClose.Odometr = model.CarService.Odometr;
-    //    //}
-    //    //if (model.CarService.Ammount > 0)
-    //    //{
-    //    //    carServiceToClose.Ammount = model.CarService.Ammount;
-    //    //}
-    //    //if (uniqueFileName != null)
-    //    //{
-    //    //    //carServiceToClose.DocumentPath = uniqueFileName;
-    //    //    carServiceToClose.DocumentPath = filePath;
-    //    //}
-
-    //    //_context.SaveChanges();
-    //}
-
-
-
-    async Task HandleSelection(IFileListEntry[] files)
-    {
-        var file = files.FirstOrDefault();
-        string uniqueFileName;
-
-        if (file != null)
-        {
-            //= file.RelativePath;
-            // Just load into .NET memory to show it can be done
-            // Alternatively it could be saved to disk, or parsed in memory, or similar
-            var ms = new MemoryStream();
-            await file.Data.CopyToAsync(ms);
-
-            status = $"Finished loading {file.Size} bytes from {file.Name}";
-
-
-
-
-
-
-
-
-            var content = new MultipartFormDataContent
-    {
-                { new ByteArrayContent(ms.GetBuffer()), "\"upload\"", file.Name }
-            };
-
-
-            filePath = $"data:application/pdf;base64,{Convert.ToBase64String(ms.ToArray())}";
-
-
-
-            string uploadFolder = Path.Combine(environment.WebRootPath, "AccountingDocuments");
-            uploadFolder = Path.Combine(uploadFolder, carRegistration);
-
-            try
-            {
-                if (!Directory.Exists(uploadFolder))
-                {
-                    DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
-                }
-
-            }
-            catch (Exception)
-            {
-
-                //throw;
-            }
-
-
-
-            uniqueFileName = Guid.NewGuid() + "_" + file.Name;
-            //filePath = Path.Combine(uploadFolder, uniqueFileName);
-
-
-
-
-
-
-
-            await client.PostAsync($"api/upload?registrationNumber={Path.Combine(uploadFolder, uniqueFileName)}", content);
-            status = $"Finished loading {file.Size} bytes from {file.Name}";
-        }
-    }
-
-
-
-
-
-
-    //async Task UploadFile()
-    //{
-
-
-
-
-    //    //var data = await JsInterop.GetFileData("fileUpload");
-    //    //var response = await Http.PostAsync("/api/upload", new ByteArrayContent(Convert.FromBase64String(data)));
-    //    //var fileTempName = await response.Content.ReadAsStringAsync();
-    //}
-
-
-
-
-
-
-
-
-
-    @*int z = 0;
-
-            //    //var maxAllowedFiles = 3;
-            //    //var format = "image/png";
-
-            //    //foreach (var imageFile in e.GetMultipleFiles(maxAllowedFiles))
-            //    //{
-            //    //    var resizedImageFile = await imageFile.RequestImageFileAsync(format,
-            //    //        100, 100);
-            //    //    var buffer = new byte[resizedImageFile.Size];
-            //    //    await resizedImageFile.OpenReadStream().ReadAsync(buffer);
-            //    //    var imageDataUrl =
-            //    //        $"data:{format};base64,{Convert.ToBase64String(buffer)}";
-            //    //    //imageDataUrls.Add(imageDataUrl);
-            //    //}
-        }*@
-
-
 }

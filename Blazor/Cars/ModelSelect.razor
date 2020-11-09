@@ -58,6 +58,8 @@
     {
         int tempInt;
 
+
+
         if (CurrentValueAsString != "1")
         {
             int.TryParse(CurrentValueAsString, out tempInt);
@@ -67,23 +69,8 @@
             int.TryParse(CurrentManufacturer, out tempInt);
 
             Values = Context.CarModels.Where(cm => cm.ManufacturerId == tempInt).ToDictionary(m => m.Model, m => m.CarModelId);
-            //int.TryParse(CurrentManufacturer, out tempInt);
-
-            //Values = Context.CarModels.Where(cm => cm.ManufacturerId == tempInt).ToDictionary(m => m.Model, m => m.CarModelId);
-
+        
         }
-        //else
-        //{
-        //    CurrentManufacturer = 1.ToString();
-        //}
-
-
-        //Values= Context.CarModels(cm => cm.ManufacturerId == CarData.CarModel.ManufacturerId).ToDictionaryAsync(m => m.Model, m => m.CarModelId);
-
-        //CurrentManufacturer = 2.ToString();
-        //CarData = await Context.Cars.Include(c => c.CarModel).ThenInclude(c => c.Manufacturer).FirstOrDefaultAsync(c => c.Id == Id);
-        //Manufacturers = await Context.Manufacturers.ToDictionaryAsync(m => m.Name, m => m.ManufacturerId);
-        //CarModels = await Context.CarModels(cm => cm.ManufacturerId == CarData.CarModel.ManufacturerId).ToDictionaryAsync(m => m.Model, m => m.CarModelId);
     }
 
 

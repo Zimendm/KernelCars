@@ -8,6 +8,7 @@
 @*<h3>CarsList from Blazor Folder</h3>*@
 
 <h4 class="bg-primary text-white text-center p-2">Автомобили</h4>
+<NavLink class="btn btn-sm btn-light" href="/cars/create">Новый автомобиль</NavLink>
 
 <div class="form-group">
     <label class="form-text">Поиск авто</label>
@@ -74,7 +75,7 @@
         <div>*@
 
             <span>
-                <NavLink class="btn btn-sm btn-info" href="@GetEditUrl(c.Id)">
+                <NavLink class="btn btn-sm btn-info" href="@GetDetailUrl(c.Id)">
                     Подробно
                 </NavLink>
             </span>
@@ -118,6 +119,7 @@
 
     public string GetEditUrl(long id) => $"/cars/edit/{id}";
     public string GetServiceUrl(long id) => $"/service/create/{id}";
+    public string GetDetailUrl(long id) => $"/cars/details/{id}";
 
     public int PageNumber { get; set; } = 1;
     public int TotalPages { get; set; } = 10;

@@ -1,0 +1,89 @@
+﻿@page "/status/create/{CarId:long}"
+@using KernelCars.Blazor.Shared  
+@inherits OwningComponentBase<DataContext>
+
+<h3>Create new car status</h3>
+<EditForm Model="carStatus">
+    @*<CustomSelect TValue="int"
+                      Values="carStatuses"
+                      Parser="@(str=>int.Parse(str))"
+                      @bind-Value="statusID">
+            <option selected disabled value="0">Выберите статус ...</option>
+        </CustomSelect>
+
+        <CustomSelect TValue="int"
+                      Values="firms"
+                      Parser="@(str=>int.Parse(str))"
+                      @bind-Value="firmID" @onchange="firmSelected">
+            <option selected disabled value="0">Выберите юр.лицо ...</option>
+        </CustomSelect>
+
+        <CustomSelect TValue="int"
+                      Values="departments"
+                      Parser="@(str=>int.Parse(str))"
+                      @bind-Value="firmID">
+            <option selected disabled value="0">Выберите подразделение ...</option>
+        </CustomSelect>*@
+
+
+    <select class="form-control" value="@firmID" @onchange="@firmSelected">
+        <option selected disabled value="0">Выберите юр.лицо ...</option>
+        @foreach (KeyValuePair<string, int> kvp in firms)
+        {
+            <option value="@kvp.Value">@kvp.Key</option>
+        }
+    </select>
+
+
+    <select class="form-control" value="@departmentID">
+        @foreach (KeyValuePair<string, int> kvp in departments)
+        {
+            <option value="@kvp.Value">@kvp.Key</option>
+        }
+    </select>
+
+
+
+
+
+
+
+</EditForm>
+
+@statusID
+@firmID
+@departmentID
+
+@code {
+    [Parameter]
+    public long CarId { get; set; }
+    DataContext _context => Service;
+
+    CarStatus carStatus = new CarStatus();
+
+    int statusID;
+    public int firmID { get; set; }
+   
+    int departmentID;
+
+    Dictionary<string, int> carStatuses = new Dictionary<string, int>();
+    Dictionary<string, int> firms = new Dictionary<string, int>();
+    Dictionary<string, int> departments = new Dictionary<string, int>();
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        carStatuses = await _context.Statuses.OrderBy(st => st.StatusID).ToDictionaryAsync(st => st.State, st => st.StatusID);
+        firms = await _context.Firms.OrderBy(f => f.Name).ToDictionaryAsync(f => f.Name,f => f.FirmId);
+        //departments = await _context.Units.Include(u=>u.Department).Where(u=>u.FirmId == firmID).ToDictionaryAsync(u =>u.Department.Name, f => f.UnitId);
+        //return base.OnInitializedAsync();
+    }
+
+    protected void firmSelected(ChangeEventArgs e)
+    {
+        departments =  _context.Units.Include(u => u.Department).Where(u => u.FirmId == int.Parse((string)e.Value)).ToDictionary(u => u.Department.Name, f => f.UnitId);
+
+
+
+    }
+}

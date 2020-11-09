@@ -1,34 +1,332 @@
-﻿@page  "/forms/details/{id:long}"
-@layout EmptyLayout
+﻿@page  "/cars/details/{id:long}"
+@*@layout EmptyLayout*@
 @inherits OwningComponentBase<DataContext>
 
-<h4 class="bg-info text-center text-white p-2">Details</h4>
-<div class="form-group">
-    <label>ID</label>
-    <input class="form-control" value="@CarData.Id" disabled />
-</div>
-<div class="form-group">
-    <label>Гос.номер</label>
-    <input class="form-control" value="@CarData.RegistrationNumber" disabled />
-</div>
-<div class="text-center">
-    <NavLink class="btn btn-info" href="@EditUrl">Edit</NavLink>
-    <NavLink class="btn btn-secondary" href="/forms">Back</NavLink>
-</div>
+    <style>
+        .rotated90 {
+            transform: rotate(90deg)
+        }
+        .rotated180 {
+            transform: rotate(180deg)
+        }
+        .rotated270 {
+            transform: rotate(270deg)
+        }
+    </style>
+
+    <p class="@dispLoad">Загрузка данных .....</p>
 
 
-@code {
+    <div class="card @dispContent">
+        <div class="card-header">
+            <p>
+                <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@CarData.RegistrationNumber</b> Год выпуска: <b>@CarData.FirstRegistrationYear</b></h4>
+                <span class="badge badge-pill badge-success" style="float:left">@carCurrentStatus</span>
+            </p>
+        </div>
+        <div class="card-body">
+            <h6 class="bg-info text-center text-white p-2">Данные пользователя</h6>
+            <table class="table table-active table-striped">
+                <tr>
+                    <td>Экслуатирующая организация:</td>
+                    <td>@CarData.FullNameFirmForView</td>
+                </tr>
+                <tr>
+                    <td>Подразделение: </td>
+                    <td>@CarData.DepartmentNameForView</td>
+                </tr>
+                <tr>
+                    <td>Водитель: </td>
+                    <td>@CarData.CarUserForView</td>
+                </tr>
+                <tr>
+                    <td>Размещение: </td>
+                    <td>@carCurrentLocation</td>
+                </tr>
+                <tr>
+                    <td>Автомобиль в аренде: </td>
+                </tr>
+            </table>
 
-    DataContext Context => Service;
+            <h6 class="bg-info text-center text-white p-2">Регистрационные данные</h6>
+            <div class="form-group  p-2">
+                <table class="table table-active table-striped">
+                    <tbody>
+                        <tr>
+                            <td>Владелец:</td>
+                            <td>@CarData.CarOwner.FullName</td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#FFFFFF" style="line-height:10px;" colspan=3>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>Свидетельство о регистрации:</td>
+                            <td>@CarData.RegistrationCertificate</td>
+                        </tr>
+                        <tr>
+                            <td>Сервисный центр:</td>
+                            <td>@CarData.TSC</td>
+                        </tr>
+                        <tr>
+                            <td>Дата выдачи свидетельства:</td>
+                            <td>@CarData.RegistrationDate</td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#FFFFFF" style="line-height:10px;" colspan=3>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>VIN код:</td>
+                            <td>@CarData.VinNumber</td>
+                        </tr>
+                        <tr>
+                            <td>Тип:</td>
+                            <td>@CarData.CarType</td>
+                        </tr>
+                        <tr>
+                            <td>Цвет:</td>
+                            <td>@CarData.Color</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-    public Car CarData { get; set; } = new Car();
 
-    [Parameter]
-    public long Id { get; set; }
+            @*<img src=@imgReg_1Src @onclick="RotateImage_1" />*@
 
-    protected async override Task OnParametersSetAsync()
-    {
-        CarData = await Context.Cars.FirstOrDefaultAsync(c => c.Id == Id);
+
+
+
+
+
+
+
+
+            <div class="col-2">
+                <p>
+                    <button class="btn btn-primary btn-block" type="button" @onclick="(e)=>regCollapsed(e)">
+                        Техпаспорт
+                    </button>
+                </p>
+            </div>
+            <div class="@regCSSCollapse col-12" id="collapsePhoto">
+                <div class="row">
+                    <div class="col-sm text-center">
+                        @{
+                            try
+                            {
+                                var base64 = Convert.ToBase64String(CarData.ImagePage2);
+                                var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                                <img src="@imgsrc" class="img-thumbnail @CSSrotated1" style="width:auto;height:400px;transform-origin:center center" @onclick="RotateImage_1" />
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
+                            }
+
+                        }
+                    </div>
+                    <div class="col-sm text-center">
+                        @{
+                            try
+                            {
+                                var base64 = Convert.ToBase64String(CarData.ImagePage2);
+                                var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                                <img src="@imgsrc" class="img-thumbnail @CSSrotated2" style="width:auto;height:400px;transform-origin:center center" @onclick="RotateImage_2" />
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
+                            }
+
+                        }
+                    </div>
+                    <div class="col-sm">
+
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="bg-info text-center text-white p-2">Технические данные</h6>
+            @CarData.Fuel
+
+
+
+
+
+
+
+        </div>
+        <div class="text-center mb-3">
+            <NavLink class="btn btn-info" href="@EditUrl">Сервис</NavLink>
+            <NavLink class="btn btn-info" href="@StatusUrl">Распределение</NavLink>
+            <NavLink class="btn btn-info" href="@EditUrl">Аренда</NavLink>
+            <NavLink class="btn btn-info" href="@EditUrl">Страховка</NavLink>
+            <NavLink class="btn btn-info" href="@EditUrl">Edit</NavLink>
+            <NavLink class="btn btn-secondary" href="/forms">Back</NavLink>
+        </div>
+        <div class="card-footer"></div>
+    </div>
+
+
+
+    @*<h4 class="bg-info text-center text-white p-2">Details</h4>
+    <div class="form-group">
+        <label>ID</label>
+        <input class="form-control" value="@CarData.Id" disabled />
+    </div>
+    <div class="form-group">
+        <label>Гос.номер</label>
+        <input class="form-control" value="@CarData.RegistrationNumber" disabled />
+    </div>*@
+
+
+
+
+
+
+    @code {
+
+        DataContext Context => Service;
+
+        public Car CarData { get; set; } = new Car() { 
+            CarOwner = new Employee(),
+            CarStatuses = new List<CarStatus>(),
+            CarUsers=new List<CarUser>()
+        };
+
+        [Parameter]
+        public long Id { get; set; }
+
+        string carCurrentStatus;
+        string carModel;
+        string carCurrentLocation;
+
+
+        string dispLoad = "";
+        string dispContent = "d-none";
+
+        string CSSrotated1 = "";
+        string CSSrotated2 = "";
+        string regCSSCollapse = "collapse";
+
+
+
+        protected async override Task OnParametersSetAsync()
+        {
+            CarData = await Context.Cars
+                    .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+                    .Include(c => c.CarOwner)
+                    .Include(c => c.CarSevices)
+                    .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+                    .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                    .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                    .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+                    .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+                    .Include(c => c.LeaseContracts)
+                    .FirstOrDefaultAsync(c => c.Id == Id);
+
+
+
+
+            //CarData = await Context.Cars
+            //        .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            //        .Include(c => c.CarOwner)
+            //        .Include(c => c.CarSevices)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+            //        .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+            //        .Include(c => c.LeaseContracts).Where(c => c.Id == Id)
+            //        .FirstOrDefaultAsync();
+
+            //CarData = Context.Cars.Where(c => c.Id == Id).FirstOrDefault();
+
+
+            CarData = Context.Cars
+               .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+               .Include(c => c.CarOwner)
+               .Include(c => c.CarSevices)
+               .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+               .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+               .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+               .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+               .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+               .Include(c => c.LeaseContracts).Where(c => c.Id == Id)
+               .FirstOrDefault();
+
+            dispLoad = "d-none";
+            dispContent = "";
+
+            carCurrentStatus = CarData.CarStatuses.LastOrDefault() != null ? CarData.CarStatuses.LastOrDefault().Status.State : "Не определён";
+            carModel = CarData.CarModel.Manufacturer.Name + " " + CarData.CarModel.Model;
+
+            carCurrentLocation = CarData.CarStatuses.LastOrDefault() != null ? CarData.CarStatuses.LastOrDefault().Location.LocationName : "Не определено";
+
+
+
+
+
+            //using (var ms = new MemoryStream(CarData.ImagePage1))
+            //{
+            //    img_1 = new Bitmap(ms);
+            //}
+        }
+
+        public string EditUrl => $"/forms/edit/{Id}";
+        public string StatusUrl => $"/status/create/{CarData.Id}";
+
+        string regCollapsed(MouseEventArgs e)
+        {
+            if (regCSSCollapse=="")
+            {
+                regCSSCollapse= "collapse";
+            }
+            else
+            {
+                regCSSCollapse = "";
+            }
+            return regCSSCollapse;
+        }
+        protected void RotateImage_1(MouseEventArgs e)
+        {
+            switch (CSSrotated1)
+            {
+                case "":
+                    CSSrotated1="rotated90";
+                    break;
+                case "rotated90":
+                    CSSrotated1 = "rotated180";
+                    break;
+                case "rotated180":
+                    CSSrotated1 = "rotated270";
+                    break;
+                case "rotated270":
+                    CSSrotated1 = "";
+                    break;
+                default:
+                    break;
+            }
+        }
+        protected void RotateImage_2(MouseEventArgs e)
+        {
+            switch (CSSrotated2)
+            {
+                case "":
+                    CSSrotated2 = "rotated90";
+                    break;
+                case "rotated90":
+                    CSSrotated2 = "rotated180";
+                    break;
+                case "rotated180":
+                    CSSrotated2 = "rotated270";
+                    break;
+                case "rotated270":
+                    CSSrotated2 = "";
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
-    public string EditUrl => $"/forms/edit/{Id}";
-}
