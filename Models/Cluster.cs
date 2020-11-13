@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace KernelCars.Models
 {
-    public class Claster
+    public class Cluster
     {
         public int Id { get; set; }
-        public string ClaserName { get; set; }
-
+        public string ClusterName { get; set; }
         public ICollection<Unit> Units { get; set; }
     }
 }

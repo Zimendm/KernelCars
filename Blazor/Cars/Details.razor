@@ -21,7 +21,7 @@
         <div class="card-header">
             <p>
                 <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@CarData.RegistrationNumber</b> Год выпуска: <b>@CarData.FirstRegistrationYear</b></h4>
-                <span class="badge badge-pill badge-success" style="float:left">@carCurrentStatus</span>
+                <span class="badge badge-pill @CSScarCurrentStatus" style="float:left">@carCurrentStatus</span>
             </p>
         </div>
         <div class="card-body">
@@ -48,8 +48,8 @@
                 </tr>
             </table>
 
-            <h6 class="bg-info text-center text-white p-2">Регистрационные данные</h6>
-            <div class="form-group  p-2">
+            <h6 class="bg-info text-center text-white p-2" @onclick="(e)=>regCollapsed(e)">Регистрационные данные</h6>
+            <div class="@regCSSCollapse form-group  p-2">
                 <table class="table table-active table-striped">
                     <tbody>
                         <tr>
@@ -88,27 +88,7 @@
                         </tr>
                     </tbody>
                 </table>
-            </div>
-
-
-            @*<img src=@imgReg_1Src @onclick="RotateImage_1" />*@
-
-
-
-
-
-
-
-
-
-            <div class="col-2">
-                <p>
-                    <button class="btn btn-primary btn-block" type="button" @onclick="(e)=>regCollapsed(e)">
-                        Техпаспорт
-                    </button>
-                </p>
-            </div>
-            <div class="@regCSSCollapse col-12" id="collapsePhoto">
+                @* Отображение тех.паспорта *@
                 <div class="row">
                     <div class="col-sm text-center">
                         @{
@@ -146,6 +126,28 @@
                 </div>
             </div>
 
+
+            @*<img src=@imgReg_1Src @onclick="RotateImage_1" />*@
+
+
+
+
+
+
+
+
+
+            @*<div class="col-2">
+                <p>
+                    <button class="btn btn-primary btn-block" type="button" @onclick="(e)=>regCollapsed(e)">
+                        Техпаспорт
+                    </button>
+                </p>
+            </div>*@
+            @*<div class="@regCSSCollapse col-12" id="collapsePhoto">*@
+                
+            @*</div>*@
+
             <h6 class="bg-info text-center text-white p-2">Технические данные</h6>
             @CarData.Fuel
 
@@ -157,12 +159,12 @@
 
         </div>
         <div class="text-center mb-3">
-            <NavLink class="btn btn-info" href="@EditUrl">Сервис</NavLink>
+            <span class="@CSSisEnableService"><NavLink class="btn btn-info" href="@EditUrl">Сервис</NavLink></span>
             <NavLink class="btn btn-info" href="@StatusUrl">Распределение</NavLink>
-            <NavLink class="btn btn-info" href="@EditUrl">Аренда</NavLink>
-            <NavLink class="btn btn-info" href="@EditUrl">Страховка</NavLink>
+            <span class="@CSSisRentCar"><NavLink class="btn btn-info" href="@EditUrl">Аренда</NavLink></span>
+            <span class="@CSSisEnableService"> <NavLink class="btn btn-info" href="@EditUrl">Страховка</NavLink></span>
             <NavLink class="btn btn-info" href="@EditUrl">Edit</NavLink>
-            <NavLink class="btn btn-secondary" href="/forms">Back</NavLink>
+            <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
         </div>
         <div class="card-footer"></div>
     </div>
@@ -188,7 +190,7 @@
 
         DataContext Context => Service;
 
-        public Car CarData { get; set; } = new Car() { 
+        public Car CarData { get; set; } = new Car() {
             CarOwner = new Employee(),
             CarStatuses = new List<CarStatus>(),
             CarUsers=new List<CarUser>()
@@ -207,8 +209,11 @@
 
         string CSSrotated1 = "";
         string CSSrotated2 = "";
+        string CSScarCurrentStatus = "";
         string regCSSCollapse = "collapse";
 
+        string CSSisEnableService = "d-none";
+        string CSSisRentCar = "d-none";
 
 
         protected async override Task OnParametersSetAsync()
@@ -258,7 +263,39 @@
             dispLoad = "d-none";
             dispContent = "";
 
-            carCurrentStatus = CarData.CarStatuses.LastOrDefault() != null ? CarData.CarStatuses.LastOrDefault().Status.State : "Не определён";
+
+            carCurrentStatus = CarData.CarStatuses.Where(cs=>cs.EndDate==null).LastOrDefault() != null ? CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault().Status.State : "Не определён";
+
+            if (CarData != null)
+            {
+                if (CarData.IsEnableService)
+                {
+                    CSSisEnableService = "";
+                }
+            }
+
+            if (CarData != null)
+            {
+                if (CarData.IsRentCar)
+                {
+                    CSSisRentCar = "";
+                }
+            }
+            //isEnableService = CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault() != null ? CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault().IsEnableService : false;
+
+            //isRentCar = CarData != null ? CarData.IsRentCar : false;
+
+            switch (carCurrentStatus)
+            {
+                case "Эксплуатация":
+                    CSScarCurrentStatus = "badge-success";
+                    break;
+                default:
+                    CSScarCurrentStatus = "badge-danger";
+                    break;
+            }
+
+
             carModel = CarData.CarModel.Manufacturer.Name + " " + CarData.CarModel.Model;
 
             carCurrentLocation = CarData.CarStatuses.LastOrDefault() != null ? CarData.CarStatuses.LastOrDefault().Location.LocationName : "Не определено";
@@ -274,7 +311,8 @@
         }
 
         public string EditUrl => $"/forms/edit/{Id}";
-        public string StatusUrl => $"/status/create/{CarData.Id}";
+        //public string StatusUrl => $"/status/create/{CarData.Id}";
+        public string StatusUrl => $"/status/list/{CarData.Id}";
 
         string regCollapsed(MouseEventArgs e)
         {

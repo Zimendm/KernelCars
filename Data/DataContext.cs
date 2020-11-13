@@ -31,6 +31,7 @@ namespace KernelCars.Data
         public DbSet<LeaseContract> LeaseContracts { get; set; }
 
         public DbSet<Manager> Managers { get; set; }
+        public DbSet<Cluster> Clusters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

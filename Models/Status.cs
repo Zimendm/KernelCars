@@ -9,6 +9,8 @@ namespace KernelCars.Models
     {
         public int StatusID { get; set; }
         public string State { get; set; }
+        public bool? IsEnableService { get; set; }
         public string Description { get; set; }
+        
     }
 }

@@ -1,0 +1,120 @@
+﻿@page "/status/list/{CarId:long}"
+@using KernelCars.Blazor.Shared
+@inherits OwningComponentBase<DataContext>
+
+
+<div class="card">
+    <div class="card-header">
+        <p>
+            <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@carData.RegistrationNumber</b> Год выпуска: <b>@carData.FirstRegistrationYear</b></h4>
+            @*<span class="badge badge-pill @CSScarCurrentStatus" style="float:left">@carCurrentStatus</span>*@
+        </p>
+    </div>
+    <div class="card-body">
+        <h6 class="bg-primary text-white text-center p-2">Распределения автомобиля</h6>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Статус</th>
+                        <th>Кластер</th>
+                        <th>Организация</th>
+                        <th>Подразделение</th>
+                        <th>Размещение</th>
+                        <th>Обслуживание</th>
+                        <th>Установлен</th>
+                        <th>Изменён</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                    <tr>
+                        <td>@item.Status.State</td>
+                        <td>@item.Unit.Cluster.ClusterName</td>
+                        <td>@item.Unit.Firm.Name</td>
+                        <td>@item.Unit.Department.Name</td>
+                        <td>@item.Location.LocationName</td>
+                        <td>
+                            @if (item.IsEnableService)
+                            {
+                                @:Да
+                            }
+                            else
+                            {
+                                @:Нет
+                            }
+                    </td>
+                    <td>@item.BeginDate.ToShortDateString()</td>
+                    <td>@(item.EndDate!=null ? ((DateTime)item.EndDate).ToShortDateString(): "")</td>
+                    </tr>
+                    }
+                    @*@foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Status.State</td>
+                            <td>@item.Unit.Firm.Employee.FullName</td>
+                            <td>@item.Unit.Department.Name</td>
+                            <td>@item.Location.LocationName</td>
+                            <td>@Html.DisplayFor(i => item.IsEnableService)</td>
+                            <td>@item.BeginDate.ToShortDateString()</td>
+                            <td>@(item.EndDate!=null ? ((DateTime)item.EndDate).ToShortDateString() : "")</td>
+                        </tr>
+                    }*@
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="text-center">
+            <NavLink class="btn btn-primary" href=@($"/status/create/{CarId}")>Новое распределение</NavLink>
+            <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+        </div>
+    </div>
+</div>
+
+    
+
+
+
+
+
+
+
+@code {
+    DataContext _context => Service;
+
+    [Parameter]
+    public long CarId { get; set; }
+    List<CarStatus> Model=new List<CarStatus>();
+
+
+    Car carData=new Car();
+
+    string carModel;
+
+    protected async override Task OnParametersSetAsync()
+    {
+        carData = await _context.Cars
+                   .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+                   .Include(c=>c.CarStatuses).ThenInclude(c=>c.Location)
+                   .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                   .Include(c=>c.CarStatuses).ThenInclude(c=>c.Unit).ThenInclude(c=>c.Firm)
+                   .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                   .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Cluster)
+                   //.Include(c => c.CarModel).ThenInclude(c => c.Model).Where(c => c.Id == CarId)
+                   .FirstOrDefaultAsync(c => c.Id == CarId);
+
+        Model = carData.CarStatuses.OrderByDescending(c => c.BeginDate).ToList();
+
+        carModel = $"{carData.CarModel.Manufacturer.Name} {carData.CarModel.Model}";
+    }
+
+    private string GetNewStateURL()
+    {
+        return $"/status/create/{CarId}";
+    }
+
+}

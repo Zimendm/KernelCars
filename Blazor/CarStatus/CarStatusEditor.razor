@@ -3,58 +3,107 @@
 @inherits OwningComponentBase<DataContext>
 
 <h3>Create new car status</h3>
-<EditForm Model="carStatus">
-    @*<CustomSelect TValue="int"
-                      Values="carStatuses"
-                      Parser="@(str=>int.Parse(str))"
-                      @bind-Value="statusID">
-            <option selected disabled value="0">Выберите статус ...</option>
-        </CustomSelect>
 
-        <CustomSelect TValue="int"
-                      Values="firms"
-                      Parser="@(str=>int.Parse(str))"
-                      @bind-Value="firmID" @onchange="firmSelected">
+
+
+
+<EditForm Model="carStatus" OnValidSubmit="HandleValidSubmit">
+
+    <div class="form-row">
+        <div class="form-group col">
+            <label class="col-form-label">Новый статус</label>
+            <CustomSelect TValue="int"
+                          Values="carStatuses"
+                          Parser="@(str=>int.Parse(str))"
+                          @bind-Value="carStatus.StatusId">
+                <option selected disabled value="0">Выберите статус ...</option>
+            </CustomSelect>
+        </div>
+
+        <div class="form-group col">
+            <label class="col-form-label">Действует с </label>
+            <input class="form-control" type="date" @bind="OpenDate" />
+        </div>
+    </div>
+
+    @* TODO исправить установку возможности тех.обслуживания *@
+    <div class="form-group @((carStatus.StatusId < 4)&&(carStatus.StatusId !=0) ? ""  : "d-none")">
+        <div class="form-check">
+            <InputCheckbox class="form-check-input" @bind-Value="carStatus.IsEnableService"></InputCheckbox>
+            <label class="form-check-label">Предусмотрено сервисное обслуживание</label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Кластер</label>
+        <select class="form-control" value="@clusterID" @onchange="@clusterSelected">
+            <option selected disabled value="0">Выберите кластер ...</option>
+            @foreach (KeyValuePair<string, int> kvp in clusters)
+            {
+                <option value="@kvp.Value">@kvp.Key</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Юридическое лицо</label>
+        <select class="form-control" value="@firmID" @onchange="@firmSelected">
             <option selected disabled value="0">Выберите юр.лицо ...</option>
-        </CustomSelect>
+            @foreach (KeyValuePair<string, int> kvp in firms)
+            {
+                <option value="@kvp.Value">@kvp.Key</option>
+            }
+        </select>
+    </div>
 
-        <CustomSelect TValue="int"
-                      Values="departments"
-                      Parser="@(str=>int.Parse(str))"
-                      @bind-Value="firmID">
+    <div class="form-group">
+        <label>Департамент</label>
+        <select class="form-control" value="@departmentID" @onchange="@departmentSelected">
             <option selected disabled value="0">Выберите подразделение ...</option>
-        </CustomSelect>*@
+            @foreach (KeyValuePair<string, int> kvp in departments)
+            {
+                <option value="@kvp.Value">@kvp.Key</option>
+            }
+        </select>
+    </div>
 
+    <div class="form-group">
+        <label>Расположение автомобиля</label>
+        <CustomSelect TValue="int"
+                      Values="carLocations"
+                      Parser="@(str=>int.Parse(str))"
+                      @bind-Value="locationID">
+            <option selected disabled value="0">Выберите место дислокации ...</option>
+        </CustomSelect>
+    </div>
+    
+    <div class="form-group">
+        <label>Закреплённый пользователь</label>
+        <input class="form-control" list="carUsers"  @onchange="@userSelected"/>
+    </div>
 
-    <select class="form-control" value="@firmID" @onchange="@firmSelected">
-        <option selected disabled value="0">Выберите юр.лицо ...</option>
-        @foreach (KeyValuePair<string, int> kvp in firms)
+    <datalist id="carUsers">
+        @foreach (var owner in usersList)
         {
-            <option value="@kvp.Value">@kvp.Key</option>
+            <option>@owner</option>
         }
-    </select>
+    </datalist>
 
-
-    <select class="form-control" value="@departmentID">
-        @foreach (KeyValuePair<string, int> kvp in departments)
-        {
-            <option value="@kvp.Value">@kvp.Key</option>
-        }
-    </select>
-
-
-
-
-
-
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <NavLink class="btn btn-secondary" href="/service">Back</NavLink>
+    </div>
 
 </EditForm>
 
-@statusID
+@*@statusID
 @firmID
-@departmentID
+@departmentID*@
 
 @code {
+    [Inject]
+    public NavigationManager NavManager { get; set; }
+
     [Parameter]
     public long CarId { get; set; }
     DataContext _context => Service;
@@ -63,27 +112,141 @@
 
     int statusID;
     public int firmID { get; set; }
-   
+    int clusterID;
+    int locationID;
+
+    DateTime OpenDate = DateTime.Now;
+
     int departmentID;
 
     Dictionary<string, int> carStatuses = new Dictionary<string, int>();
     Dictionary<string, int> firms = new Dictionary<string, int>();
     Dictionary<string, int> departments = new Dictionary<string, int>();
+    Dictionary<string, int> clusters = new Dictionary<string, int>();
+    Dictionary<string, int> carLocations = new Dictionary<string, int>();
+    List<string> usersList = new List<string>();
+    List<Unit> units;
+
+    CarUser carUser;
+
+    //CSS переключатели
+    //string CSSenableService = "d-none";
 
 
     protected async override Task OnInitializedAsync()
     {
         carStatuses = await _context.Statuses.OrderBy(st => st.StatusID).ToDictionaryAsync(st => st.State, st => st.StatusID);
-        firms = await _context.Firms.OrderBy(f => f.Name).ToDictionaryAsync(f => f.Name,f => f.FirmId);
+        //firms = await _context.Firms.OrderBy(f => f.Name).ToDictionaryAsync(f => f.Name,f => f.FirmId);
+        clusters = await _context.Clusters.OrderBy(cl => cl.ClusterName).ToDictionaryAsync(cl => cl.ClusterName, cl => cl.Id);
+
+
+        carLocations = await _context.Locations.ToDictionaryAsync(l=>l.LocationName,l=>l.ID);
+
+
+        //usersList = await _context.Employees.ToDictionaryAsync(e => e.Id,e=>e.FullName);
+
+        usersList = await (from e in _context.Employees
+                           select e.FullName).ToListAsync();
         //departments = await _context.Units.Include(u=>u.Department).Where(u=>u.FirmId == firmID).ToDictionaryAsync(u =>u.Department.Name, f => f.UnitId);
         //return base.OnInitializedAsync();
     }
 
+    protected override void OnParametersSet()
+    {
+        carStatus.CarId = CarId;
+    }
+
+    protected void clusterSelected(ChangeEventArgs e)
+    {
+        units = _context.Units.Include(u => u.Firm).Where(u => u.ClusterId == int.Parse((string)e.Value)).ToList();
+        firms = new Dictionary<string, int>();
+
+        foreach (var item in units)
+        {
+            if (!firms.ContainsKey(item.Firm.Name))
+            {
+                firms.Add(item.Firm.Name, item.FirmId);
+            }
+        }
+    }
+
     protected void firmSelected(ChangeEventArgs e)
     {
+        firmID = int.Parse((string)e.Value);
         departments =  _context.Units.Include(u => u.Department).Where(u => u.FirmId == int.Parse((string)e.Value)).ToDictionary(u => u.Department.Name, f => f.UnitId);
+    }
+
+    protected void departmentSelected(ChangeEventArgs e)
+    {
+        carStatus.UnitId = int.Parse((string)e.Value);
+        //int depId;
+        //int.TryParse((string)e.Value,out depId);
+
+        //carStatus.UnitId = units.First(u => u.DepartmentId == depId).UnitId;
+
+
+        //foreach (var item in units)
+        //{
+        //    if (item.DepartmentId==depId)
+        //    {
+        //        carStatus.UnitId = item.UnitId;
+        //    }
+        //}
+
+
+        //carStatus.UnitId = units.Where(u => u.DepartmentId == int.Parse((string)e.Value));
+        //departments = _context.Units.Include(u => u.Department).Where(u => u.FirmId == int.Parse((string)e.Value)).ToDictionary(u => u.Department.Name, f => f.UnitId);
+        //carStatus.StatusId = int.Parse((string)e.Value);
+    }
+
+    protected void userSelected(ChangeEventArgs e)
+    {
+        //var id = int.Parse((string)e.Value);
+        //departments = _context.Units.Include(u => u.Department).Where(u => u.FirmId == int.Parse((string)e.Value)).ToDictionary(u => u.Department.Name, f => f.UnitId);
+        var users = (from u in _context.Employees
+                     select u).ToList();
+
+        foreach (var item in users)
+        {
+            if (item.FullName == (string) e.Value )
+            {
+                carUser = new CarUser { CarId = CarId, EmployeeId = item.Id, StartUsingDate = carStatus.BeginDate, Comment = "Добавлен при присвоении статуса" };
+            }
+        }
+
+        //.Where(u => u.FullName == e.Value.ToString()).FirstOrDefault();
+
+        //int z = 0;
+    }
 
 
 
+
+    public async Task HandleValidSubmit()
+    {
+
+        //if (Mode == "Create")
+        //{
+
+
+        carStatus.LocationId = 1;
+
+
+        _context.Add(carStatus);
+        _context.Add(carUser);
+        //}
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        //UpdateCarServiceWorks();
+
+        NavManager.NavigateTo("/cars");
     }
 }
