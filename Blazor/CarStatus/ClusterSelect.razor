@@ -3,7 +3,6 @@
 
 <select class="form-control @CssClass" value="@CurrentValueAsString"
         @onchange="HandleSelect">
-
     @ChildContent
     @foreach (KeyValuePair<string, TValue> kvp in Values)
     {
@@ -23,8 +22,11 @@
     [Parameter]
     public EventCallback<string> SelectedValueChanged { get; set; }
 
+    [Parameter]
+    public EventCallback<string> CustomEvent { get; set; }
 
-    protected override bool TryParseValueFromString(string value, out TValue result, out string validationErrorMessage)
+    protected override bool TryParseValueFromString(string value, out TValue result,
+out string validationErrorMessage)
     {
         try
         {
@@ -40,18 +42,10 @@
         }
     }
 
-
-
-
-
-
-
     public async Task HandleSelect(ChangeEventArgs e)
     {
         CurrentValueAsString = e.Value as string;
         await SelectedValueChanged.InvokeAsync(CurrentValueAsString);
+        await CustomEvent.InvokeAsync(CurrentValueAsString);
     }
-
-    // @*@onchange="@(ev => CurrentValueAsString = ev.Value as string)">*@
-
 }

@@ -2,7 +2,7 @@
 @inherits InputBase<int>
 
 <div class="form-group">
-    <label>Производитель</label>
+    <label>Марка</label>
     <select class="form-control" value="@CurrentManufacturer" @onchange="@modelFilter">
         @foreach (KeyValuePair<string, int> kvp in Manufacturers)
         {

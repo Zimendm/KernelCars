@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,11 +9,15 @@ namespace KernelCars.Models
     public class Unit
     {
         public int UnitId { get; set; }
-        public bool IsAgriBusiness { get; set; } 
+        public bool IsAgriBusiness { get; set; }
+        [Required]
+        [Range(1, long.MaxValue, ErrorMessage = "A location must be selected")]
         public int FirmId { get; set; }
         public int DepartmentId { get; set; }
 
-        public int? ClusterId { get; set; }
+        [Required]
+        [Range(1, long.MaxValue, ErrorMessage = "A location must be selected")]
+        public int ClusterId { get; set; }
         //public int ClasterId { get; set; }
         public Firm Firm { get; set; }
         public Department Department { get; set; }

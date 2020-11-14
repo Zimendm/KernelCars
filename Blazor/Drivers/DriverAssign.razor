@@ -1,0 +1,33 @@
+﻿@page "/driver/assignment/{CarId:long}"
+@inherits OwningComponentBase<DataContext>
+
+<div class="card">
+    <div class="card-header">
+        <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@carData.RegistrationNumber</b> Год выпуска: <b>@carData.FirstRegistrationYear</b></h4>
+    </div>
+    <div class="card-body">Hello!</div>
+</div>
+
+
+@code {
+    [Parameter]
+    public long CarId { get; set; }
+
+    //[Parameter]
+    //public long Id { get; set; }
+
+    DataContext _context => Service;
+
+    Car carData = new Car() { CarModel = new CarModel() };
+    string carModel;
+
+
+    protected async override Task OnParametersSetAsync()
+    {
+        carData = await _context.Cars.Include(c => c.CarModel).ThenInclude(c => c.Manufacturer).FirstOrDefaultAsync(c => c.Id == CarId);
+        carModel = $"{carData.CarModel.Manufacturer.Name} {carData.CarModel.Model}";
+
+        //return base.OnParametersSetAsync();
+    }
+
+}

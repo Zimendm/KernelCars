@@ -1,100 +1,138 @@
 ﻿@page "/status/create/{CarId:long}"
 @using KernelCars.Blazor.Shared  
+@using System.Globalization 
 @inherits OwningComponentBase<DataContext>
 
-<h3>Create new car status</h3>
+@*<h3>Create new car status</h3>*@
 
-
-
-
-<EditForm Model="carStatus" OnValidSubmit="HandleValidSubmit">
-
-    <div class="form-row">
-        <div class="form-group col">
-            <label class="col-form-label">Новый статус</label>
-            <CustomSelect TValue="int"
-                          Values="carStatuses"
-                          Parser="@(str=>int.Parse(str))"
-                          @bind-Value="carStatus.StatusId">
-                <option selected disabled value="0">Выберите статус ...</option>
-            </CustomSelect>
-        </div>
-
-        <div class="form-group col">
-            <label class="col-form-label">Действует с </label>
-            <input class="form-control" type="date" @bind="OpenDate" />
-        </div>
+<div class="card">
+    <div class="card-header">
+        <p>
+            <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@carData.RegistrationNumber</b> Год выпуска: <b>@carData.FirstRegistrationYear</b></h4>
+            @*<span class="badge badge-pill @CSScarCurrentStatus" style="float:left">@carCurrentStatus</span>*@
+        </p>
     </div>
+    <div class="card-body">
+        <EditForm Model="carStatus" OnValidSubmit="HandleValidSubmit">
+            @*<o DataAnnotationsValidator  />*@
+            <ObjectGraphDataAnnotationsValidator />
+            <ValidationSummary />
+            @*<ClusterValidator />*@
 
-    @* TODO исправить установку возможности тех.обслуживания *@
-    <div class="form-group @((carStatus.StatusId < 4)&&(carStatus.StatusId !=0) ? ""  : "d-none")">
-        <div class="form-check">
-            <InputCheckbox class="form-check-input" @bind-Value="carStatus.IsEnableService"></InputCheckbox>
-            <label class="form-check-label">Предусмотрено сервисное обслуживание</label>
-        </div>
+            <div class="form-row">
+                <div class="form-group col">
+                    <label class="col-form-label">Новый статус</label>
+                    <ValidationMessage For="@(() => carStatus.StatusId)" />
+                    <CustomSelect TValue="int"
+                                  Values="carStatuses"
+                                  Parser="@(str=>int.Parse(str))"
+                                  @bind-Value="carStatus.StatusId">
+                        <option selected disabled value="0">Выберите статус ...</option>
+                    </CustomSelect>
+                </div>
+
+                <div class="form-group col">
+                    <label class="col-form-label">Действует с </label>
+                    <input class="form-control" type="date" @bind="carStatus.BeginDate"/>
+                </div>
+            </div>
+
+            @* TODO исправить установку возможности тех.обслуживания *@
+            <div class="form-group @((carStatus.StatusId < 4)&&(carStatus.StatusId !=0) ? ""  : "d-none")">
+                <div class="form-check">
+                    <InputCheckbox class="form-check-input" @bind-Value="carStatus.IsEnableService"></InputCheckbox>
+                    <label class="form-check-label">Предусмотрено сервисное обслуживание</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Кластер</label>
+                <ValidationMessage For="@(() => carStatus.Unit.ClusterId)" />
+                <ClusterSelect TValue="int"
+                               Values="clusters"
+                               Parser="@(str=>int.Parse(str))"
+                               CustomEvent="@clusterSelected"
+                               @bind-Value="carStatus.Unit.ClusterId">
+                    <option selected disabled value="0">Выберите кластер ...</option>
+                </ClusterSelect>
+            </div>
+
+            <div class="form-group">
+                <label>Юридическое лицо</label>
+                <ValidationMessage For="@(() => carStatus.Unit.FirmId)" />
+                <ClusterSelect TValue="int"
+                               Values="firms"
+                               Parser="@(str=>int.Parse(str))"
+                               CustomEvent="@firmSelected"
+                               @bind-Value="carStatus.Unit.FirmId">
+                    <option selected disabled value="0">Выберите юр.лицо ...</option>
+                </ClusterSelect>
+            </div>
+
+            <div class="form-group">
+                <label>Департамент</label>
+                <ValidationMessage For="@(() => carStatus.UnitId)" />
+                <CustomSelect TValue="int"
+                              Values="departments"
+                              Parser="@(str=>int.Parse(str))"
+                              S
+                              @bind-Value="carStatus.UnitId">
+                    <option selected disabled value="0">Выберите подразделение ...</option>
+                </CustomSelect>
+
+
+
+
+
+
+
+
+
+                @*<select class="form-control" value="@departmentID" @onchange="@departmentSelected">
+                    <option selected disabled value="0">Выберите подразделение ...</option>
+                    @foreach (KeyValuePair<string, int> kvp in departments)
+                    {
+                        <option value="@kvp.Value">@kvp.Key</option>
+                    }
+                </select>*@
+            </div>
+
+            <div class="form-group">
+                <label>Расположение автомобиля</label>
+                <ValidationMessage For="@(() => carStatus.LocationId)" />
+                <CustomSelect TValue="int"
+                              Values="carLocations"
+                              Parser="@(str=>int.Parse(str))"
+                              S
+                              @bind-Value="carStatus.LocationId">
+                    <option selected disabled value="0">Выберите место дислокации ...</option>
+                </CustomSelect>
+            </div>
+
+            <div class="form-group">
+                <label>Закреплённый пользователь</label>
+                <input class="form-control" list="carUsers" @onchange="@userSelected" />
+            </div>
+
+            <datalist id="carUsers">
+                @foreach (var owner in usersList)
+                {
+                    <option>@owner</option>
+                }
+            </datalist>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <NavLink class="btn btn-secondary" href=@($"/status/list/{CarId}")>Back</NavLink>
+            </div>
+
+        </EditForm>
+
     </div>
+    @*<div class="card-footer"></div>*@
+</div>
 
-    <div class="form-group">
-        <label>Кластер</label>
-        <select class="form-control" value="@clusterID" @onchange="@clusterSelected">
-            <option selected disabled value="0">Выберите кластер ...</option>
-            @foreach (KeyValuePair<string, int> kvp in clusters)
-            {
-                <option value="@kvp.Value">@kvp.Key</option>
-            }
-        </select>
-    </div>
 
-    <div class="form-group">
-        <label>Юридическое лицо</label>
-        <select class="form-control" value="@firmID" @onchange="@firmSelected">
-            <option selected disabled value="0">Выберите юр.лицо ...</option>
-            @foreach (KeyValuePair<string, int> kvp in firms)
-            {
-                <option value="@kvp.Value">@kvp.Key</option>
-            }
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Департамент</label>
-        <select class="form-control" value="@departmentID" @onchange="@departmentSelected">
-            <option selected disabled value="0">Выберите подразделение ...</option>
-            @foreach (KeyValuePair<string, int> kvp in departments)
-            {
-                <option value="@kvp.Value">@kvp.Key</option>
-            }
-        </select>
-    </div>
-
-    <div class="form-group">
-        <label>Расположение автомобиля</label>
-        <CustomSelect TValue="int"
-                      Values="carLocations"
-                      Parser="@(str=>int.Parse(str))"
-                      @bind-Value="locationID">
-            <option selected disabled value="0">Выберите место дислокации ...</option>
-        </CustomSelect>
-    </div>
-    
-    <div class="form-group">
-        <label>Закреплённый пользователь</label>
-        <input class="form-control" list="carUsers"  @onchange="@userSelected"/>
-    </div>
-
-    <datalist id="carUsers">
-        @foreach (var owner in usersList)
-        {
-            <option>@owner</option>
-        }
-    </datalist>
-
-    <div class="text-center">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <NavLink class="btn btn-secondary" href="/service">Back</NavLink>
-    </div>
-
-</EditForm>
 
 @*@statusID
 @firmID
@@ -108,14 +146,20 @@
     public long CarId { get; set; }
     DataContext _context => Service;
 
-    CarStatus carStatus = new CarStatus();
+    Car carData = new Car() {CarModel=new CarModel() };
+    string carModel;
+
+    CarStatus carStatus = new CarStatus() { BeginDate=DateTime.Now, Unit=new Unit() };
 
     int statusID;
     public int firmID { get; set; }
     int clusterID;
     int locationID;
 
-    DateTime OpenDate = DateTime.Now;
+    //DateTime OpenDate = DateTime.Now;
+
+    public CultureInfo Culture { get; set; } = CultureInfo.GetCultureInfo("ru-ru");
+
 
     int departmentID;
 
@@ -133,8 +177,15 @@
     //string CSSenableService = "d-none";
 
 
+
+
     protected async override Task OnInitializedAsync()
     {
+        carData = await _context.Cars
+                   .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+                   .FirstOrDefaultAsync(c => c.Id == CarId);
+        carModel = $"{carData.CarModel.Manufacturer.Name} {carData.CarModel.Model}";
+
         carStatuses = await _context.Statuses.OrderBy(st => st.StatusID).ToDictionaryAsync(st => st.State, st => st.StatusID);
         //firms = await _context.Firms.OrderBy(f => f.Name).ToDictionaryAsync(f => f.Name,f => f.FirmId);
         clusters = await _context.Clusters.OrderBy(cl => cl.ClusterName).ToDictionaryAsync(cl => cl.ClusterName, cl => cl.Id);
@@ -156,9 +207,10 @@
         carStatus.CarId = CarId;
     }
 
-    protected void clusterSelected(ChangeEventArgs e)
+    protected void clusterSelected(string e)
     {
-        units = _context.Units.Include(u => u.Firm).Where(u => u.ClusterId == int.Parse((string)e.Value)).ToList();
+        //ChangeEventArgs
+        units = _context.Units.Include(u => u.Firm).Where(u => u.ClusterId == int.Parse((string)e)).ToList();
         firms = new Dictionary<string, int>();
 
         foreach (var item in units)
@@ -170,10 +222,10 @@
         }
     }
 
-    protected void firmSelected(ChangeEventArgs e)
+    protected void firmSelected(string e)
     {
-        firmID = int.Parse((string)e.Value);
-        departments =  _context.Units.Include(u => u.Department).Where(u => u.FirmId == int.Parse((string)e.Value)).ToDictionary(u => u.Department.Name, f => f.UnitId);
+        firmID = int.Parse((string)e);
+        departments =  _context.Units.Include(u => u.Department).Where(u => u.FirmId == firmID).ToDictionary(u => u.Department.Name, f => f.UnitId);
     }
 
     protected void departmentSelected(ChangeEventArgs e)
@@ -229,11 +281,30 @@
         //{
 
 
+        var lcarstatus = await _context.CarStatuses.Where(cs => cs.CarId == CarId).ToListAsync();
+        //var lunit = await _context.Units.Where(u => u.UnitId == carStatus.UnitId).FirstOrDefaultAsync();
+        //carStatus.UnitId = lunit.UnitId;
+        carStatus.Unit = null;
+
+        foreach (var item in lcarstatus)
+        {
+            if (item.EndDate==null)
+            {
+                item.EndDate = carStatus.BeginDate;
+            }
+        }
+
+
         carStatus.LocationId = 1;
 
 
         _context.Add(carStatus);
-        _context.Add(carUser);
+
+        if (carUser!=null)
+        {
+            _context.Add(carUser);
+        }
+
         //}
 
         try

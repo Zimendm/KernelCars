@@ -26,7 +26,7 @@
         </div>
         <div class="card-body">
             <h6 class="bg-info text-center text-white p-2">Данные пользователя</h6>
-            <table class="table table-active table-striped">
+            <table class="table table-sm">
                 <tr>
                     <td>Экслуатирующая организация:</td>
                     <td>@CarData.FullNameFirmForView</td>
@@ -50,7 +50,7 @@
 
             <h6 class="bg-info text-center text-white p-2" @onclick="(e)=>regCollapsed(e)">Регистрационные данные</h6>
             <div class="@regCSSCollapse form-group  p-2">
-                <table class="table table-active table-striped">
+                <table class="table table-sm">
                     <tbody>
                         <tr>
                             <td>Владелец:</td>
@@ -148,8 +148,29 @@
                 
             @*</div>*@
 
-            <h6 class="bg-info text-center text-white p-2">Технические данные</h6>
-            @CarData.Fuel
+            <h6 class="bg-info text-center text-white p-2" @onclick="(e)=>techCollapsed(e)">Технические данные</h6>
+            <div class="@techCSSCollapse">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td>Топливо:</td>
+                            <td>@CarData.Fuel</td>
+                        </tr>
+                        <tr>
+                            <td>Ёмкость топливного бака:</td>
+                        </tr>
+                        <tr>
+                            <td>Установлено ГБО:</td>
+                        </tr>
+                        <tr>
+                            <td>Зимние шины:</td>
+                        </tr>
+                        <tr>
+                            <td>Летние шины:</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
 
 
@@ -158,15 +179,17 @@
 
 
         </div>
-        <div class="text-center mb-3">
-            <span class="@CSSisEnableService"><NavLink class="btn btn-info" href="@EditUrl">Сервис</NavLink></span>
-            <NavLink class="btn btn-info" href="@StatusUrl">Распределение</NavLink>
-            <span class="@CSSisRentCar"><NavLink class="btn btn-info" href="@EditUrl">Аренда</NavLink></span>
-            <span class="@CSSisEnableService"> <NavLink class="btn btn-info" href="@EditUrl">Страховка</NavLink></span>
-            <NavLink class="btn btn-info" href="@EditUrl">Edit</NavLink>
-            <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+        <div class="card-footer">
+            <div class="text-center">
+                <span class="@CSSisEnableService"><NavLink class="btn btn-info" href="@EditUrl">Сервис</NavLink></span>
+                <NavLink class="btn btn-info" href="@StatusUrl">Распределение</NavLink>
+                <NavLink class="btn btn-info" href="@($"/driver/list/{Id}")">Водитель</NavLink>
+                <span class="@CSSisRentCar"><NavLink class="btn btn-info" href="@EditUrl">Аренда</NavLink></span>
+                <span class="@CSSisEnableService"> <NavLink class="btn btn-info" href="@EditUrl">Страховка</NavLink></span>
+                <NavLink class="btn btn-info" href="@EditUrl">Edit</NavLink>
+                <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+            </div>
         </div>
-        <div class="card-footer"></div>
     </div>
 
 
@@ -199,6 +222,9 @@
         [Parameter]
         public long Id { get; set; }
 
+        CarStatus carStatus = new CarStatus();
+
+
         string carCurrentStatus;
         string carModel;
         string carCurrentLocation;
@@ -211,6 +237,7 @@
         string CSSrotated2 = "";
         string CSScarCurrentStatus = "";
         string regCSSCollapse = "collapse";
+        string techCSSCollapse = "collapse";
 
         string CSSisEnableService = "d-none";
         string CSSisRentCar = "d-none";
@@ -221,16 +248,16 @@
             CarData = await Context.Cars
                     .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
                     .Include(c => c.CarOwner)
-                    .Include(c => c.CarSevices)
-                    .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
-                    .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
-                    .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                    //.Include(c => c.CarSevices)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Status)
                     .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
-                    .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Location)
                     .Include(c => c.LeaseContracts)
                     .FirstOrDefaultAsync(c => c.Id == Id);
 
-
+            //CarData.CarModel = await Context.CarModels.Where(cm=>cm.Cars.)
 
 
             //CarData = await Context.Cars
@@ -248,21 +275,50 @@
             //CarData = Context.Cars.Where(c => c.Id == Id).FirstOrDefault();
 
 
-            CarData = Context.Cars
-               .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
-               .Include(c => c.CarOwner)
-               .Include(c => c.CarSevices)
-               .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
-               .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
-               .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
-               .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
-               .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
-               .Include(c => c.LeaseContracts).Where(c => c.Id == Id)
-               .FirstOrDefault();
+            //CarData = Context.Cars
+            //   .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            //   .Include(c => c.CarOwner)
+            //   .Include(c => c.CarSevices)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+            //   .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+            //   .Include(c => c.LeaseContracts).Where(c => c.Id == Id)
+            //   .FirstOrDefault();
 
             dispLoad = "d-none";
             dispContent = "";
 
+            //CarData.CarStatuses = Context.CarStatuses
+            //    .Include(cs=>cs.Unit).ThenInclude(cs=>cs.Firm).ThenInclude(cs=>cs.Employee)
+            //    .Include(c => c.Unit).ThenInclude(c => c.Department)
+            //    .Include(c => c.Status)
+            //    .Include(c => c.Location)
+            //    //.Include(c => c.Car)
+            //    .Where(s => s.CarId == Id).LastOrDefault().ToList();
+
+
+
+
+            var carStatus1 = Context.CarStatuses
+               //.Include(cs => cs.Unit).ThenInclude(cs => cs.Firm).ThenInclude(cs => cs.Employee)
+               //.Include(c => c.Unit).ThenInclude(c => c.Department)
+               //.Include(c => c.Status)
+               //.Include(c => c.Location)
+               .Where(s => s.CarId == Id);//.Max(s=>s.BeginDate) ;// .ToList();
+
+
+            // car
+
+
+            CarData.CarStatuses = Context.CarStatuses
+               .Include(cs => cs.Unit).ThenInclude(cs => cs.Firm).ThenInclude(cs => cs.Employee)
+               .Include(c => c.Unit).ThenInclude(c => c.Department)
+               .Include(c => c.Status)
+               .Include(c => c.Location)
+               .Where(s => s.CarId == Id).ToList();
+            //CarData.CarStatuses.Add(carStatus);
 
             carCurrentStatus = CarData.CarStatuses.Where(cs=>cs.EndDate==null).LastOrDefault() != null ? CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault().Status.State : "Не определён";
 
@@ -325,6 +381,18 @@
                 regCSSCollapse = "";
             }
             return regCSSCollapse;
+        }
+        string techCollapsed(MouseEventArgs e)
+        {
+            if (techCSSCollapse == "")
+            {
+                techCSSCollapse = "collapse";
+            }
+            else
+            {
+                techCSSCollapse = "";
+            }
+            return techCSSCollapse;
         }
         protected void RotateImage_1(MouseEventArgs e)
         {
