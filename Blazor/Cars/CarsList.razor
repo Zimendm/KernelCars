@@ -33,62 +33,18 @@
     <tbody>
         @foreach (KernelCars.Models.ViewModels.CarsDisplayViewModel c in Cars)
         {
-        <tr>
-            <td>@c.Id</td>
-            <td>@c.RegistrationNumber</td>
-            <td>@c.CarModel</td>
-            <td>@c.CarUser</td>
-            <td>@c.Firm</td>
-            @*<td hidden>@c.Id</td>
-        <td>@c.CarCurrentStatus</td>
-        <td>@c.RegistrationNumber</td>
-        <td>@c.CarModel.Manufacturer.Name @c.CarModel.Model</td>*@
-            @*<td>@c.CarStatuses?.LastOrDefault()</td>
-        <td>@c.CarUsers?.LastOrDefault().Employee.FullName</td>*@
-
-            @*@if (@c.CarStatuses.LastOrDefault() == null)
-        {
-            <td>Не установлен</td>
-        }
-        else
-        {
-            <td>@c.CarStatuses.LastOrDefault().Status.State</td>
-        }*@
-            @*@if (@c.CarUsers.LastOrDefault() == null)
-        {
-            <td>Не закреплён</td>
-        }
-        else
-        {
-            <td>@c.CarUsers.LastOrDefault().Employee.FullName</td>
-        }*@
-        <td>
-
-            @*<div class="row">
-        <div class="@(!c.EnableService ? "d-none":null)">*@
-            <span class="@(!c.EnableService ? "d-none":null)">
-                <NavLink class="btn btn-sm btn-success" href="@GetServiceUrl(c.Id)">
-                    Сервис
-                </NavLink>
-            </span>
-            @*</div>
-        <div>*@
-
-            <span>
-                <NavLink class="btn btn-sm btn-info" href="@GetDetailUrl(c.Id)">
-                    Подробно
-                </NavLink>
-            </span>
-            <span>
-                <NavLink class="btn btn-sm btn-info" href="@GetEditUrl(c.Id)">
-                    Edit
-                </NavLink>
-            </span>
-            @*</div>
-        </div>*@
-        </td>
+            <tr>
+                <td>@c.Id</td>
+                <td>@c.RegistrationNumber</td>
+                <td>@c.CarModel</td>
+                <td>@c.CarUser</td>
+                <td>@c.Firm</td>
+                <td>
+                    <span><NavLink class="btn btn-sm btn-info" href="@GetDetailUrl(c.Id)">Подробно</NavLink></span>
+                    <span class="@(!c.EnableService ? "d-none":null)"><NavLink class="btn btn-sm btn-success" href="@GetServiceUrl(c.Id)">Сервис</NavLink></span>
+                </td>
         
-        </tr>
+            </tr>
         }
     </tbody>
 </table>
@@ -117,7 +73,7 @@
 
     public List<string> Numbers => new List<string> { "Acs", "Des" };
 
-    public string GetEditUrl(long id) => $"/cars/edit/{id}";
+    //public string GetEditUrl(long id) => $"/cars/edit/{id}";
     public string GetServiceUrl(long id) => $"/service/create/{id}";
     public string GetDetailUrl(long id) => $"/cars/details/{id}";
 
@@ -183,23 +139,19 @@
         //int z = 0;
     }
 
-    public async void PageIndexChanged(int newPageNumber)
+    public void PageIndexChanged(int newPageNumber)
     {
         if (newPageNumber < 1 || newPageNumber > TotalPages)
         {
             return;
         }
-        //pageNumber = newPageNumber;
-        //paginatedList = await service.GetPagedResult(pageNumber, currentSortField, currentSortOrder);
-        //toDoList = paginatedList.Items;
 
         IEnumerable<KernelCars.Models.Car> cars = Context.Cars
         .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
         .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
         .Include(c => c.CarStatuses).ThenInclude(c => c.Status).ToList().Skip((newPageNumber - 1) * 10).Take(10);
 
-        // Cars = cars;
-
+        //cars = cars.Skip((newPageNumber - 1) * 10).Take(10);
 
         PageNumber = newPageNumber;
         StateHasChanged();

@@ -164,12 +164,12 @@
                     <dd>
                         @Model.TankCapacity
                     </dd>
-                    <dt>
+                    @*<dt>
                         @Html.DisplayNameFor(model => model.Tyres)
-                    </dt>
-                    <dd>
+                    </dt>*@
+                    @*<dd>
                         <b style="color:white">.</b>@Model.Tyres
-                    </dd>
+                    </dd>*@
                     @if (@Model.LPG)
                     {
                         @:<dt>@Html.DisplayNameFor(model => model.LPG)</dt>

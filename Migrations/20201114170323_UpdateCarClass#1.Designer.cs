@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201114170323_UpdateCarClass#1")]
+    partial class UpdateCarClass1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,9 +32,6 @@ namespace KernelCars.Migrations
                         .HasColumnType("int");
 
                     b.Property<int?>("CarOwnerId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CarTypeId")
                         .HasColumnType("int");
 
                     b.Property<string>("Color")
@@ -106,8 +105,6 @@ namespace KernelCars.Migrations
                     b.HasIndex("CarModelId");
 
                     b.HasIndex("CarOwnerId");
-
-                    b.HasIndex("CarTypeId");
 
                     b.HasIndex("TyresId");
 
@@ -220,21 +217,6 @@ namespace KernelCars.Migrations
                     b.HasIndex("UnitId");
 
                     b.ToTable("CarStatuses");
-                });
-
-            modelBuilder.Entity("KernelCars.Models.CarType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("TypeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CarTypes");
                 });
 
             modelBuilder.Entity("KernelCars.Models.CarUser", b =>
@@ -602,10 +584,6 @@ namespace KernelCars.Migrations
                     b.HasOne("KernelCars.Models.Employee", "CarOwner")
                         .WithMany()
                         .HasForeignKey("CarOwnerId");
-
-                    b.HasOne("KernelCars.Models.CarType", "CarType")
-                        .WithMany("Cars")
-                        .HasForeignKey("CarTypeId");
 
                     b.HasOne("KernelCars.Models.TireSize", "Tyres")
                         .WithMany("Cars")

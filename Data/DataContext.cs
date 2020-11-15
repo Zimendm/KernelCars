@@ -33,6 +33,9 @@ namespace KernelCars.Data
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Cluster> Clusters { get; set; }
 
+        public DbSet<TireSize> TireSizes { get; set; }
+
+        public DbSet<CarType> CarTypes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<Car>()

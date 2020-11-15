@@ -69,6 +69,7 @@ namespace KernelCars
             //{
             //    BaseAddress = new Uri("http://localhost")
             //});
+            services.AddSingleton<KernelCars.Components.ReportingService>();
             services.AddScoped(sp => new HttpClient());
 
             services.AddDbContext<DataContext>(options=>

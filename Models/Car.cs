@@ -12,7 +12,17 @@ namespace KernelCars.Models
         Diesel, 
         Electro
     }
-
+    public enum Transmission
+    {
+        Автомат,
+        Ручная
+    }
+    public enum DriveType
+    {
+        Монопривод,
+        ПолныйПривод
+    }
+   
     public class Car
     {
         public long Id { get; set; }
@@ -20,9 +30,13 @@ namespace KernelCars.Models
         [DisplayName("Государственный номер")]
         public string RegistrationNumber { get; set; }
         //Тип транспортого средства
-        public string CarType { get; set; }
+        public int? CarTypeId { get; set; }
+        public CarType CarType { get; set; }
         //Данный тех.паспорта
         //Номер тех.паспорта
+
+
+
         public string RegistrationCertificate { get; set; }
         //Дата выдачи
         public DateTime RegistrationDate { get; set; }
@@ -41,8 +55,21 @@ namespace KernelCars.Models
         public TypeOfFuel? Fuel { get; set; }
         [DisplayName("Ёмкость бака")]
         public int TankCapacity { get; set; }
+
+        //public int SummerTyresId { get; set; }
+        //[DisplayName("Размер летних шин")]
+        //public TireSize SummerTyres { get; set; }
+
+        //public int WinterTyresId { get; set; }
+        //[DisplayName("Размер зимних шин")]
+        //public TireSize WinterTyres { get; set; }
+        public Transmission? Transmission { get; set; }
+        public DriveType? DriveType { get; set; }
+
         [DisplayName("Размер шин")]
-        public string Tyres { get; set; }
+        public int? TyresId { get; set; }
+        public TireSize Tyres { get; set; }
+
         public bool LPG { get; set; }
         public byte[] ImagePage1 { get; set; }
         public byte[] ImagePage2 { get; set; }

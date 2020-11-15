@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201114162233_UpdateCarClass")]
+    partial class UpdateCarClass
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,13 +34,10 @@ namespace KernelCars.Migrations
                     b.Property<int?>("CarOwnerId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CarTypeId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Color")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("DriveType")
+                    b.Property<int>("DriveType")
                         .HasColumnType("int");
 
                     b.Property<int>("EngineCapacity")
@@ -68,6 +67,9 @@ namespace KernelCars.Migrations
                     b.Property<string>("RegistrationNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("SummerTyres")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("TSC")
                         .HasColumnType("nvarchar(max)");
 
@@ -92,13 +94,13 @@ namespace KernelCars.Migrations
                     b.Property<string>("TempUser")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Transmission")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TyresId")
+                    b.Property<int>("Transmission")
                         .HasColumnType("int");
 
                     b.Property<string>("VinNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("WinterTyres")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -106,10 +108,6 @@ namespace KernelCars.Migrations
                     b.HasIndex("CarModelId");
 
                     b.HasIndex("CarOwnerId");
-
-                    b.HasIndex("CarTypeId");
-
-                    b.HasIndex("TyresId");
 
                     b.ToTable("Cars");
                 });
@@ -220,21 +218,6 @@ namespace KernelCars.Migrations
                     b.HasIndex("UnitId");
 
                     b.ToTable("CarStatuses");
-                });
-
-            modelBuilder.Entity("KernelCars.Models.CarType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("TypeName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CarTypes");
                 });
 
             modelBuilder.Entity("KernelCars.Models.CarUser", b =>
@@ -515,21 +498,6 @@ namespace KernelCars.Migrations
                     b.ToTable("Statuses");
                 });
 
-            modelBuilder.Entity("KernelCars.Models.TireSize", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Size")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TireSizes");
-                });
-
             modelBuilder.Entity("KernelCars.Models.TypeOfService", b =>
                 {
                     b.Property<int>("ID")
@@ -602,14 +570,6 @@ namespace KernelCars.Migrations
                     b.HasOne("KernelCars.Models.Employee", "CarOwner")
                         .WithMany()
                         .HasForeignKey("CarOwnerId");
-
-                    b.HasOne("KernelCars.Models.CarType", "CarType")
-                        .WithMany("Cars")
-                        .HasForeignKey("CarTypeId");
-
-                    b.HasOne("KernelCars.Models.TireSize", "Tyres")
-                        .WithMany("Cars")
-                        .HasForeignKey("TyresId");
                 });
 
             modelBuilder.Entity("KernelCars.Models.CarModel", b =>

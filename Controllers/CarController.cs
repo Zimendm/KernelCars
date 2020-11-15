@@ -316,7 +316,7 @@ namespace KernelCars.Controllers
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public IActionResult EditPost([Bind("Id","RegistrationNumber", "VinNumber", "FirstRegistrationYear","CarModelId","Fuel","LPG", "EngineCapacity",
-            "TankCapacity","Tyres")] Car car, string owners, IFormFile image1, IFormFile image2)
+            "TankCapacity")] Car car, string owners, IFormFile image1, IFormFile image2)
         {
             Car c;
             if (car.Id==0)
@@ -384,10 +384,10 @@ namespace KernelCars.Controllers
                 c.LPG = car.LPG;
             }
             //Проверка размер шин
-            if (car.Tyres != null)
-            {
-                c.Tyres = car.Tyres;
-            }
+            //if (car.Tyres != null)
+            //{
+            //    c.Tyres = car.Tyres;
+            //}
 
             // Техпаспорт страница 1
             if (image1 != null)

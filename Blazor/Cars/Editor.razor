@@ -82,6 +82,12 @@
                 <div class="col">
                     <div class="form-group">
                         <label>Тип</label>
+                        <CustomSelect TValue="int?"
+                                      Values="carTypes"
+                                      Parser="@(str=>int.Parse(str))"
+                                      @bind-Value="CarData.CarTypeId">
+                            <option selected disabled value="0">Выберите тип авто ...</option>
+                        </CustomSelect>
                     </div>
                 </div>
                 <div class="col">
@@ -123,12 +129,13 @@
             <div class="form-row">
                 <div class="col">
                     <div class="form-group">
-                        <label>Летние шины</label>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label>Зимние шины</label>
+                        <label>Размер шин</label>
+                        <CustomSelect TValue="int?"
+                                       Values="tireSizes"
+                                       Parser="@(str=>int.Parse(str))"
+                                       @bind-Value="CarData.TyresId">
+                            <option selected disabled value="0">Выберите размер шин ...</option>
+                        </CustomSelect>
                     </div>
                 </div>
             </div>
@@ -137,12 +144,26 @@
                 <div class="col">
                     <div class="form-group">
                         <label>Тип привода</label>
+                        <select class="form-control" @onchange="@SelectDriveTypeChanged">
+                            <option disabled>Select type of drive...</option>
+                            @foreach (var fuel in Enum.GetValues(typeof(KernelCars.Models.DriveType)))
+                            {
+                                <option>@fuel</option>
+                            }
+                        </select>
                         @*<InputText class="form-control"></InputText>*@
                     </div>
                 </div>
                 <div class="col">
                     <div class="form-group">
                         <label>Тип АКП</label>
+                        <select class="form-control" @onchange="@SelectTransChanged">
+                            <option disabled>Select type of transmission...</option>
+                            @foreach (var fuel in Enum.GetValues(typeof(KernelCars.Models.Transmission)))
+                            {
+                                <option>@fuel</option>
+                            }
+                        </select>
                         @*<InputNumber class="form-control"></InputNumber>*@
                     </div>
                 </div>
@@ -237,6 +258,8 @@
     public Car CarData { get; set; } = new Car() { CarModel = new CarModel() };
     string collapseCSS = "collapse";
 
+    Dictionary<string, int?> tireSizes = new Dictionary<string, int?>();
+    Dictionary<string, int?> carTypes = new Dictionary<string, int?>();
 
     public string FormSubmitMessage { get; set; } = "Form Data Not Submitted";
     public void HandleValidSubmit()
@@ -250,6 +273,24 @@
 
     //public IDictionary<string, int> CarModels { get; set; } = new Dictionary<string, int>();
     //public IDictionary<string, int> Manufacturers { get; set; } = new Dictionary<string, int>();
+
+    protected override void OnInitialized()
+    {
+        var tireSizeList = Context.TireSizes.OrderBy(ts => ts.Size).ToList();// .ToDictionary(t => t.Size,t=>t.Id);
+        foreach (var item in tireSizeList)
+        {
+            tireSizes.Add(item.Size,item.Id);
+        }
+
+        var carTypeList = Context.CarTypes.OrderBy(ts => ts.TypeName).ToList();// .ToDictionary(t => t.Size,t=>t.Id);
+
+        foreach (var item in carTypeList)
+        {
+            tireSizes.Add(item.TypeName, item.Id);
+        }
+        //base.OnInitialized();
+    }
+
 
     protected override void OnParametersSet()
     {
@@ -266,6 +307,20 @@
         TypeOfFuel tof;
         Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
         CarData.Fuel = tof;
+    }
+
+    void SelectDriveTypeChanged(ChangeEventArgs e)
+    {
+        KernelCars.Models.DriveType tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        CarData.DriveType = tof;
+    }
+
+    void SelectTransChanged(ChangeEventArgs e)
+    {
+        KernelCars.Models.Transmission tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        CarData.Transmission = tof;
     }
 
 
