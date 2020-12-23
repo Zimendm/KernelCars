@@ -1,0 +1,90 @@
+﻿@*@page "/cars/create"*@
+@inherits OwningComponentBase<DataContext>
+
+
+
+<h4 class="bg-primary text-white text-center p-2">Регистрация нового автомобиля</h4>
+<EditForm Model="car">
+    <div class="form-row">
+        @*Первая сторона техпаспорта*@
+        <div class="col">
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Регистрационный номер</label>
+                        <InputText class="form-control" @bind-Value="car.RegistrationNumber"></InputText>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Год выпуска</label>
+                        <InputNumber class="form-control" @bind-Value="car.FirstRegistrationYear"></InputNumber>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Тип топлива</label>
+                        <select class="form-control" value="@car.Fuel" @onchange="@SelectFuelChanged">
+                            <option disabled>Select type of fuel...</option>
+                            @foreach (var fuel in Enum.GetValues(typeof(TypeOfFuel)))
+                            {
+                                <option>@fuel</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <label>Ёмкось бака</label>
+                    <InputNumber class="form-control" @bind-Value="car.TankCapacity"></InputNumber>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label class="control-label">Установлено ГБО</label>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="car.LPG"></InputCheckbox>
+                            @*<label class="form-check-label">LPG</label>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <CarOwnerSelect></CarOwnerSelect>
+        </div>
+        @*Вторая сторона техпаспорта*@
+    <div class="col">
+        <div class="form-group">
+            <ModelSelect TValue="int"
+                         Parser="@(str => int.Parse(str))"
+                         @bind-Value=@car.CarModelId>
+                <option selected disabled value="0">Выберите модель ....</option>
+            </ModelSelect>
+        </div>
+        
+    </div>
+    </div>
+</EditForm>
+
+
+
+@code {
+
+    DataContext _context => Service;
+
+    private Car car = new Car
+    {
+        FirstRegistrationYear=DateTime.Now.Year,
+        CarModelId=1
+    };
+
+
+
+
+    void SelectFuelChanged(ChangeEventArgs e)
+    {
+        TypeOfFuel tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        car.Fuel = tof;
+    }
+}

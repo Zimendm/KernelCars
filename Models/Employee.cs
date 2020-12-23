@@ -17,6 +17,10 @@ namespace KernelCars.Models
                 return (LastName + " " + FirstName + " " + MiddleName).Trim();
             }
         }
+
+        public string Address { get; set; }
+        public string TaxNumber { get; set; }
+
         public bool IsFirm { 
             get
             {
@@ -34,5 +38,7 @@ namespace KernelCars.Models
         public Firm Firm { get; set; }
         public List <CarUser> CarUsers { get; set; }
         //public List<CarStatus> CarStatuses { get; set; }
+
+        //TODO для заключения внутригрупповых договоров аренды и других добавить банковские реквизиты и другие данные.
     }
 }

@@ -1,0 +1,34 @@
+﻿@inherits OwningComponentBase<DataContext>
+
+<div class="form-group">
+    <label>Владелец автомобиля</label>
+    <input class="form-control" list="carOwners" />
+</div>
+
+
+<datalist id="carOwners">
+   @*@for (int i = 0; i < 10; i++)
+   {
+       <option>@i.ToString()</option>
+   }*@
+    @foreach (var owner in ownersList)
+    {
+        <option>@owner</option>
+    }
+</datalist>
+
+@code
+{
+    DataContext _context => Service;
+
+    List<string> ownersList;
+
+
+    protected override void OnInitialized()
+    {
+        ownersList = (from e in _context.Employees
+                         select e.FullName).ToList();
+        //base.OnInitialized();
+    }
+
+}

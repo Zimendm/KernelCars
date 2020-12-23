@@ -28,7 +28,14 @@ namespace KernelCars.Data
         public DbSet<ServiceStation> ServiceStations { get; set; }
         public DbSet<CarUser> CarUsers { get; set; }
         public DbSet<Location> Locations { get; set; }
+        public DbSet<LeaseContract> LeaseContracts { get; set; }
 
+        public DbSet<Manager> Managers { get; set; }
+        public DbSet<Cluster> Clusters { get; set; }
+
+        public DbSet<TireSize> TireSizes { get; set; }
+
+        public DbSet<CarType> CarTypes { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<Car>()
@@ -38,8 +45,10 @@ namespace KernelCars.Data
                 .HasKey(c=>new {c.FirmId, c.DepartmentId });
 
             modelBuilder.Entity<Unit>()
-                .HasIndex(u => new { u.DepartmentId, u.FirmId })
+                .HasIndex(u => new { u.DepartmentId, u.FirmId, u.ClusterId })
                 .IsUnique(true);
+            modelBuilder.Entity<Unit>().HasAlternateKey(u => new { u.DepartmentId, u.FirmId, u.ClusterId });
+
             modelBuilder.Entity<CarModel>()
                 .HasIndex(m => new { m.Model, m.ManufacturerId })
                 .IsUnique(true);

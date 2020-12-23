@@ -1,0 +1,9 @@
+﻿@page "/car"
+@page "/car/{id:int}"
+<h5>Editor for Car: @Id</h5>
+<NavLink class="btn btn-primary" href="/cars">Return</NavLink>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+}

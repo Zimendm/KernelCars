@@ -1,0 +1,370 @@
+﻿@page "/cars/create"
+@page "/cars/edit/{id:long}"
+@*@layout EmptyLayout*@
+@using BlazorInputFile
+
+@inherits OwningComponentBase<DataContext>
+
+<link href="~/CSS/blazorValidation.css" rel="stylesheet" />
+<h4 class="bg-primary text-center text-white p-2">Edit</h4>
+<h6 class="bg-info text-center text-white p-2">@FormSubmitMessage</h6>
+
+@*<FormSpy CarData="CarData">*@
+<EditForm Model="CarData" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label>Car ID</label>
+                <InputNumber class="form-control" @bind-Value="CarData.Id" disabled />
+            </div>
+            <div class="form-group">
+                <label>Гос.номер</label>
+                <ValidationMessage For="@(() => CarData.RegistrationNumber)" />
+                <InputText class="form-control" @bind-Value="CarData.RegistrationNumber"></InputText>
+            </div>
+            <div class="form-group">
+                <label>Год выпуска</label>
+                <InputNumber class="form-control" @bind-Value="CarData.FirstRegistrationYear"></InputNumber>
+            </div>
+            <CarOwnerSelect></CarOwnerSelect>
+            <!--<div class="form-group">
+            <label>Дата регистрации</label>-->
+            @*<ValidationMessage For="@(() => CarData.RegistrationDate)" />*@
+            <!--<InputText class="form-control" @bind-Value="CarData.RegistrationDate"></InputText>
+            </div>-->
+            <div class="form-group">
+                <label>Свидетельство о регистрации</label>
+                @*<ValidationMessage For="@(() => CarData.RegistrationDate)" />*@
+                <InputText class="form-control" @bind-Value="CarData.RegistrationCertificate"></InputText>
+            </div>
+            <div class="form-group">
+                <label>Выдано</label>
+                @*<ValidationMessage For="@(() => CarData.RegistrationDate)" />*@
+                <InputText class="form-control" @bind-Value="CarData.TSC"></InputText>
+            </div>
+            <div class="form-group">
+                <label>Дата выдачи</label>
+                @*<ValidationMessage For="@(() => CarData.RegistrationDate)" />*@
+                <InputDate class="form-control" @bind-Value="CarData.RegistrationDate"></InputDate>
+            </div>
+        </div>
+
+
+
+
+
+
+        <div class="col">
+            <div class="form-group">
+                <ModelSelect TValue="int"
+                             Parser="@(str => int.Parse(str))"
+                             @bind-Value="CarData.CarModelId">
+                    @*<option selected disabled value="0">Выберите модель ....</option>*@
+                </ModelSelect>
+            </div>
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>VIN код</label>
+                        <InputText class="form-control" @bind-Value="CarData.VinNumber"></InputText>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Объём двигателя</label>
+                        <InputNumber class="form-control" @bind-Value="CarData.EngineCapacity"></InputNumber>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Тип</label>
+                        <CustomSelect TValue="int?"
+                                      Values="carTypes"
+                                      Parser="@(str=>int.Parse(str))"
+                                      @bind-Value="CarData.CarTypeId">
+                            <option selected disabled value="0">Выберите тип авто ...</option>
+                        </CustomSelect>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Цвет</label>
+                        <InputText class="form-control" @bind-Value="CarData.Color"></InputText>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Тип топлива</label>
+                        <select class="form-control" value="@CarData.Fuel" @onchange="@SelectFuelChanged">
+                            <option disabled>Select type of fuel...</option>
+                            @foreach (var fuel in Enum.GetValues(typeof(TypeOfFuel)))
+                            {
+                                <option>@fuel</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <label>Ёмкось бака</label>
+                    <InputNumber class="form-control" @bind-Value="CarData.TankCapacity"></InputNumber>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label class="control-label">Установлено ГБО</label>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="CarData.LPG"></InputCheckbox>
+                            @*<label class="form-check-label">LPG</label>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Размер шин</label>
+                        <CustomSelect TValue="int?"
+                                       Values="tireSizes"
+                                       Parser="@(str=>int.Parse(str))"
+                                       @bind-Value="CarData.TyresId">
+                            <option selected disabled value="0">Выберите размер шин ...</option>
+                        </CustomSelect>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group">
+                        <label>Тип привода</label>
+                        <select class="form-control" @onchange="@SelectDriveTypeChanged">
+                            <option disabled>Select type of drive...</option>
+                            @foreach (var fuel in Enum.GetValues(typeof(KernelCars.Models.DriveType)))
+                            {
+                                <option>@fuel</option>
+                            }
+                        </select>
+                        @*<InputText class="form-control"></InputText>*@
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group">
+                        <label>Тип АКП</label>
+                        <select class="form-control" @onchange="@SelectTransChanged">
+                            <option disabled>Select type of transmission...</option>
+                            @foreach (var fuel in Enum.GetValues(typeof(KernelCars.Models.Transmission)))
+                            {
+                                <option>@fuel</option>
+                            }
+                        </select>
+                        @*<InputNumber class="form-control"></InputNumber>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @*Фото техпаспорта*@
+    <div class="form-row">
+        <div class="col-sm text-center">
+            <div class="card">
+                <div class="card-header" @onclick="(e)=>CollapseChange(e)">
+                    Техпаспорт.Сторона 1 <span style="float:right">Click</span>
+                </div>
+                <div class="@collapseCSS card-body text-center">
+                    @{
+                        try
+                        {
+                            var base64 = Convert.ToBase64String(CarData.ImagePage1);
+                            var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@imgsrc" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                        catch (Exception)
+                        {
+                            <img src="" class="img-thumbnail" id="image" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="custom-file">
+                        @*<input type="file" class="form-control custom-file-input" asp-for="ImagePage1" name="image1" />
+                            <label class="custom-file-label">Choose file...</label>*@
+                        <InputFile OnChange="HandleSelection"></InputFile>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @* Изменить на вторую сторону техпаспорта *@
+        <div class="col-sm text-center">
+            <div class="card">
+                <div class="card-header"  @onclick="(e)=>CollapseChange(e)">
+                    Техпаспорт.Сторона 2 <span style="float:right">Click</span>
+                </div>
+                <div class="@collapseCSS card-body text-center">
+                    @{
+                        try
+                        {
+                            var base64 = Convert.ToBase64String(CarData.ImagePage2);
+                            var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                            <img src="@imgsrc" class="img-thumbnail" id="image2" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                        catch (Exception)
+                        {
+                            <img src="" class="img-thumbnail" id="image2" style="width:auto;height:400px;transform-origin:center center" />
+                        }
+                    }
+                </div>
+                <div class="card-footer">
+                    <div class="custom-file">
+                        @*<input type="file" class="form-control custom-file-input" asp-for="ImagePage2" name="image2" />
+                        <label class="custom-file-label">Choose file...</label>*@
+                        <InputFile OnChange="HandleSelection2"></InputFile>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-2">
+        <div class="col">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+                </div>
+        </div>
+    </div>
+
+</EditForm>
+@*</FormSpy>*@
+
+@code {
+    [Inject]
+    public NavigationManager NavManager { get; set; }
+
+    //[Inject]
+    DataContext Context => Service; // { get; set; }
+
+    [Parameter]
+    public long Id { get; set; }
+
+    public Car CarData { get; set; } = new Car() { CarModel = new CarModel() };
+    string collapseCSS = "collapse";
+
+    Dictionary<string, int?> tireSizes = new Dictionary<string, int?>();
+    Dictionary<string, int?> carTypes = new Dictionary<string, int?>();
+
+    public string FormSubmitMessage { get; set; } = "Form Data Not Submitted";
+    public void HandleValidSubmit()
+    {
+        FormSubmitMessage = "Valid Data Submitted";
+        Context.SaveChanges();
+    }
+    public void HandleInvalidSubmit() =>
+    FormSubmitMessage = "Invalid Data Submitted";
+
+
+    //public IDictionary<string, int> CarModels { get; set; } = new Dictionary<string, int>();
+    //public IDictionary<string, int> Manufacturers { get; set; } = new Dictionary<string, int>();
+
+    protected override void OnInitialized()
+    {
+        var tireSizeList = Context.TireSizes.OrderBy(ts => ts.Size).ToList();// .ToDictionary(t => t.Size,t=>t.Id);
+        foreach (var item in tireSizeList)
+        {
+            tireSizes.Add(item.Size,item.Id);
+        }
+
+        var carTypeList = Context.CarTypes.OrderBy(ts => ts.TypeName).ToList();// .ToDictionary(t => t.Size,t=>t.Id);
+
+        foreach (var item in carTypeList)
+        {
+            tireSizes.Add(item.TypeName, item.Id);
+        }
+        //base.OnInitialized();
+    }
+
+
+    protected override void OnParametersSet()
+    {
+        if (Id != 0)
+        {
+            CarData = Context.Cars.Find(Id);
+        }
+        //CarData = await Context.Cars.Include(c => c.CarModel).ThenInclude(c=>c.Manufacturer).FirstOrDefaultAsync(c => c.Id == Id);
+
+        //        Manufacturers = await Context.Manufacturers.ToDictionaryAsync(m => m.Name, m => m.ManufacturerId);
+        ////        CarModels = await Context.CarModels.Where(cm=>cm.ManufacturerId==CarData.CarModel.ManufacturerId).ToDictionaryAsync(m => m.Model, m => m.CarModelId);
+        //        CarModels = await Context.CarModels.ToDictionaryAsync(m => m.Model, m => m.CarModelId);
+
+    }
+
+    void SelectFuelChanged(ChangeEventArgs e)
+    {
+        TypeOfFuel tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        CarData.Fuel = tof;
+    }
+
+    void SelectDriveTypeChanged(ChangeEventArgs e)
+    {
+        KernelCars.Models.DriveType tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        CarData.DriveType = tof;
+    }
+
+    void SelectTransChanged(ChangeEventArgs e)
+    {
+        KernelCars.Models.Transmission tof;
+        Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
+        CarData.Transmission = tof;
+    }
+
+
+    async Task HandleSelection(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+
+        if (file != null)
+        {
+            var ms = new MemoryStream();
+            await file.Data.CopyToAsync(ms);
+
+            CarData.ImagePage1 = ms.ToArray();
+        }
+    }
+
+    async Task HandleSelection2(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+
+        if (file != null)
+        {
+            var ms = new MemoryStream();
+            await file.Data.CopyToAsync(ms);
+
+            CarData.ImagePage2 = ms.ToArray();
+        }
+    }
+
+
+    private void CollapseChange(MouseEventArgs e)
+    {
+        if (collapseCSS!="")
+        {
+            collapseCSS = "";
+        }
+        else
+        {
+            collapseCSS = "collapse";
+        }
+    }
+}

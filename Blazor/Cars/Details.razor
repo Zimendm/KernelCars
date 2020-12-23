@@ -1,0 +1,424 @@
+﻿@page  "/cars/details/{id:long}"
+@*@layout EmptyLayout*@
+@inherits OwningComponentBase<DataContext>
+
+    <style>
+        .rotated90 {
+            transform: rotate(90deg)
+        }
+        .rotated180 {
+            transform: rotate(180deg)
+        }
+        .rotated270 {
+            transform: rotate(270deg)
+        }
+    </style>
+
+    <p class="@dispLoad">Загрузка данных .....</p>
+
+
+    <div class="card @dispContent">
+        <div class="card-header">
+            <p>
+                <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@CarData.RegistrationNumber</b> Год выпуска: <b>@CarData.FirstRegistrationYear</b></h4>
+                <span class="badge badge-pill @CSScarCurrentStatus" style="float:left">@carCurrentStatus</span>
+            </p>
+        </div>
+        <div class="card-body">
+            <h6 class="bg-info text-center text-white p-2">Данные пользователя</h6>
+            <table class="table table-sm">
+                <tr>
+                    <td>Экслуатирующая организация:</td>
+                    <td>@CarData.FullNameFirmForView</td>
+                </tr>
+                <tr>
+                    <td>Подразделение: </td>
+                    <td>@CarData.DepartmentNameForView</td>
+                </tr>
+                <tr>
+                    <td>Водитель: </td>
+                    <td>@CarData.CarUserForView</td>
+                </tr>
+                <tr>
+                    <td>Размещение: </td>
+                    <td>@carCurrentLocation</td>
+                </tr>
+                <tr class="@CSSisEnableService">
+                    <td>Сервисное обслуживание:</td>
+                    <td>Полное</td>
+                </tr>
+                <tr class="@(CarData.IsRentCar == true ? "":"d-none")">
+                    <td>Автомобиль в аренде: </td>
+                    <td>@(CarData.IsPrivat == true ? "Частный автомобиль" : "Межгрупповая")</td>
+                </tr>
+            </table>
+
+            <h6 class="bg-info text-center text-white p-2" @onclick="(e)=>regCollapsed(e)">Регистрационные данные</h6>
+            <div class="@regCSSCollapse form-group  p-2">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td>Владелец:</td>
+                            <td>@CarData.CarOwner.FullName</td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#FFFFFF" style="line-height:10px;" colspan=3>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>Свидетельство о регистрации:</td>
+                            <td>@CarData.RegistrationCertificate</td>
+                        </tr>
+                        <tr>
+                            <td>Сервисный центр:</td>
+                            <td>@CarData.TSC</td>
+                        </tr>
+                        <tr>
+                            <td>Дата выдачи свидетельства:</td>
+                            <td>@CarData.RegistrationDate</td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="#FFFFFF" style="line-height:10px;" colspan=3>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>VIN код:</td>
+                            <td>@CarData.VinNumber</td>
+                        </tr>
+                        <tr>
+                            <td>Тип:</td>
+                            <td>@carTyreSize</td>
+                        </tr>
+                        <tr>
+                            <td>Цвет:</td>
+                            <td>@CarData.Color</td>
+                        </tr>
+                    </tbody>
+                </table>
+                @* Отображение тех.паспорта *@
+                <div class="row">
+                    <div class="col-sm text-center">
+                        @{
+                            try
+                            {
+                                var base64 = Convert.ToBase64String(CarData.ImagePage1);
+                                var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                                <img src="@imgsrc" class="img-thumbnail @CSSrotated1" style="width:auto;height:400px;transform-origin:center center" @onclick="RotateImage_1" />
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
+                            }
+
+                        }
+                    </div>
+                    <div class="col-sm text-center">
+                        @{
+                            try
+                            {
+                                var base64 = Convert.ToBase64String(CarData.ImagePage2);
+                                var imgsrc = string.Format("data:image/jpg;base64,{0}", base64);
+                                <img src="@imgsrc" class="img-thumbnail @CSSrotated2" style="width:auto;height:400px;transform-origin:center center" @onclick="RotateImage_2" />
+                            }
+                            catch (Exception)
+                            {
+                                //throw;
+                            }
+
+                        }
+                    </div>
+                    <div class="col-sm">
+
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="bg-info text-center text-white p-2" @onclick="(e)=>techCollapsed(e)">Технические данные</h6>
+            <div class="@techCSSCollapse col-5">
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td>Топливо:</td>
+                            <td>@CarData.Fuel</td>
+                        </tr>
+                        <tr>
+                            <td>Ёмкость топливного бака:</td>
+                            <td>@CarData.TankCapacity</td>
+                        </tr>
+                        <tr class="@(CarData.LPG==true ? "":"d-none")">
+                            <td>Установлено ГБО:</td>
+                        </tr>
+                        <tr>
+                            <td>Шины:</td>
+                            <td>@carTyreSize</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+
+
+
+        </div>
+        <div class="card-footer">
+            <div class="text-center">
+                <span class="@CSSisEnableService"><NavLink class="btn btn-info" href="@EditUrl">Сервис</NavLink></span>
+                <NavLink class="btn btn-info" href="@StatusUrl">Распределение</NavLink>
+                <NavLink class="btn btn-info" href="@($"/driver/list/{Id}")">Водитель</NavLink>
+                <span class="@CSSisRentCar"><NavLink class="btn btn-info" href="@($"/lease/create/{Id}")">Аренда</NavLink></span>
+                <span class="@CSSisEnableService"> <NavLink class="btn btn-info" href="@EditUrl">Страховка</NavLink></span>
+                <NavLink class="btn btn-info" href="@($"/cars/edit/{Id}")">Edit</NavLink>
+                <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+            </div>
+        </div>
+    </div>
+
+
+
+    @*<h4 class="bg-info text-center text-white p-2">Details</h4>
+    <div class="form-group">
+        <label>ID</label>
+        <input class="form-control" value="@CarData.Id" disabled />
+    </div>
+    <div class="form-group">
+        <label>Гос.номер</label>
+        <input class="form-control" value="@CarData.RegistrationNumber" disabled />
+    </div>*@
+
+
+
+
+
+
+    @code {
+
+        DataContext Context => Service;
+
+        public Car CarData { get; set; } = new Car() {
+            CarOwner = new Employee(),
+            CarStatuses = new List<CarStatus>(),
+            CarUsers=new List<CarUser>(),
+            Tyres = new TireSize()
+        };
+
+        [Parameter]
+        public long Id { get; set; }
+
+        CarStatus carStatus = new CarStatus();
+
+
+        string carCurrentStatus;
+        string carModel;
+        string carCurrentLocation;
+        string carTyreSize;
+
+
+        string dispLoad = "";
+        string dispContent = "d-none";
+
+        string CSSrotated1 = "";
+        string CSSrotated2 = "";
+        string CSScarCurrentStatus = "";
+        string regCSSCollapse = "collapse";
+        string techCSSCollapse = "collapse";
+
+        string CSSisEnableService = "d-none";
+        string CSSisRentCar = "d-none";
+
+
+        protected async override Task OnParametersSetAsync()
+        {
+            CarData = await Context.Cars
+                    .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+                    .Include(c => c.CarOwner)
+                    //.Include(c => c.CarSevices)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                    .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+                    //.Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+                    .Include(c => c.LeaseContracts)
+                    .Include(c => c.Tyres)
+                    .FirstOrDefaultAsync(c => c.Id == Id);
+
+            //CarData.CarModel = await Context.CarModels.Where(cm=>cm.Cars.)
+
+
+            //CarData = await Context.Cars
+            //        .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            //        .Include(c => c.CarOwner)
+            //        .Include(c => c.CarSevices)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+            //        .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+            //        .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+            //        .Include(c => c.LeaseContracts).Where(c => c.Id == Id)
+            //        .FirstOrDefaultAsync();
+
+            //CarData = Context.Cars.Where(c => c.Id == Id).FirstOrDefault();
+
+
+            //CarData = Context.Cars
+            //   .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            //   .Include(c => c.CarOwner)
+            //   .Include(c => c.CarSevices)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+            //   .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
+            //   .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+            //   .Include(c => c.LeaseContracts).Where(c => c.Id == Id)
+            //   .FirstOrDefault();
+
+            dispLoad = "d-none";
+            dispContent = "";
+
+            //CarData.CarStatuses = Context.CarStatuses
+            //    .Include(cs=>cs.Unit).ThenInclude(cs=>cs.Firm).ThenInclude(cs=>cs.Employee)
+            //    .Include(c => c.Unit).ThenInclude(c => c.Department)
+            //    .Include(c => c.Status)
+            //    .Include(c => c.Location)
+            //    //.Include(c => c.Car)
+            //    .Where(s => s.CarId == Id).LastOrDefault().ToList();
+
+
+
+
+            var carStatus1 = Context.CarStatuses
+               //.Include(cs => cs.Unit).ThenInclude(cs => cs.Firm).ThenInclude(cs => cs.Employee)
+               //.Include(c => c.Unit).ThenInclude(c => c.Department)
+               //.Include(c => c.Status)
+               //.Include(c => c.Location)
+               .Where(s => s.CarId == Id);//.Max(s=>s.BeginDate) ;// .ToList();
+
+
+            // car
+
+
+            CarData.CarStatuses = Context.CarStatuses
+               .Include(cs => cs.Unit).ThenInclude(cs => cs.Firm).ThenInclude(cs => cs.Employee)
+               .Include(c => c.Unit).ThenInclude(c => c.Department)
+               .Include(c => c.Status)
+               .Include(c => c.Location)
+               .Where(s => s.CarId == Id).ToList();
+            //CarData.CarStatuses.Add(carStatus);
+
+            carCurrentStatus = CarData.CarStatuses.Where(cs=>cs.EndDate==null).LastOrDefault() != null ? CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault().Status.State : "Не определён";
+
+            if (CarData != null)
+            {
+                if (CarData.IsEnableService)
+                {
+                    CSSisEnableService = "";
+                }
+            }
+
+            if (CarData != null)
+            {
+                if (CarData.IsRentCar)
+                {
+                    CSSisRentCar = "";
+                }
+            }
+            carTyreSize = CarData.Tyres != null ? CarData.Tyres.Size.ToString() : "";
+            //isEnableService = CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault() != null ? CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault().IsEnableService : false;
+
+            //isRentCar = CarData != null ? CarData.IsRentCar : false;
+
+            switch (carCurrentStatus)
+            {
+                case "Эксплуатация":
+                    CSScarCurrentStatus = "badge-success";
+                    break;
+                default:
+                    CSScarCurrentStatus = "badge-danger";
+                    break;
+            }
+
+
+            carModel = CarData.CarModel.Manufacturer.Name + " " + CarData.CarModel.Model;
+
+            carCurrentLocation = CarData.CarStatuses.LastOrDefault() != null ? CarData.CarStatuses.LastOrDefault().Location.LocationName : "Не определено";
+
+
+
+
+
+            //using (var ms = new MemoryStream(CarData.ImagePage1))
+            //{
+            //    img_1 = new Bitmap(ms);
+            //}
+        }
+
+        public string EditUrl => $"/forms/edit/{Id}";
+        //public string StatusUrl => $"/status/create/{CarData.Id}";
+        public string StatusUrl => $"/status/list/{CarData.Id}";
+
+        string regCollapsed(MouseEventArgs e)
+        {
+            if (regCSSCollapse=="")
+            {
+                regCSSCollapse= "collapse";
+            }
+            else
+            {
+                regCSSCollapse = "";
+            }
+            return regCSSCollapse;
+        }
+        string techCollapsed(MouseEventArgs e)
+        {
+            if (techCSSCollapse == "")
+            {
+                techCSSCollapse = "collapse";
+            }
+            else
+            {
+                techCSSCollapse = "";
+            }
+            return techCSSCollapse;
+        }
+        protected void RotateImage_1(MouseEventArgs e)
+        {
+            switch (CSSrotated1)
+            {
+                case "":
+                    CSSrotated1="rotated90";
+                    break;
+                case "rotated90":
+                    CSSrotated1 = "rotated180";
+                    break;
+                case "rotated180":
+                    CSSrotated1 = "rotated270";
+                    break;
+                case "rotated270":
+                    CSSrotated1 = "";
+                    break;
+                default:
+                    break;
+            }
+        }
+        protected void RotateImage_2(MouseEventArgs e)
+        {
+            switch (CSSrotated2)
+            {
+                case "":
+                    CSSrotated2 = "rotated90";
+                    break;
+                case "rotated90":
+                    CSSrotated2 = "rotated180";
+                    break;
+                case "rotated180":
+                    CSSrotated2 = "rotated270";
+                    break;
+                case "rotated270":
+                    CSSrotated2 = "";
+                    break;
+                default:
+                    break;
+            }
+        }
+
+    }

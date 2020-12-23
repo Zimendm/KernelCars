@@ -69,14 +69,16 @@
                 </div>
             </form>
         </div>
-    <div class="col-md-3">
-        @*История ТО за весь период (в разработке)*@
-        @*@await Component.InvokeAsync("ServiceSummary")*@
-        <vc:service-summary car-id="@Model.Car.Id"/>
-    </div>
+        <div class="col-md-3">
+            @*История ТО за весь период (в разработке)*@
+            @*@await Component.InvokeAsync("ServiceSummary")*@
+            <vc:service-summary car-id="@Model.Car.Id" />
+        </div>
     </div>
 
-<div>
-    <a asp-action="CarSeviceList" asp-route-carId="@Model.Car.Id">Back to List</a>
-</div>
+    <div>
+        @*<a asp-action="CarSeviceList" asp-route-carId="@Model.Car.Id">Back to List</a>*@
+        <a asp-controller="CarServices" asp-action="CarSeviceList" asp-route-CarId="@Model.Car.Id">Back to List</a>
+    </div>
 
+   

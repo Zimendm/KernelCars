@@ -1,72 +1,164 @@
 ﻿@*@model IEnumerable<KernelCars.Models.Car>*@
 @model CarsListViewModel
+@{
+    Layout = "_Layout";
+}
 
-<h1>Cars</h1>
-@*@foreach (var item in Model.Cars)
-{
-    //@Html.Partial("CarSummary", item)
-    <partial name="CarSummary" model="item"/>
-}*@
-<form asp-action="Index" method="get">
-    <div class="form-actions no-color">
-        <p>
-            Поиск по номеру: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
-            <input type="submit" value="Search" class="btn-primary" /> |
-            <a asp-action="Index">Back to Full List</a>
-        </p>
+
+<script>
+    $(document).ready(function ()
+    {
+        //$("#carstatusfilter").keyup(function ()
+        //{
+        //    var datasearch = $(this).val().toLowerCase();
+        //    $(".carList").each(function () {
+        //        if ($(this).find(".searchField").text().toLowerCase().indexOf(datasearch)<0)
+        //        {
+        //            $(this).hide();
+        //        }
+        //        else
+        //        {
+        //            $(this).show();
+        //        }
+        //    });
+        //});
+        $("#carstatusfilter").change(function ()
+        {
+            var url = "/Car/Index?status=" + $('#carstatusfilter option:selected').text(); /*etails?NestId=" + NestId;
+             * 
+             * 
+*/
+
+            alert(url);
+            window.location.href = url; 
+
+            //var options = {};
+            //options.url = "/Section/Search?" + $.param({ SearchResults: $("#search").val() });
+            //options.url = "/Car/List";
+            //options.type = "GET";
+            //options.contentType = "application/json";
+            //options.dataType = "json";
+            @*$.ajax(
+                {
+                    type: "GET",
+                    url:"/home/index"
+            });
+
+            alert('hello');
+
+
+            $.get("/Car/Index", null, function (data) {
+                alert(data);
+            });  
+
+
+            var url = "@Url.Action("List")";
+            $.get(url);*@
+            //$.get("cars/list");
+            //$(".carList").each(function ()
+            //{
+            //    $(this).hide();
+            //});
+
+        });
+    });
+</script>
+
+
+
+
+
+<div class="row">
+    <div class="col-2">
+        @await Component.InvokeAsync("NavigationMenu")
     </div>
-</form>
-
-<a asp-action="Create">Create New</a>
-    <table class="table table-sm table-striped">
-        <thead>
-            <tr>
-                <th></th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cars.First().CarModel.Manufacturer.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cars.First().RegistrationNumber)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cars.First().FirstRegistrationYear)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Cars.First().CarOwner)
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Cars)
+    <div class="col-10">
+        <h1>Cars</h1>
+        @*@foreach (var item in Model.Cars)
             {
+                //@Html.Partial("CarSummary", item)
+                <partial name="CarSummary" model="item"/>
+            }*@
+        <form asp-action="Index" method="get">
+            <div class="form-actions no-color">
+                <p>
+                    Поиск по номеру: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+                    <input type="submit" value="Search" class="btn-primary" /> |
+                    <a asp-action="Index">Back to Full List</a>
+                </p>
+            </div>
+        </form>
 
+        <div class="col-3">
+            <b>Статус авто:</b> <select class="form-control" asp-items="ViewBag.StatusID" id="carstatusfilter">
+                <option value="">-- Выберите статус --</option>
+            </select>
+        </div>
+
+        <a asp-action="Create">Create New</a>
+        <table class="table table-sm table-striped">
+            <thead>
                 <tr>
-                    <td>
-                        <input type="hidden" asp-for="@item.Id" />
-                    </td>
-                    <td>@item.CarModel.Manufacturer.Name @item.CarModel.Model</td>
-                    @*<td>@item.CarType.Type</td>*@
-                    @*<td>@item.TypeOfFuel</td>*@
-                    <td>@item.RegistrationNumber</td>
-                    @*<td>@item.VinNumber</td>*@
-                    <td>@item.FirstRegistrationYear</td>
-                    <td>@Html.DisplayFor(c => item.CarOwner.LastName) @Html.DisplayFor(c => item.CarOwner.FirstName) @Html.DisplayFor(c => item.CarOwner.MiddleName)</td>
-                    @*<td>@item.Capacity</td>*@
-                    <td>
-                        <a asp-action="Edit" class="btn btn-sm btn-warning" asp-route-id="@item.Id">Edit</a>
-                    </td>
-                       @*Html.Partial("CarSummary",item)*@
-                    @*<td>
-                        <partial name="CarSummary" model="item">
-                    </td>*@
+                    <th></th>
+                    <th>Статус</th>
+                    <th>
+                        Марка, Модель
+                        @*@Html.DisplayNameFor(model => model.Cars.First().CarModel.Manufacturer.Name)*@
+                    </th>
+                    <th>
+                        Гос.номер
+                        @*@Html.DisplayNameFor(model => model.Cars.First().RegistrationNumber)*@
+                    </th>
+                    @*<th>
+                            @Html.DisplayNameFor(model => model.Cars.First().FirstRegistrationYear)
+                        </th>*@
+                    <th>
+                        Пользователь
+                        @*@Html.DisplayNameFor(model => model.Cars.First().CarUsers)*@
+                    </th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Cars)
+                {
 
+                    <tr class="carList">
+                        <td>
+                            <input type="hidden" asp-for="@item.Id" />
+                        </td>
+                        @*<td>@item.CarCurrentStatus</td>*@
+                        <td>
+                            <span class="badge badge-pill  @(item.CarCurrentStatus=="Эксплуатация" ? "badge-success":"badge-danger")" style="float:left">@item.CarCurrentStatus</span>
+                        </td>
+                        <td>@item.CarModel.Manufacturer.Name @item.CarModel.Model</td>
+                        @*<td>@item.CarType.Type</td>*@
+                        @*<td>@item.TypeOfFuel</td>*@
+                        <td>@item.RegistrationNumber</td>
+                        @*<td>@item.VinNumber</td>*@
+                        @*<td>@item.FirstRegistrationYear</td>*@
+                        <td>@item.CarUserForView</td>
+                        @*<td>@Html.DisplayFor(c => item.CarOwner.LastName) @Html.DisplayFor(c => item.CarOwner.FirstName) @Html.DisplayFor(c => item.CarOwner.MiddleName)</td>*@
+                        @*<td>@item.Capacity</td>*@
+                        @*<td>@item.FullNameFirmForView</td>
+                            <td>@item.DepartmentNameForView</td>*@
+                        <td>
+                            <a asp-action="Details" class="btn btn-sm btn-info" asp-route-id="@item.Id">Info</a>
+                            <a asp-action="Edit" class="btn btn-sm btn-warning" asp-route-id="@item.Id">Edit</a>
+                        </td>
+                        @*Html.Partial("CarSummary",item)*@
+                        @*<td>
+                                <partial name="CarSummary" model="item">
+                            </td>*@
+                    </tr>
+                }
+            </tbody>
+        </table>
 
+        @*page-url-values="new Dictionary<string,string>()"*@
 
-<div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true"
-     page-class="btn" page-class-normal="btn-secondary"
-     page-class-selected="btn-primary" class="btn-group float-left m-1">
+        <div page-model="@Model.PagingInfo" page-action="Index" page-classes-enabled="true" page-url-status="@Model.CurrentStatus"
+             page-class="btn" page-class-normal="btn-secondary"
+             page-class-selected="btn-primary" class="btn-group float-left m-1">
+        </div>
+    </div>
 </div>

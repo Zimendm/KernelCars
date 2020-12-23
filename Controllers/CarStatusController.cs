@@ -251,6 +251,23 @@ namespace KernelCars.Controllers
             ViewData["LocationId"] = new SelectList(_context.Locations, "ID", "LocationName");
 
             int carID = (int)carId;
+            //var statusQuery = _context.CarStatuses.Where(cs => cs.CarId == (int)carId).ToList().LastOrDefault();// from cs in _context.CarStatuses
+            //                                                                                                    //                 //where cs.CarId == carID
+            //                                                                                                    //                 //select cs;
+
+            //////var lastStatus = statusQuery.Last();
+
+            //if (statusQuery != null)
+            //{
+            //    statusQuery.EndDate = DateTime.Now;
+            //    _context.Update(statusQuery);
+                
+            //}
+            //if (lastStatus!=null)
+            //{
+            //    lastStatus.EndDate = DateTime.Now;
+            //}
+
             return View(new CarStatus { CarId= carID, BeginDate=DateTime.Now });
         }
 
@@ -268,6 +285,11 @@ namespace KernelCars.Controllers
             {
                 try
                 {
+                    var statusQuery = _context.CarStatuses.Where(cs => cs.CarId == carStatus.CarId).ToList().LastOrDefault();
+                    if (statusQuery!=null)
+                    {
+                        statusQuery.EndDate = carStatus.BeginDate;
+                    }
                     _context.Update(carStatus);
                     await _context.SaveChangesAsync();
                 }

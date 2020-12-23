@@ -1,0 +1,119 @@
+﻿@page "/services/edit/{id:int}"
+@using KernelCars.Models.ViewModels
+@inherits OwningComponentBase<DataContext>
+
+<h3>CarServiceEdit</h3>
+
+<EditForm Model="CarServiceData">
+
+
+    <div class="form-group">
+        <InputText class="form-control" @bind-Value="@CarServiceData.ServiceDescription"></InputText>
+
+    </div>
+
+    <div class="form-group">
+        <input class="form-control" type="date">
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <table>
+                @{
+                    int cnt = 0;
+
+                    foreach (var item in assignedTOF)
+                    {
+                        if (cnt++ % 2 == 0)
+                        {
+                            @:<tr>
+                            }
+                            @:<td>
+                                <div>
+                                    <input type="checkbox"
+                                           name="selectedWorks"
+                                           value="item.TypeOfServiceID"
+                                           checked="@item.IsAssigned" />
+                                    <label>@item.Service</label>
+                                </div>
+                            @:</td>
+                        }
+                        if (cnt++ % 3 == 0)
+                        {
+                        @:</tr>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="exampleFormControlFile1">Example file input</label>
+        <input type="file" class="form-control-file" id="exampleFormControlFile1">
+    </div>
+
+    <!--<div class="custom-file">
+        <input type="file" class="custom-file-input" id="customFile">
+        <label class="custom-file-label" for="customFile">Choose file</label>
+    </div>
+
+    <div class="file-field">
+        <div class="btn btn-primary btn-sm float-left">
+            <span>Choose file</span>
+            <input type="file">
+        </div>-->
+    @*<div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Upload your file">
+        </div>*@
+    <!--</div>-->
+
+
+
+    <NavLink href="service">Back</NavLink>
+</EditForm>
+
+    @code{
+        [Inject]
+        public NavigationManager NavManager { get; set; }
+
+        DataContext _context => Service;
+
+        [Parameter]
+        public int Id { get; set; }
+
+        public CarService CarServiceData { get; set; } = new CarService();
+
+        List<AssignedTypeOfService> assignedTOF = new List<AssignedTypeOfService>();
+
+
+        protected override void OnInitialized()
+        {
+            if (Id!=0)
+            {
+                CarService carService = _context.CarServices.Include(c=>c.WorkAssigments).Where(c=>c.ID==Id).FirstOrDefault();
+                assignedTOF = PopulateAssignedWorks(carService);
+            }
+            //base.OnInitialized();
+        }
+
+
+        private List<AssignedTypeOfService> PopulateAssignedWorks(CarService carService)
+        {
+            var allServices = _context.TypeOfServices;
+            var currentServices = new HashSet<int>(carService.WorkAssigments.Select(c => c.TypeOfServiceId));
+            var viewModel = new List<AssignedTypeOfService>();
+            foreach (var service in allServices)
+            {
+                viewModel.Add(new AssignedTypeOfService
+                {
+                    TypeOfServiceID = service.ID,
+                    Service = service.Service,
+                    IsAssigned = currentServices.Contains(service.ID)
+                });
+            }
+
+            return viewModel;
+            //ViewBag.Works = viewModel;
+        }
+
+}

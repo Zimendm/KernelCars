@@ -1,0 +1,29 @@
+﻿@model IEnumerable<CarStatus>
+
+<table>
+    <thead>
+        <tr>
+            <th>Статус</th>
+            <th>Организация</th>
+            <th>Подразделение</th>
+            <th>Размещение</th>
+            <th>Обслуживание</th>
+            <th>Установлен</th>
+            <th>Изменён</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>@item.Status.State</td>
+            <td>@item.Unit.Firm.Employee.FullName</td>
+            <td>@item.Unit.Department.Name</td>
+            <td>@item.Location.LocationName</td>
+            <td>@Html.DisplayFor(i=>item.IsEnableService)</td>
+            <td>@item.BeginDate.ToShortDateString()</td>
+            <td>@(item.EndDate!=null ? ((DateTime)item.EndDate).ToShortDateString() : "")</td>
+        </tr>
+        }
+    </tbody>
+</table>

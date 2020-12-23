@@ -1,0 +1,121 @@
+﻿@page "/rent"
+@page "/rent/list"
+
+@using System.Text.Json
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@inherits OwningComponentBase<DataContext>
+
+
+<h4 class="bg-primary text-white text-center p-2">Договора аренды</h4>
+<h5 class="bg-danger text-white text-center p-2">В разработке</h5>
+
+<div class="form-group">
+    <label class="form-text">Поиск авто</label>
+    <input class="form-control" placeholder="Введите номер или фамилию ...." @oninput="@SearchChanged" />
+</div>
+
+
+@*<div class="text-center mb-3">
+        <NavLink class="btn btn-secondary" ref="">Back</NavLink>
+    </div>*@
+<div class="form-group">
+    <label>Тип договора аренды</label>
+    <select class="form-control">
+        <option>Все</option>
+        <option>Внутригрупповой</option>
+        <option>Частный</option>
+    </select>
+</div>
+
+<div class="form-group">
+    <label>Статус договора аренды</label>
+    <select class="form-control">
+        <option>Все</option>
+        <option>Закрытые</option>
+        <option>Действующие</option>
+        <option>Отсутствующие</option>
+    </select>
+</div>
+
+<Pagination TotalPagesQuantity="totalPageQuantity" CurrentPage="@currentPage" Radius="10"
+            SelectedPage="SelectedPages"></Pagination>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Гос.номер</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lc in LeaseContracts)
+        {
+            <tr>
+                <td>@lc.Id</td>
+                <td>@lc.RegistrationNumber</td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+
+@code {
+
+    DataContext _context => Service;
+
+    private int totalPageQuantity;
+
+    public int currentPage { get; set; } = 1;
+
+    public string SearchString { get; set; } = null;
+
+    public IEnumerable<KernelCars.Models.ViewModels.LeaseListViewModel> LeaseContracts { get; set; } = new List<KernelCars.Models.ViewModels.LeaseListViewModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Http.BaseAddress ??= new Uri(NavigationManager.BaseUri);
+        await LoadDocuments();
+    }
+
+
+    private async Task SelectedPages(int page)
+    {
+        currentPage = page;
+        await LoadDocuments(page, searchString: SearchString);
+    }
+
+    async Task LoadDocuments(int page = 1, int quantityPerPage = 25, string searchString = null)
+    {
+
+
+        //Cars = await Http.GetJsonAsync<List<KernelCars.Models.ViewModels.CarsDisplayViewModel>>($"api/carapi?page={page}&quantityPerPage={quantityPerPage}");
+        //StateHasChanged();
+
+        var httpResponse = await Http.GetAsync($"api/leaseapi?page={page}&quantityPerPage={quantityPerPage}&searchString={searchString}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            totalPageQuantity = int.Parse(httpResponse.Headers.GetValues("pagesQuantity").FirstOrDefault());
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            LeaseContracts = JsonSerializer.Deserialize<List<KernelCars.Models.ViewModels.LeaseListViewModel>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            //StateHasChanged();
+        }
+        else
+        {
+            // handle error
+        }
+    }
+
+    async Task SearchChanged(ChangeEventArgs e)
+    {
+        currentPage = 1;
+        SearchString = e.Value.ToString();
+        await LoadDocuments(currentPage, searchString: SearchString);//, status: StatusFilter);
+    }
+}

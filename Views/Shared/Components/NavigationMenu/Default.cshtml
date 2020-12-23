@@ -1,19 +1,27 @@
 ﻿@model IEnumerable<string>
 
-<a class="btn btn-block btn-secondary"
-   asp-action="List"
+@*<a class="btn btn-block btn-secondary"
+   asp-action="Index"
    asp-controller="Car"
    asp-route-status="">
-    Home
-</a>
+    All
+</a>*@
 @foreach (string status in Model)
 {
     <a class="btn btn-block
        @(status == ViewBag.SelectedStatus ? "btn-primary": "btn-secondary")"
-       asp-action="List"
+       asp-action="Index"
        asp-controller="Car"
        asp-route-status="@status"
        asp-route-productPage="1">
         @status
     </a>
 }
+<a class="btn btn-block
+       @(ViewBag.SelectedStatus=="Не указан" ? "btn-primary": "btn-secondary")"
+   asp-action="Index"
+   asp-controller="Car"
+   asp-route-status="Не указан"
+   asp-route-productPage="1">
+    Не указан
+</a>

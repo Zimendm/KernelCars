@@ -1,0 +1,24 @@
+﻿@model IEnumerable<CarUser>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Отв.сотрудник</th>
+            <th>С</th>
+            <th>По</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Employee.FullName</td>
+                <td>@item.StartUsingDate</td>
+                <td>@item.EndUsingDate</td>
+                <td>
+                    <a class="btn btn-secondary disabled" asp-action="Print">Приказ</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

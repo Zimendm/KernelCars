@@ -15,7 +15,7 @@ namespace KernelCars.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
+                .HasAnnotation("ProductVersion", "3.1.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -32,6 +32,15 @@ namespace KernelCars.Migrations
                     b.Property<int?>("CarOwnerId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("CarTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Color")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("DriveType")
+                        .HasColumnType("int");
+
                     b.Property<int>("EngineCapacity")
                         .HasColumnType("int");
 
@@ -40,6 +49,9 @@ namespace KernelCars.Migrations
 
                     b.Property<int?>("Fuel")
                         .HasColumnType("int");
+
+                    b.Property<float>("FuelFlowRate")
+                        .HasColumnType("real");
 
                     b.Property<byte[]>("ImagePage1")
                         .HasColumnType("varbinary(max)");
@@ -50,7 +62,16 @@ namespace KernelCars.Migrations
                     b.Property<bool>("LPG")
                         .HasColumnType("bit");
 
+                    b.Property<string>("RegistrationCertificate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("RegistrationNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TSC")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TankCapacity")
@@ -74,8 +95,11 @@ namespace KernelCars.Migrations
                     b.Property<string>("TempUser")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Tyres")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("Transmission")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TyresId")
+                        .HasColumnType("int");
 
                     b.Property<string>("VinNumber")
                         .HasColumnType("nvarchar(max)");
@@ -85,6 +109,10 @@ namespace KernelCars.Migrations
                     b.HasIndex("CarModelId");
 
                     b.HasIndex("CarOwnerId");
+
+                    b.HasIndex("CarTypeId");
+
+                    b.HasIndex("TyresId");
 
                     b.ToTable("Cars");
                 });
@@ -197,6 +225,21 @@ namespace KernelCars.Migrations
                     b.ToTable("CarStatuses");
                 });
 
+            modelBuilder.Entity("KernelCars.Models.CarType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("TypeName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CarTypes");
+                });
+
             modelBuilder.Entity("KernelCars.Models.CarUser", b =>
                 {
                     b.Property<int>("ID")
@@ -228,6 +271,21 @@ namespace KernelCars.Migrations
                     b.ToTable("CarUsers");
                 });
 
+            modelBuilder.Entity("KernelCars.Models.Cluster", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ClusterName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Clusters");
+                });
+
             modelBuilder.Entity("KernelCars.Models.Department", b =>
                 {
                     b.Property<int>("DepartmentId")
@@ -250,6 +308,9 @@ namespace KernelCars.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
@@ -257,6 +318,9 @@ namespace KernelCars.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MiddleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TaxNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -300,6 +364,46 @@ namespace KernelCars.Migrations
                     b.ToTable("FirmDepartment");
                 });
 
+            modelBuilder.Entity("KernelCars.Models.LeaseContract", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<long>("CarId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("FromDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("LeaseAmmount")
+                        .HasColumnType("decimal(7, 2)");
+
+                    b.Property<int>("LeaseCurrency")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ManagerId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ToDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CarId");
+
+                    b.HasIndex("ManagerId");
+
+                    b.ToTable("LeaseContracts");
+                });
+
             modelBuilder.Entity("KernelCars.Models.Location", b =>
                 {
                     b.Property<int>("ID")
@@ -316,9 +420,41 @@ namespace KernelCars.Migrations
                     b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<float>("RegionCoeff")
+                        .HasColumnType("real");
+
                     b.HasKey("ID");
 
                     b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("KernelCars.Models.Manager", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LeaseProcuratory")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("LeaseProcuratoryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LeaseProcuratoryNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("Managers");
                 });
 
             modelBuilder.Entity("KernelCars.Models.Manufacturer", b =>
@@ -374,12 +510,30 @@ namespace KernelCars.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("IsEnableService")
+                        .HasColumnType("bit");
+
                     b.Property<string>("State")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StatusID");
 
                     b.ToTable("Statuses");
+                });
+
+            modelBuilder.Entity("KernelCars.Models.TireSize", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Size")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TireSizes");
                 });
 
             modelBuilder.Entity("KernelCars.Models.TypeOfService", b =>
@@ -404,6 +558,9 @@ namespace KernelCars.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ClusterId")
+                        .HasColumnType("int");
+
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
@@ -415,9 +572,13 @@ namespace KernelCars.Migrations
 
                     b.HasKey("UnitId");
 
+                    b.HasAlternateKey("DepartmentId", "FirmId", "ClusterId");
+
+                    b.HasIndex("ClusterId");
+
                     b.HasIndex("FirmId");
 
-                    b.HasIndex("DepartmentId", "FirmId")
+                    b.HasIndex("DepartmentId", "FirmId", "ClusterId")
                         .IsUnique();
 
                     b.ToTable("Units");
@@ -449,6 +610,14 @@ namespace KernelCars.Migrations
                     b.HasOne("KernelCars.Models.Employee", "CarOwner")
                         .WithMany()
                         .HasForeignKey("CarOwnerId");
+
+                    b.HasOne("KernelCars.Models.CarType", "CarType")
+                        .WithMany("Cars")
+                        .HasForeignKey("CarTypeId");
+
+                    b.HasOne("KernelCars.Models.TireSize", "Tyres")
+                        .WithMany("Cars")
+                        .HasForeignKey("TyresId");
                 });
 
             modelBuilder.Entity("KernelCars.Models.CarModel", b =>
@@ -541,8 +710,36 @@ namespace KernelCars.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("KernelCars.Models.LeaseContract", b =>
+                {
+                    b.HasOne("KernelCars.Models.Car", "Car")
+                        .WithMany("LeaseContracts")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("KernelCars.Models.Manager", "Manager")
+                        .WithMany("LeaseContracts")
+                        .HasForeignKey("ManagerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("KernelCars.Models.Manager", b =>
+                {
+                    b.HasOne("KernelCars.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId");
+                });
+
             modelBuilder.Entity("KernelCars.Models.Unit", b =>
                 {
+                    b.HasOne("KernelCars.Models.Cluster", "Cluster")
+                        .WithMany("Units")
+                        .HasForeignKey("ClusterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("KernelCars.Models.Department", "Department")
                         .WithMany("Units")
                         .HasForeignKey("DepartmentId")

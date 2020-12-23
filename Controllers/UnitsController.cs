@@ -53,6 +53,7 @@ namespace KernelCars.Controllers
 
 
 
+            ViewData["ClusterId"] = new SelectList(_context.Clusters, "Id", "ClusterName");
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "DepartmentId", "Name");
             ViewData["FirmId"] = new SelectList(firmQuery, "FirmId", "Employee.FullName");
             return View();
@@ -63,7 +64,7 @@ namespace KernelCars.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UnitId,FirmId,DepartmentId,IsAgriBusiness")] Unit unit)
+        public async Task<IActionResult> Create([Bind("UnitId,FirmId,DepartmentId,ClusterId,IsAgriBusiness")] Unit unit)
         {
             if (ModelState.IsValid)
             {

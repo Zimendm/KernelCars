@@ -1,0 +1,26 @@
+﻿@model LeaseContract
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@*<input asp-for="@Model.LeaseAmmount" />*@
+@*@Html.DisplayFor(m=>m.LeaseAmmount)*@
+
+     валюта 
+
+
+<div class="row">
+    <div class="col-1">
+        <input class="form-control  text-right" asp-for="@Model.LeaseAmmount" />
+    </div>
+    <div class="col-1">
+        <select class="browser-default custom-select" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
+    </div>
+</div>
+
+@*<p>
+    <input class="form-control col-1" asp-for="@Model.LeaseAmmount" />
+    <select class="browser-default custom-select col-1" asp-for="@Model.LeaseCurrency" asp-items="@Html.GetEnumSelectList<KernelCars.Models.Currency>()"></select>
+</p>*@
