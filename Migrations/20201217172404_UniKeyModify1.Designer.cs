@@ -4,14 +4,16 @@ using KernelCars.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace KernelCars.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201217172404_UniKeyModify1")]
+    partial class UniKeyModify1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,9 +51,6 @@ namespace KernelCars.Migrations
 
                     b.Property<int?>("Fuel")
                         .HasColumnType("int");
-
-                    b.Property<float>("FuelFlowRate")
-                        .HasColumnType("real");
 
                     b.Property<byte[]>("ImagePage1")
                         .HasColumnType("varbinary(max)");
@@ -419,9 +418,6 @@ namespace KernelCars.Migrations
 
                     b.Property<string>("LocationName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("RegionCoeff")
-                        .HasColumnType("real");
 
                     b.HasKey("ID");
 

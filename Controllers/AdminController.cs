@@ -20,7 +20,7 @@ namespace KernelCars.Controllers
             userManager = usrMgr;
         }
 
-        [Authorize]
+        //[Authorize]
         public ViewResult Index() => View(userManager.Users);
 
         public ViewResult Create() => View();

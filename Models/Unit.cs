@@ -29,9 +29,14 @@ namespace KernelCars.Models
         {
             get
             {
-                string retValue = Department.Name + " [" + Firm.Employee.FullName + "]";
-                if (IsAgriBusiness)
-                    retValue += " (Агробизнес)";
+                string retValue = "";
+                if (Department!=null&&Firm.Employee!=null)
+                {
+                    retValue = Department.Name + " [" + Firm.Employee.FullName + "]";
+                    if (IsAgriBusiness)
+                        retValue += " (Агробизнес)";
+                }
+                
                 return retValue;
             }
         }

@@ -1,7 +1,7 @@
 ﻿@model KernelCars.Models.Unit
 
 @{
-    Layout = null;
+//Layout = null;
 }
 
 <!DOCTYPE html>
@@ -20,6 +20,10 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
+                <label asp-for="ClusterId" class="control-label"></label>
+                <select asp-for="ClusterId" class="form-control" asp-items="ViewBag.ClusterId"></select>
+            </div>
+            <div class="form-group">
                 <label asp-for="FirmId" class="control-label"></label>
                 <select asp-for="FirmId" class="form-control" asp-items="ViewBag.FirmId"></select>
             </div>
@@ -29,7 +33,7 @@
             </div>
             <div class="form-group form-check">
                 <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsAgriBusiness" /> 
+                    <input class="form-check-input" asp-for="IsAgriBusiness" />
                     @Html.DisplayNameFor(model => model.IsAgriBusiness)
                 </label>
             </div>

@@ -159,7 +159,7 @@ namespace KernelCars.Controllers
                 );
         }
 
-       
+        [Authorize]
         public IActionResult List(string status, int carPage = 1)
         {
             var carsQuery = _context.Cars

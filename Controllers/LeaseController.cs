@@ -36,8 +36,10 @@ namespace KernelCars.Controllers
             //return RedirectToAction("Test");// View();
         }
 
-        public IActionResult Create(int carId)
+        public IActionResult Create(int Id)
         {
+            int carId = Id;
+            
             var carQuery = _context.Cars
                 .Include(c=>c.CarOwner)
                 .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
@@ -107,7 +109,7 @@ namespace KernelCars.Controllers
             _context.Add(model);
             _context.SaveChanges();
 
-            return RedirectToAction("Edit", new {id= model.ID } );
+            return RedirectToPage($"/cars/details/{model.CarId}");//  RedirectToAction("Edit", new {id= model.ID } );
             //return View(model);
             ///
 

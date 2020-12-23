@@ -105,4 +105,5 @@
 </form>
 <div>
     <a asp-controller="Car" asp-action="Details" asp-route-id="@Model.Car.Id">Назад к автомобилю</a>
+    <a href=@($"/cars/details/{Model.Car.Id}")>Blazor:Назад к автомобилю</a> 
 </div>

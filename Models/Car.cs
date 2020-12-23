@@ -56,6 +56,9 @@ namespace KernelCars.Models
         [DisplayName("Ёмкость бака")]
         public int TankCapacity { get; set; }
 
+        [DisplayName("Линейная норма расхода")]
+        public float FuelFlowRate { get; set; }
+
         //public int SummerTyresId { get; set; }
         //[DisplayName("Размер летних шин")]
         //public TireSize SummerTyres { get; set; }

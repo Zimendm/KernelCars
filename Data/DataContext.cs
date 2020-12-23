@@ -45,8 +45,10 @@ namespace KernelCars.Data
                 .HasKey(c=>new {c.FirmId, c.DepartmentId });
 
             modelBuilder.Entity<Unit>()
-                .HasIndex(u => new { u.DepartmentId, u.FirmId })
+                .HasIndex(u => new { u.DepartmentId, u.FirmId, u.ClusterId })
                 .IsUnique(true);
+            modelBuilder.Entity<Unit>().HasAlternateKey(u => new { u.DepartmentId, u.FirmId, u.ClusterId });
+
             modelBuilder.Entity<CarModel>()
                 .HasIndex(m => new { m.Model, m.ManufacturerId })
                 .IsUnique(true);

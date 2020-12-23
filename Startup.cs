@@ -83,6 +83,11 @@ namespace KernelCars
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
 
+          
+            //services.AddIdentity<IdentityUser, IdentityRole>()
+            //.AddEntityFrameworkStores<AppIdentityDbContext>();
+            //.AddDefaultTokenProviders();
+
             //services.AddMvc();
             services.AddControllersWithViews();
             services.AddRazorPages();

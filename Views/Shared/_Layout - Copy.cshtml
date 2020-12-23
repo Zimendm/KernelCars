@@ -69,52 +69,37 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="">Home</a>
                     </li>
-                    @*<li class="nav-item active">
-            <a class="nav-link" asp-area="" asp-controller="ImportData" asp-action="Index">Import Data</a>
-        </li>*@
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-area="" asp-controller="ImportData" asp-action="Index">Import Data</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="firmDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Компания
+                            Компанія
                         </a>
                         <div class="dropdown-menu" aria-labelledby="firmDropdown">
-                            <a class="dropdown-item" asp-controller="Cluster" asp-action="Index">Дивизионы</a>
-                            <a class="dropdown-item" asp-controller="Firms" asp-action="Index">Предприятия</a>
-                            <a class="dropdown-item" asp-controller="Departments" asp-action="Index">Подразделения</a>
+                            <a class="dropdown-item" asp-controller="Departments" asp-action="Index">Підрозділи</a>
+                            <a class="dropdown-item" asp-controller="Firms" asp-action="Index">Підприємства</a>
                             <a class="dropdown-item" asp-controller="Units" asp-action="Index">Units</a>
+                            <a class="dropdown-item" asp-controller="Employee" asp-action="Index">Співробітники</a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" asp-controller="Departments" asp-action="Index">Локации</a>
-        @*<a class="dropdown-item" asp-controller="Car" asp-action="WorkWithData">Авто</a>*@
+                            <a class="dropdown-item" asp-controller="Car" asp-action="WorkWithData">Авто</a>
                         </div>
                     </li>
-
-
-
-                    @*<li class="nav-item active">
-            <a class="nav-link" asp-area="" asp-controller="CarServices" asp-action="Index" asp-route-carId="975">Тех.обслуживание</a>
-        </li>
-        <li class="nav-item active">
-            <a class="nav-link" asp-area="" asp-controller="Lease" asp-action="Index">Аренда</a>
-        </li>*@
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-area="" asp-controller="CarServices" asp-action="Index" asp-route-carId="975">Тех.обслуживание</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" asp-area="" asp-controller="Lease" asp-action="Index">Аренда</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Автомобили
+                            Автомобілі
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" asp-controller="Manufacturers" asp-action="Index">Производители</a>
-                            <a class="dropdown-item" asp-controller="CarModels" asp-action="Index">Модели</a>
-                            @*<div class="dropdown-divider"></div>*@
-                            @*<a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>*@
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="importDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Импорт данных</a>
-                        <div class="dropdown-menu" aria-labelledby="importDropdown">
-                            <a class="dropdown-item" asp-controller="Report" asp-action="CarsBase">База авто</a>
-                            <a class="dropdown-item" asp-controller="Report" asp-action="OpenServices">Открытые ТО</a>
-                            <a class="dropdown-item" asp-controller="Report" asp-action="Services">ТО за период</a>
-                            @*<a class="dropdown-item" asp-controller="CarModels" asp-action="Index">Моделі</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>*@
+                            <a class="dropdown-item" asp-controller="Manufacturers" asp-action="Index">Виробники</a>
+                            <a class="dropdown-item" asp-controller="CarModels" asp-action="Index">Моделі</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>
                         </div>
                     </li>
 
@@ -129,16 +114,6 @@
                 <a class="dropdown-item" asp-controller="Car" asp-action="Index">Авто</a>*@
                         </div>
                     </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index">Станции ТО</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index">Сотрудники</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" asp-area="" asp-controller="Employee" asp-action="Index">Менеджеры</a>
-                    </li>
-
 
                 </ul>
         </div>

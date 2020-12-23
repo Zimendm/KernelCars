@@ -1,4 +1,5 @@
-﻿@page "/cars/edit/{id:long}"
+﻿@page "/cars/create"
+@page "/cars/edit/{id:long}"
 @*@layout EmptyLayout*@
 @using BlazorInputFile
 
@@ -294,8 +295,12 @@
 
     protected override void OnParametersSet()
     {
+        if (Id != 0)
+        {
+            CarData = Context.Cars.Find(Id);
+        }
         //CarData = await Context.Cars.Include(c => c.CarModel).ThenInclude(c=>c.Manufacturer).FirstOrDefaultAsync(c => c.Id == Id);
-        CarData = Context.Cars.Find(Id);
+
         //        Manufacturers = await Context.Manufacturers.ToDictionaryAsync(m => m.Name, m => m.ManufacturerId);
         ////        CarModels = await Context.CarModels.Where(cm=>cm.ManufacturerId==CarData.CarModel.ManufacturerId).ToDictionaryAsync(m => m.Model, m => m.CarModelId);
         //        CarModels = await Context.CarModels.ToDictionaryAsync(m => m.Model, m => m.CarModelId);
