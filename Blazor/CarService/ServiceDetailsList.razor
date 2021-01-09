@@ -1,0 +1,171 @@
+﻿@page "/cars/service/list/{CarId:long}"
+
+@using System.Text.Json
+
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+@inherits OwningComponentBase<DataContext>
+
+
+<div class="card">
+    <div class="card-header">
+        <p>
+            <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@carData.RegistrationNumber</b> Год выпуска: <b>@carData.FirstRegistrationYear</b></h4>
+            @*<span class="badge badge-pill @CSScarCurrentStatus" style="float:left">@carCurrentStatus</span>*@
+        </p>
+    </div>
+    <div class="card-body">
+        <span class="@(!carData.IsEnableService ? "d-none":null) ">
+            <NavLink class="btn btn-sm btn-success mb-2" href="@GetServiceUrl(CarId)">Запись на сервис</NavLink>
+        </span>
+       
+        <h6 class="bg-primary text-white text-center p-2">Сервисное обслуживание автомобиля</h6>
+        <table class=" table table-light">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>СТО</th>
+                    <th>Дата начала</th>
+                    <th>Дата окончания</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Services)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.ServiceStation</td>
+                        <td>@item.StartDate.ToShortDateString()</td>
+                        <td>@(item.DateOfCompletion != null ? ((DateTime)item.DateOfCompletion).ToShortDateString() : "")</td>
+                        <td>
+                            <span>
+                                <NavLink class="btn btn-sm btn-info"
+                                         href="@GetDetailsUrl(item.Id)">
+                                    Details
+                                </NavLink>
+                            </span>
+                            <span class="@(item.DateOfCompletion != null ? "d-none" : "")">
+                                <NavLink class="btn btn-sm btn-warning"
+                                         href="@GetEditUrl(item.Id)">
+                                    Edit
+                                </NavLink>
+                            </span>
+                            <span class="@(item.DateOfCompletion != null ? "d-none" : "")">
+                                <NavLink class="btn btn-sm btn-danger"
+                                         href="@GetEditUrl(item.Id)">
+                                    Delete
+                                </NavLink>
+                            </span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-footer">
+        <div class="text-center">
+            <button class="btn btn-secondary" @onclick="backOnClick">Назад</button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    DataContext _context => Service;
+
+    [Parameter]
+    public long CarId { get; set; }
+
+
+    Car carData = new Car();
+    public List<KernelCars.Models.ViewModels.ServiceListViewModel> Services = new List<KernelCars.Models.ViewModels.ServiceListViewModel>();
+
+
+
+    string carModel;
+    public int PageNumber { get; set; } = 1;
+    public int TotalPages { get; set; } = 10;
+    private int totalPageQuantity;
+
+
+
+    protected async override Task OnParametersSetAsync()
+    {
+        carData = await _context.Cars
+                   .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+                   //.Include(c => c.CarStatuses).ThenInclude(c => c.Location)
+                   .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
+                   //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm)
+                   //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                   //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Cluster)
+                   //.Include(c => c.CarModel).ThenInclude(c => c.Model).Where(c => c.Id == CarId)
+                   .FirstOrDefaultAsync(c => c.Id == CarId);
+
+        carModel = $"{carData.CarModel.Manufacturer.Name} {carData.CarModel.Model}";
+
+        await LoadCars(searchString: carData.RegistrationNumber);
+    }
+
+    async Task LoadCars(int page = 1, int quantityPerPage = 25, string searchString = null, string status = "")
+    {
+        var quaryable = await _context.CarServices
+             .Include(c => c.Car)
+             .Include(c => c.ServiceStation)
+             .Where(c => c.Car.Id == CarId)
+             .ToListAsync();
+
+        foreach (var item in quaryable)
+        {
+            Services.Add(new Models.ViewModels.ServiceListViewModel
+            {
+                Id = item.ID,
+                StartDate = item.OpenDate,
+                DateOfCompletion = item.CompleteDate,
+                ServiceStation = item.ServiceStation.Name
+            });
+        }
+
+        //var quaryable = _context.CarServices
+        //        .Include(c => c.Car).ThenInclude(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+        //        .Include(c => c.Car).ThenInclude(c => c.CarUsers).ThenInclude(c => c.Employee)
+        //        .Include(c => c.ServiceStation);
+        //var quaryable = _context.CarServices
+        //        .Include(c => c.Car).ThenInclude(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+        //        .Include(c => c.Car).ThenInclude(c => c.CarUsers).ThenInclude(c => c.Employee)
+        //        .Include(c => c.ServiceStation);
+
+
+        //Cars = await Http.GetJsonAsync<List<KernelCars.Models.ViewModels.CarsDisplayViewModel>>($"api/carapi?page={page}&quantityPerPage={quantityPerPage}");
+        //StateHasChanged();
+
+        ////var httpResponse = await Http.GetAsync($"api/serviceapi?page={page}&quantityPerPage={quantityPerPage}&searchString={searchString}&status={status}");
+
+        ////if (httpResponse.IsSuccessStatusCode)
+        ////{
+        ////    totalPageQuantity = int.Parse(httpResponse.Headers.GetValues("pagesQuantity").FirstOrDefault());
+        ////    var responseString = await httpResponse.Content.ReadAsStringAsync();
+        ////    Services = JsonSerializer.Deserialize<List<KernelCars.Models.ViewModels.ServiceListViewModel>>(responseString,
+        ////        new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        ////    //StateHasChanged();
+        ////}
+        ////else
+        ////{
+        ////    // handle error
+        ////}
+    }
+
+
+    public string GetEditUrl(long id) => $"/service/edit/{id}";
+    public string GetServiceUrl(long id) => $"/service/create/{id}";
+
+    string GetDetailsUrl(long id) => $"/forms/details/{id}";
+
+
+    private void backOnClick(MouseEventArgs e)
+    {
+        JS.InvokeVoidAsync("history.back");
+    }
+}

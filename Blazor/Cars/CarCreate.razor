@@ -1,6 +1,12 @@
-﻿@*@page "/cars/create"*@
-@inherits OwningComponentBase<DataContext>
+﻿@page "/cars/create"
 
+@using DocumentFormat.OpenXml.Packaging;
+@using DocumentFormat.OpenXml.Wordprocessing;
+@using System.IO.Compression;
+
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment
+@inject IJSRuntime iJSRuntime
+@inherits OwningComponentBase<DataContext>
 
 
 <h4 class="bg-primary text-white text-center p-2">Регистрация нового автомобиля</h4>
@@ -22,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-row">
                 <div class="col">
                     <div class="form-group">
@@ -53,18 +59,20 @@
             <CarOwnerSelect></CarOwnerSelect>
         </div>
         @*Вторая сторона техпаспорта*@
-    <div class="col">
-        <div class="form-group">
-            <ModelSelect TValue="int"
-                         Parser="@(str => int.Parse(str))"
-                         @bind-Value=@car.CarModelId>
-                <option selected disabled value="0">Выберите модель ....</option>
-            </ModelSelect>
+        <div class="col">
+            <div class="form-group">
+                <ModelSelect TValue="int"
+                             Parser="@(str => int.Parse(str))"
+                             @bind-Value=@car.CarModelId>
+                    <option selected disabled value="0">Выберите модель ....</option>
+                </ModelSelect>
+            </div>
+
         </div>
-        
-    </div>
     </div>
 </EditForm>
+
+<button @onclick="btnDocClick">Document</button>
 
 
 
@@ -74,8 +82,8 @@
 
     private Car car = new Car
     {
-        FirstRegistrationYear=DateTime.Now.Year,
-        CarModelId=1
+        FirstRegistrationYear = DateTime.Now.Year,
+        CarModelId = 1
     };
 
 
@@ -86,5 +94,203 @@
         TypeOfFuel tof;
         Enum.TryParse(e.Value.ToString(), out tof); //(TypeOfFuel) e.Value;
         car.Fuel = tof;
+    }
+
+    private void btnDocClick(MouseEventArgs e)
+    {
+        string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles/Registrations");
+        string pathLocal = Path.Combine(hostingEnvironment.WebRootPath, "Templates/Registration");
+        string destinationFile = null;
+        string templFile = Path.Combine(pathLocal, "StatementHSC.docx");
+
+
+        uploadFolder = Path.Combine(uploadFolder, "VINCODE");
+        try
+        {
+            if (!Directory.Exists(uploadFolder))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
+            }
+
+        }
+        catch (Exception)
+        {
+
+            //throw;
+        }
+
+        destinationFile = Path.Combine(uploadFolder, "StatementHSC.docx");
+
+        try
+        {
+            System.IO.File.Copy(templFile, destinationFile, true);
+
+
+
+            using (WordprocessingDocument document = WordprocessingDocument.Open(destinationFile, true))
+            {
+                // Change the document type to Document
+                //document.ChangeDocumentType(DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
+
+
+
+
+
+
+                // Find all structured document tags
+                IEnumerable<Text> placeHolders = document.MainDocumentPart.RootElement.Descendants<Text>();
+
+                foreach (var item in placeHolders)
+                {
+                    switch (item.Text)
+                    {
+                        case "RENAULT":
+                            item.Text = "MB AMG";
+                            break;
+                        //case "TaxNumber":
+                        //    item.Text = car.CarOwner.TaxNumber;
+                        //    break;
+                        //case "Address":
+                        //    item.Text = car.CarOwner.Address;
+                        //    break;
+                        //case "RegistrationNumber":
+                        //    item.Text = car.RegistrationNumber;
+                        //    break;
+                        //case "FirstRegistrationYear":
+                        //    item.Text = car.FirstRegistrationYear.ToString();
+                        //    break;
+                        //case "VinNumber":
+                        //    item.Text = car.VinNumber;
+                        //    break;
+                        //case "Manufacturer":
+                        //    item.Text = car.CarModel.Manufacturer.Name;
+                        //    break;
+                        //case "Model":
+                        //    item.Text = car.CarModel.Model;
+                        //    break;
+
+
+                        default:
+                            break;
+                    }
+                    //item.InsertAt(new Text("Hello!"), 0);
+                    //item.RemoveAllChildren();
+                    //Text txt = new Text("Hello, Word!");
+                    //item.AppendChild<Text>(new Text("Hell0, world")); // .Descendants<Text>(). .First().Text = "Hello, world!";
+
+                }
+
+                List<SdtBlock> sdtList = document.MainDocumentPart.RootElement.Descendants<SdtBlock>().ToList();
+
+                //sdtList[0].InnerText = "Changed By Code";
+
+                // Get the MainPart of the document
+                MainDocumentPart mainPart = document.MainDocumentPart;
+
+
+
+                // Get the Document Settings Part
+                //DocumentSettingsPart documentSettingPart1 = mainPart.DocumentSettingsPart;
+
+                // Create a new attachedTemplate and specify a relationship ID
+                // AttachedTemplate attachedTemplate1 = new AttachedTemplate() { Id = "relationId1" };
+
+                // Append the attached template to the DocumentSettingsPart
+                //documentSettingPart1.Settings.Append(attachedTemplate1);
+
+                // Add an ExternalRelationShip of type AttachedTemplate.
+                // Specify the path of template and the relationship ID
+                //documentSettingPart1.AddExternalRelationship("http://schemas.openxmlformats.org/officeDocument/2006/relationships/attachedTemplate", new Uri(sourceFile, UriKind.Absolute), "relationId1");
+
+                // Save the document
+                mainPart.Document.Save();
+
+
+            }
+
+
+
+            string uploadZipFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles");//Registration/VINCODE");
+            uploadZipFolder = Path.Combine(uploadZipFolder, "Registrations");
+            uploadZipFolder = Path.Combine(uploadZipFolder, "VINCODE");
+
+
+            uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles/Registrations");
+
+            string zipFile = Path.Combine(uploadFolder, Guid.NewGuid() + "_" + "VINCODE" + ".zip");
+            //ZipFile zip = new ZipFile();
+
+            //if (!Directory.Exists(uploadFolder))
+            //{
+            //    DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
+            //}
+
+            //string zipPath = Path.Combine(uploadFolder, contract.Car.RegistrationNumber+".zip");
+
+
+            //ZipFile.CreateFromDirectory(uploadFolder, zipPath);
+            //
+            ZipFile.CreateFromDirectory(uploadZipFolder, zipFile);
+            //Response.Headers.Add("Content-Disposition", $"inline; filename=\"{zipFile}\"");
+            //return File(zipFile, "application/zip", contract.Car.RegistrationNumber + ".zip");
+
+
+            FileStream fs = System.IO.File.OpenRead(zipFile);
+            byte[] data;
+            data = new byte[fs.Length];
+            fs.Read(data, 0, data.Length);
+            fs.Close();
+            //System.IO.File.Delete(zipFile);
+            //return File(data, "application/x-zip-compressed", contract.Car.RegistrationNumber + ".zip");
+
+
+            //byte[] fileContent;
+
+            //fileContent = fs.ToArray();
+
+            iJSRuntime.InvokeAsync<object>(
+                "saveAsFile",
+                "CarBase_" + DateTime.Now.ToString() + ".zip",
+                Convert.ToBase64String(data)
+            );
+
+
+
+
+
+
+
+
+
+            // MemoryStream ms = new MemoryStream();
+            // byte[] fileContent;
+
+            // fileContent = ms.ToArray();
+            // ms.Close();
+
+            // iJSRuntime.InvokeAsync<object>(
+            //"saveAsFile",
+            //"CarBase_" + DateTime.Now.ToString() + ".xlsx",
+            //Convert.ToBase64String(fileContent)
+            //);
+
+
+
+
+
+
+
+
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+
+        int z = 0;
     }
 }

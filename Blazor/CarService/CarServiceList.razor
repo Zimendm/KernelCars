@@ -1,5 +1,6 @@
 ﻿@page "/service"
 @page "/service/List"
+@page "/service/List/{id:long}"
 @using KernelCars.Components
 @using System.Text.Json
 @inject HttpClient Http
@@ -39,6 +40,7 @@
 <table class="table table-sm table-bordered table-striped">
     <thead>
         <tr>
+            @*<th>@Id.ToString()</th>*@
             <th>ID</th>
             <th>Гос.номер</th>
             <th>Марка,Модель</th>
@@ -120,11 +122,14 @@
 
     //[Inject]
     //HttpClient Http { get; set; }
+    [Parameter]
+    public long Id { get; set; }
 
     public int currentPage { get; set; } = 1;
     public string SearchString { get; set; } = null;
     public string StatusFilter { get; set; }
 
+   
     public IEnumerable<KernelCars.Models.ViewModels.ServiceListViewModel> Services = new List<KernelCars.Models.ViewModels.ServiceListViewModel>();
 
     private int totalPageQuantity;
@@ -153,10 +158,31 @@
     protected override async Task OnInitializedAsync()
     {
         Http.BaseAddress ??= new Uri(NavigationManager.BaseUri);
-        await LoadCars();
+
+        if (Id==0)
+        {
+            await LoadCars();
+        }
+        else
+        {
+            await LoadCars(searchString: "1938");
+        }
     }
 
-    ////protected override async Task OnAfterRenderAsync(bool firstRender)
+    //protected override void OnParametersSet()
+    //{
+    //    //base.OnParametersSet();
+    //}
+    //{
+    //    //return base.OnParametersSetAsync();
+    //}
+    ////protected 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="firstRender"></param>
+    /// <returns></returns>
+   // override async Task OnAfterRenderAsync(bool firstRender)
     ////{
     ////    //return base.OnAfterRenderAsync(firstRender);
     ////    await LoadCars();

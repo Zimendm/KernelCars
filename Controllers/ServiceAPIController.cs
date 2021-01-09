@@ -69,7 +69,29 @@ namespace KernelCars.Controllers
                 //var status = (from s in item.CarStatuses
                 //              select s).LastOrDefault();
 
-                string carUserName = carUser != null ? carUser.Employee.FullName : "Не закреплён";
+                string carUserName = carUser != null ? carUser.Employee.LastName+" "+ carUser.Employee.FullName : "Не закреплён";
+                string carUserNameToDisplay="";
+
+                if (carUser==null)
+                {
+                    carUserName = "Не закреплён";
+                }
+                else
+                {
+                    string name="";
+                    if (carUser.Employee.FirstName.Length>1)
+                    {
+                        name = carUser.Employee.FirstName.Substring(0, 1) + ".";
+                    }
+                    string surname="";
+                    if (carUser.Employee.MiddleName.Length>1)
+                    {
+                        surname= carUser.Employee.MiddleName.Substring(0, 1) + ".";
+                    }
+                    carUserNameToDisplay = $"{carUser.Employee.LastName} {name} {surname}";
+                }
+
+
                 //string carFirmToDisplay = status != null ? status.Unit.Firm.Employee.FullName : "Не указана";
                 //bool isEnableService = status != null ? status.IsEnableService : false;
                 if (carUserName.ToUpper().IndexOf(_searchString.ToUpper()) >= 0 || item.Car.RegistrationNumber.ToUpper().IndexOf(_searchString.ToUpper()) >= 0)
@@ -80,7 +102,7 @@ namespace KernelCars.Controllers
                         Id = item.ID,
                         RegistrationNumber = item.Car.RegistrationNumber,
                         CarModel = item.Car.CarModel.Manufacturer.Name + " " + item.Car.CarModel.Model,
-                        CarUser = carUserName,
+                        CarUser = carUserNameToDisplay,
                         ServiceStation=item.ServiceStation.Name,
                         StartDate = item.OpenDate,
                         DateOfCompletion=item.CompleteDate,

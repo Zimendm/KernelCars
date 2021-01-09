@@ -1,4 +1,4 @@
-﻿@page "/cars/create"
+﻿@*@page "/cars/create"*@
 @page "/cars/edit/{id:long}"
 @*@layout EmptyLayout*@
 @using BlazorInputFile
@@ -115,6 +115,10 @@
                 <div class="col">
                     <label>Ёмкось бака</label>
                     <InputNumber class="form-control" @bind-Value="CarData.TankCapacity"></InputNumber>
+                </div>
+                <div class="col">
+                    <label>Лин.норма расхода</label>
+                    <InputNumber class="form-control" @bind-Value="CarData.FuelFlowRate"></InputNumber>
                 </div>
                 <div class="col">
                     <div class="form-group">

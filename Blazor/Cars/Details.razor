@@ -143,6 +143,10 @@
                             <td>Ёмкость топливного бака:</td>
                             <td>@CarData.TankCapacity</td>
                         </tr>
+                        <tr>
+                            <td>Линейная норма расхода</td>
+                            <td>@CarData.FuelFlowRate</td>
+                        </tr>
                         <tr class="@(CarData.LPG==true ? "":"d-none")">
                             <td>Установлено ГБО:</td>
                         </tr>
@@ -163,7 +167,7 @@
         </div>
         <div class="card-footer">
             <div class="text-center">
-                <span class="@CSSisEnableService"><NavLink class="btn btn-info" href="@EditUrl">Сервис</NavLink></span>
+                <span class="@CSSisEnableService"><NavLink class="btn btn-info" href="@($"/Cars/Service/List/{Id}")">Сервис</NavLink></span>
                 <NavLink class="btn btn-info" href="@StatusUrl">Распределение</NavLink>
                 <NavLink class="btn btn-info" href="@($"/driver/list/{Id}")">Водитель</NavLink>
                 <span class="@CSSisRentCar"><NavLink class="btn btn-info" href="@($"/lease/create/{Id}")">Аренда</NavLink></span>
