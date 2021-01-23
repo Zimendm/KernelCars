@@ -1,0 +1,174 @@
+﻿@page "/rent"
+@page "/rent/list"
+
+@using System.Text.Json
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@inherits OwningComponentBase<DataContext>
+
+
+<h4 class="bg-primary text-white text-center p-2">Договора аренды</h4>
+<h5 class="bg-danger text-white text-center p-2">В разработке</h5>
+<div class="form-row">
+    <div class="col">
+        <div class="form-group">
+            <label class="form-text">Статус договора аренды</label>
+            <select class="form-control" @onchange="@ContrStatusFilterChanged">
+                <option>Все</option>
+                <option>Закрытые</option>
+                <option>Действующие</option>
+                <option selected>Отсутствующие</option>
+            </select>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-group">
+            <label class="form-text">Тип договора аренды</label>
+            <select class="form-control">
+                <option>Все</option>
+                <option>Внутригрупповой</option>
+                <option>Частный</option>
+            </select>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-group">
+            <label class="form-text">Поиск авто</label>
+            <input class="form-control" placeholder="Введите номер или фамилию ...." @oninput="@SearchChanged" />
+        </div>
+
+    </div>
+</div>
+
+
+
+@*<div class="text-center mb-3">
+        <NavLink class="btn btn-secondary" ref="">Back</NavLink>
+    </div>*@
+
+
+
+<Pagination TotalPagesQuantity="totalPageQuantity" CurrentPage="@currentPage" Radius="10"
+            SelectedPage="SelectedPages"></Pagination>
+
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Гос.номер</th>
+            <th>Марка,Модель</th>
+            <th>Арендодатель</th>
+            <th>Арендатор</th>
+            <th>Статус договора</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var lc in LeaseContracts)
+        {
+            <tr>
+                <td>@lc.Id</td>
+                <td>@lc.RegistrationNumber</td>
+                <td>@lc.CarModel</td>
+                <td>@lc.LandLord</td>
+                <td>@lc.Renter</td>
+                <td>@lc.ContrState</td>
+                <td>
+                    <span class="@(lc.ContrState.IndexOf("Не з") == 0 ? "d-none" : "")">
+                        <NavLink class="btn btn-sm btn-info"
+                                 href="@DetailsClick(lc.Id)">
+                            Details
+                        </NavLink>
+                    </span>
+                    <span class="@(lc.ContrState.IndexOf("Не з") != 0 ? "d-none" : "")">
+                        <NavLink class="btn btn-sm btn-warning"
+                                 href="@CreateClick(lc.CarID)">
+                            Create
+                        </NavLink>
+                    </span>
+                </td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+
+
+@code {
+
+        DataContext _context => Service;
+
+    private int totalPageQuantity;
+
+    public int currentPage { get; set; } = 1;
+
+    public string SearchString { get; set; } = null;
+    public string ContrStatusFilter { get; set; } = "Отсутствующие";
+
+
+
+    public IEnumerable<KernelCars.Models.ViewModels.LeaseListViewModel> LeaseContracts { get; set; } = new List<KernelCars.Models.ViewModels.LeaseListViewModel>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Http.BaseAddress ??= new Uri(NavigationManager.BaseUri);
+        await LoadDocuments();
+    }
+
+
+    private async Task SelectedPages(int page)
+    {
+        currentPage = page;
+        await LoadDocuments(page, searchString: SearchString);
+    }
+
+    async Task LoadDocuments(int page = 1, int quantityPerPage = 25, string searchString = null, string contrStatusFilter = null)
+    {
+
+
+        //Cars = await Http.GetJsonAsync<List<KernelCars.Models.ViewModels.CarsDisplayViewModel>>($"api/carapi?page={page}&quantityPerPage={quantityPerPage}");
+        //StateHasChanged();
+
+        var httpResponse = await Http.GetAsync($"api/leaseapi?page={page}&quantityPerPage={quantityPerPage}&searchString={searchString}&contrstatus={contrStatusFilter}");
+
+        if (httpResponse.IsSuccessStatusCode)
+        {
+            totalPageQuantity = int.Parse(httpResponse.Headers.GetValues("pagesQuantity").FirstOrDefault());
+            var responseString = await httpResponse.Content.ReadAsStringAsync();
+            LeaseContracts = JsonSerializer.Deserialize<List<KernelCars.Models.ViewModels.LeaseListViewModel>>(responseString,
+                new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+            //StateHasChanged();
+        }
+        else
+        {
+            // handle error
+        }
+    }
+
+    async Task SearchChanged(ChangeEventArgs e)
+    {
+        currentPage = 1;
+        SearchString = e.Value.ToString();
+        await LoadDocuments(currentPage, searchString: SearchString);//, status: StatusFilter);
+    }
+
+    async Task ContrStatusFilterChanged(ChangeEventArgs e)
+    {
+        currentPage = 1;
+        ContrStatusFilter = e.Value.ToString();
+        await LoadDocuments(currentPage, searchString: SearchString, contrStatusFilter: ContrStatusFilter);
+    }
+
+    string DetailsClick(int id)
+    {
+        return $"/lease/edit/{id}";
+    }
+
+    string CreateClick(long id)
+    {
+        return $"/lease/create/{id}";
+    }
+}

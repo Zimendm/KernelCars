@@ -78,7 +78,7 @@
                     </span>
                     <span class="@(c.DateOfCompletion != null ? "d-none" : "")">
                         <NavLink class="btn btn-sm btn-danger"
-                             href="@GetEditUrl(c.Id)">
+                             @onclick="@(()=>HandleDelete(c))">
                             Delete
                         </NavLink>
                     </span>
@@ -129,7 +129,7 @@
     public string SearchString { get; set; } = null;
     public string StatusFilter { get; set; }
 
-   
+
     public IEnumerable<KernelCars.Models.ViewModels.ServiceListViewModel> Services = new List<KernelCars.Models.ViewModels.ServiceListViewModel>();
 
     private int totalPageQuantity;
@@ -148,7 +148,7 @@
     public string GetEditUrl(long id) => $"/service/edit/{id}";
     public string GetServiceUrl(long id) => $"/service/{id}";
 
-    string GetDetailsUrl(long id) => $"/forms/details/{id}";
+    string GetDetailsUrl(long id) => $"/service/details/{id}";
 
 
     public int PageNumber { get; set; } = 1;
@@ -240,6 +240,20 @@
         //}
         StatusFilter = e.Value.ToString();
         await LoadCars(currentPage, searchString: SearchString, status: StatusFilter);
+    }
+
+    public async Task HandleDelete(KernelCars.Models.ViewModels.ServiceListViewModel sl)
+    {
+        var serviceRecord = await Context.CarServices.FirstOrDefaultAsync(cs => cs.ID == sl.Id);
+
+        if (serviceRecord != null)
+        {
+            Context.Remove(serviceRecord);
+            await Context.SaveChangesAsync();
+            await LoadCars(currentPage, searchString: SearchString, status: StatusFilter);
+            //await UpdateData();
+        }
+
     }
 
     //public async void PageIndexChanged(int newPageNumber)

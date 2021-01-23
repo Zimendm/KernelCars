@@ -1,0 +1,351 @@
+﻿@page "/lease/create/{carId:long}"
+@page "/lease/edit/{id:int}"
+
+
+@using DocumentFormat.OpenXml.Packaging;
+@using DocumentFormat.OpenXml.Wordprocessing;
+@using System.IO.Compression;
+
+
+@inherits OwningComponentBase<DataContext>
+
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment hostingEnvironment
+
+
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+
+<h4 class="bg-info text-center p-2">@windowCaption</h4>
+
+<EditForm Model="contract" OnValidSubmit="HandleValidSubmit">
+    <h6 class="bg-light text-center p-2">Автомобиль</h6>
+    <div class="row">
+        <div class="form-group col">
+            <label><b>Автомобиль:</b></label>
+            <label>@carModel</label>
+        </div>
+        <div class="form-group col">
+            <label><b>Гос.номер:</b></label>
+            <label>@carRegNumber</label>
+        </div>
+    </div>
+    <h6 class="bg-light text-center p-2">Стороны</h6>
+    <div class="row">
+        <div class="form-group col">
+            <label><b>Владелец:</b></label>
+            <label>@carOwner</label>
+        </div>
+        <div class="form-group col">
+            <label><b>Арендатор:</b></label>
+            <label>@carRenter</label>
+        </div>
+    </div>
+
+    <h6 class="bg-light text-center p-2">Условия: <b>@carRentType</b></h6>
+    <div class="form-row">
+        <div class="form-group col">
+            <label><b>Договор аренды с:</b></label>
+            <InputDate @bind-Value="contract.FromDate" @bind-Value:format="dd-MM-yyyy"></InputDate>
+        </div>
+        <div class="form-group col">
+            <label><b>по:</b></label>
+            <InputDate @bind-Value="contract.ToDate" @bind-Value:format="dd-MM-yyyy"></InputDate>
+        </div>
+        <div class="form-group col-4">
+            <label><b>Арендная плата:</b></label>
+            <InputNumber @bind-Value="contract.LeaseAmmount" @bind-Value:format="F2" />
+            <InputSelectEnum @bind-Value="contract.LeaseCurrency" />
+
+        </div>
+        @*<div class="col-1"></div>*@
+    </div>
+
+    <h6 class="bg-light text-center p-2 @(carRentType.ToLower().IndexOf("внутри")<0 ? "":"d-none")">Нотариус</h6>
+    <h6 class="bg-light text-center p-2">Акты приёма/передачи</h6>
+
+    <div class="form-group text-center">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button class="btn btn-info  @(windowMode=="edit" ? "":"d-none")" @onclick="docPrintOnClick">Распечатать</button>
+        <button class="btn btn-info @(windowMode=="edit" ? "":"d-none")">Продлить</button>
+        <button class="btn btn-danger @(windowMode=="edit" ? "":"d-none")">Расторгнуть</button>
+        <NavLink class="btn btn-secondary" @onclick="backOnClick">Back</NavLink>
+    </div>
+
+</EditForm>
+
+
+
+
+@code {
+
+    DataContext _context => Service;
+
+
+    [Inject]
+    public NavigationManager NavManager { get; set; }
+
+    private LeaseContract contract = new LeaseContract();
+
+    [Parameter]
+    public long carId { get; set; }
+
+    [Parameter]
+    public int id { get; set; }
+
+    private string windowCaption;
+    private string windowMode;
+
+
+
+    private string carModel;
+    private string carRegNumber;
+    private string carOwner;
+    private string carRenter;
+    private string carRentType;
+
+    protected override void OnInitialized()
+    {
+        //base.OnInitialized();
+        contract.FromDate = DateTime.Now;
+
+        if (DateTime.Now.CompareTo(new DateTime(DateTime.Now.Year, 06, 30)) <= 0)
+        {
+            contract.ToDate = new DateTime(DateTime.Now.Year, 06, 30);
+        }
+        else
+        {
+            contract.ToDate = new DateTime(DateTime.Now.Year + 1, 06, 30);
+        }
+
+
+
+
+
+    }
+
+    //protected override Task OnParametersSetAsync()
+    //{
+    //    return base.OnParametersSetAsync();
+    //}
+
+    protected override void OnParametersSet()
+    {
+        //base.OnParametersSet();
+
+
+        //Получение содержимого сайта
+        //HttpClient httpClient = new HttpClient();
+
+        //var httpResponse = httpClient.GetAsync($"https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json");//.Result.Content.ReadAsStringAsync().Result; ;
+
+        //Stream receiveStream = httpResponse.Result.Content.ReadAsStreamAsync().Result;// .GetResponseStream();
+        //StreamReader readStream = new StreamReader(receiveStream);//, Encoding.UTF8);
+        //var Text = readStream.ReadToEnd();
+
+
+        if (NavManager.Uri.ToLower().IndexOf("create") > 0)
+        {
+            windowCaption = "Новый Договор аренды";
+            windowMode = "create";
+        }
+        else if (NavManager.Uri.ToLower().IndexOf("edit") > 0)
+        {
+            windowCaption = "Изменение Договора аренды";
+            windowMode = "edit";
+            contract = _context.LeaseContracts.FirstOrDefault(lc => lc.ID == id);
+            carId = contract.CarId;
+        }
+
+        int z = 0;
+
+        var car = _context.Cars
+          .Include(c => c.CarOwner)
+          .Include(c => c.CarModel).ThenInclude(cm => cm.Manufacturer)
+          .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
+          .Where(c => c.Id == carId).FirstOrDefault();
+
+
+        var status = (from s in car.CarStatuses
+                      select s).LastOrDefault();
+
+        carRenter = status != null ? status.Unit.Firm.Employee.FullName : "Не указана";
+
+
+        if (car != null)
+        {
+            contract.CarId = car.Id;
+            carModel = $"{car.CarModel.Manufacturer.Name} {car.CarModel.Model}";
+            carRegNumber = car.RegistrationNumber;
+            carOwner = car.CarOwner.FullName;
+
+            if (car.CarOwner.IsFirm)
+            {
+                carRentType = "Внутригрупповая аренда";
+            }
+            else
+            {
+                carRentType = "Аренда у частного лица";
+            }
+        }
+
+        //return base.OnParametersSet(); ;
+    }
+
+    public async Task HandleValidSubmit()
+    {
+        contract.FromDate = DateTime.Now;
+        contract.ManagerId = 3;
+
+        try
+        {
+            if (windowMode == "create")
+            {
+                _context.Add(contract);
+            }
+
+            //UpdateCarServiceWorks();
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+        NavManager.NavigateTo($"/lease/edit/{contract.ID}");
+    }
+
+    private void backOnClick(MouseEventArgs e)
+    {
+        JS.InvokeVoidAsync("history.back");
+    }
+
+    private void docPrintOnClick(MouseEventArgs e)
+    {
+        string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles/LeaseContracts");
+        string templatesFolder = Path.Combine(hostingEnvironment.WebRootPath, "Templates/Lease");
+        string destinationFile = null;
+        string templFile;
+
+        uploadFolder = Path.Combine(uploadFolder, carRegNumber);
+        try
+        {
+            if (!Directory.Exists(uploadFolder))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
+            }
+
+        }
+        catch (Exception)
+        {
+
+            //throw;
+        }
+
+        #region Акт приёма автомобиля в аренду
+        try
+        {
+            templFile = Path.Combine(templatesFolder, "AcceptanceCertificate.docx");
+            destinationFile = Path.Combine(uploadFolder, "AcceptanceCertificate.docx");
+
+            System.IO.File.Copy(templFile, destinationFile, true);
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        #endregion
+
+        #region Акт возврата автомобиля из аренды
+        try
+        {
+            templFile = Path.Combine(templatesFolder, "AcceptanceCertificateReturn.docx");
+            destinationFile = Path.Combine(uploadFolder, "AcceptanceCertificateReturn.docx");
+
+            System.IO.File.Copy(templFile, destinationFile, true);
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        #endregion
+
+        #region Справка для нотариуса
+        try
+        {
+            templFile = Path.Combine(templatesFolder, "DataForTheContract.docx");
+            destinationFile = Path.Combine(uploadFolder, "DataForTheContract.docx");
+
+            System.IO.File.Copy(templFile, destinationFile, true);
+
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+        #endregion
+
+        #region Подготовка и загрузка архива
+        try
+        {
+            string uploadZipFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles");//Registration/VINCODE");
+            uploadZipFolder = Path.Combine(uploadZipFolder, "LeaseContracts");
+            uploadZipFolder = Path.Combine(uploadZipFolder, carRegNumber);
+
+
+            uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles/Registrations");
+
+            string zipFile = Path.Combine(uploadFolder, Guid.NewGuid() + "_" + carRegNumber + ".zip");
+            //ZipFile zip = new ZipFile();
+
+            //if (!Directory.Exists(uploadFolder))
+            //{
+            //    DirectoryInfo di = Directory.CreateDirectory(uploadFolder);
+            //}
+
+            //string zipPath = Path.Combine(uploadFolder, contract.Car.RegistrationNumber+".zip");
+
+
+            //ZipFile.CreateFromDirectory(uploadFolder, zipPath);
+            //
+            ZipFile.CreateFromDirectory(uploadZipFolder, zipFile);
+            //Response.Headers.Add("Content-Disposition", $"inline; filename=\"{zipFile}\"");
+            //return File(zipFile, "application/zip", contract.Car.RegistrationNumber + ".zip");
+
+
+            FileStream fs = System.IO.File.OpenRead(zipFile);
+            byte[] data;
+            data = new byte[fs.Length];
+            fs.Read(data, 0, data.Length);
+            fs.Close();
+            //System.IO.File.Delete(zipFile);
+            //return File(data, "application/x-zip-compressed", contract.Car.RegistrationNumber + ".zip");
+
+
+            //byte[] fileContent;
+
+            //fileContent = fs.ToArray();
+
+            JS.InvokeAsync<object>(
+                "saveAsFile",
+                $"LeaseContract_{carRegNumber}_" + DateTime.Now.ToString() + ".zip",
+                Convert.ToBase64String(data)
+            );
+            File.Delete(zipFile);
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+
+        #endregion
+    }
+
+}

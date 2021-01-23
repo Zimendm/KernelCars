@@ -1,5 +1,5 @@
 ﻿@page "/drivers"
-@page "/driver/list/{Id:long}"
+@page "/drivers/list/{Id:long}"
 @inherits OwningComponentBase<DataContext>
 @*<h4 class="bg-primary text-white text-center p-2">Работа с данными о водителях</h4>*@
 @*<h5 class="bg-danger text-white text-center p-2">В разработке</h5>*@
@@ -8,7 +8,33 @@
     <div class="card-header">
         <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@carData.RegistrationNumber</b> Год выпуска: <b>@carData.FirstRegistrationYear</b></h4>
     </div>
-    <div class="card-body"></div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Ф.И.О водителя</th>
+                    <th>Дата получения</th>
+                    <th>Дата возврата</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in carUsers)
+                {
+                    <tr>
+                        <td>@item.Employee.FullName</td>
+                        <td>@item.StartUsingDate.ToShortDateString()</td>
+                        <td>@item.EndUsingDate</td>
+                        <td>
+                            <button class="btn btn-dark @(item.EndUsingDate==null ? "":"d-none")">Возврат</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+
+    </div>
     <div class="card-footer">
         <div class="text-center">
             <NavLink class="btn btn-primary" href=@($"/driver/assignment/{Id}")>Новое закрепление</NavLink>
@@ -27,19 +53,31 @@
 
 
 @code {
-        [Parameter]
-        public long Id { get; set; }
+    [Parameter]
+    public long Id { get; set; }
 
-        DataContext _context => Service;
+    DataContext _context => Service;
 
-        Car carData = new Car() {CarModel=new CarModel() };
+    Car carData = new Car() {CarModel=new CarModel() };
     string carModel;
+
+    List<CarUser> carUsers = new List<CarUser>();
 
 
     protected async override Task OnParametersSetAsync()
     {
-        carData = await _context.Cars.Include(c => c.CarModel).ThenInclude(c => c.Manufacturer).FirstOrDefaultAsync(c => c.Id == Id);
+        carData = await _context.Cars
+            .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
+            .Include(c=>c.CarUsers).ThenInclude(cu=>cu.Employee)
+            .FirstOrDefaultAsync(c => c.Id == Id);
         carModel = $"{carData.CarModel.Manufacturer.Name} {carData.CarModel.Model}";
+
+
+        carUsers = carData.CarUsers.OrderByDescending(cu=>cu.ID).ToList(); 
+            
+            
+            
+            //. .OrderBy(                  (cu => cu.EndUsingDate,); сексизм.OrdeBy(cu => cu.EndUsingDate);
 
         //return base.OnParametersSetAsync();
     }

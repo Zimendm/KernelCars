@@ -15,6 +15,8 @@ namespace KernelCars.Models.ViewModels
         public DateTime StartDate { get; set; }
         public DateTime? DateOfCompletion { get; set; }
         public string Comments { get; set; }
+        public int Odometer { get; set; }
+        public float Ammount { get; set; }
         //public string Firm { get; set; }
     }
 }

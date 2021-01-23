@@ -1,0 +1,128 @@
+﻿@page "/service/details/{id:int}"
+
+@inject HttpClient client
+@inject IJSRuntime JsInterop
+
+
+@inherits OwningComponentBase<DataContext>
+
+<h6 class="bg-light text-center p-2">Сервисное обслуживание</h6>
+<label>@car</label>
+<p>
+    <label>Показания одометра: </label><span><b>@carService.Odometr</b></span>
+</p>
+
+<h6>Выполненные работы:</h6>
+<ol>
+    @foreach (var item in sb)
+    {
+        <li>@item</li>
+    }
+</ol>
+<label>Стоимость: </label><span><b>@carService.Ammount</b></span>
+        
+
+
+
+<h6 class="bg-info text-center text-white p-2" @onclick="(e)=>techCollapsed(e)">Скан акта/счёта</h6>
+<div class="@techCSSCollapse col-5">
+    <iframe src=@filePath width="800" height="400"></iframe>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="form-row">
+    <div class="col text-center">
+        <button class="btn btn-dark" @onclick="@backOnClick">Back</button>
+    </div>
+</div>
+
+
+@code {
+    DataContext _context => Service;
+
+
+    [Parameter]
+    public int id { get; set; }
+
+
+    private CarService carService = new CarService();
+    private string car;
+    private string filePath;
+
+
+
+    string techCSSCollapse = "collapse";
+
+
+    private List<string> sb = new List<string>();
+
+
+    protected override void OnParametersSet()
+    {
+        //base.OnParametersSet();
+        carService = _context.CarServices
+            .Include(cs => cs.Car)
+            .Include(cs => cs.Car).ThenInclude(c => c.CarModel).ThenInclude(cm => cm.Manufacturer)
+            .Include(cs => cs.WorkAssigments)
+            .Where(cs => cs.ID == id).FirstOrDefault();
+
+        var serviceTypes = _context.TypeOfServices.ToList();
+
+        if (carService != null)
+        {
+            car = $"Автомобиль:{carService.Car.CarModel.Manufacturer.Name} {carService.Car.CarModel.Model} Гос.номер:{carService.Car.RegistrationNumber}";
+
+            string uploadFolder = Path.Combine("AccountingDocuments", carService.Car.RegistrationNumber);
+            if (carService.DocumentPath != null)
+            {
+                filePath = Path.Combine(uploadFolder, carService.DocumentPath);
+            }
+
+
+            // filePath = carData.DocumentPath;
+
+            foreach (var item in carService.WorkAssigments)
+            {
+                foreach (var serv in serviceTypes)
+                {
+                    if (item.TypeOfServiceId == serv.ID)
+                    {
+                        sb.Add(serv.Service);
+                    }
+                }
+
+            }
+
+        }
+    }
+
+
+    private void backOnClick(MouseEventArgs e)
+    {
+        JsInterop.InvokeVoidAsync("history.back");
+    }
+
+
+    string techCollapsed(MouseEventArgs e)
+    {
+        if (techCSSCollapse == "")
+        {
+            techCSSCollapse = "collapse";
+        }
+        else
+        {
+            techCSSCollapse = "";
+        }
+        return techCSSCollapse;
+    }
+}

@@ -10,64 +10,93 @@
 
 
 <h4 class="bg-primary text-white text-center p-2">Регистрация нового автомобиля</h4>
-<EditForm Model="car">
+<EditForm Model="car" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+    <DataAnnotationsValidator />
     <div class="form-row">
-        @*Первая сторона техпаспорта*@
         <div class="col">
-            <div class="form-row">
-                <div class="col">
-                    <div class="form-group">
-                        <label>Регистрационный номер</label>
-                        <InputText class="form-control" @bind-Value="car.RegistrationNumber"></InputText>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label>Год выпуска</label>
-                        <InputNumber class="form-control" @bind-Value="car.FirstRegistrationYear"></InputNumber>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="col">
-                    <div class="form-group">
-                        <label>Тип топлива</label>
-                        <select class="form-control" value="@car.Fuel" @onchange="@SelectFuelChanged">
-                            <option disabled>Select type of fuel...</option>
-                            @foreach (var fuel in Enum.GetValues(typeof(TypeOfFuel)))
-                            {
-                                <option>@fuel</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col">
-                    <label>Ёмкось бака</label>
-                    <InputNumber class="form-control" @bind-Value="car.TankCapacity"></InputNumber>
-                </div>
-                <div class="col">
-                    <div class="form-group">
-                        <label class="control-label">Установлено ГБО</label>
-                        <div class="form-check">
-                            <InputCheckbox class="form-check-input" @bind-Value="car.LPG"></InputCheckbox>
-                            @*<label class="form-check-label">LPG</label>*@
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <CarOwnerSelect></CarOwnerSelect>
+            <CarOwnerSelect OnlyFirms="true"></CarOwnerSelect>
         </div>
-        @*Вторая сторона техпаспорта*@
+    </div>
+    <div class="form-group">
+        <ModelSelectH TValue="int"
+                      Parser="@(str => int.Parse(str))"
+                      @bind-Value=@car.CarModelId>
+            <option selected disabled value="0">Выберите модель ....</option>
+        </ModelSelectH>
+    </div>
+
+    <div class="form-row">
         <div class="col">
             <div class="form-group">
-                <ModelSelect TValue="int"
-                             Parser="@(str => int.Parse(str))"
-                             @bind-Value=@car.CarModelId>
-                    <option selected disabled value="0">Выберите модель ....</option>
-                </ModelSelect>
+                <label>Тип кузова</label>
+                <CustomSelect TValue="int?"
+                              Values="carTypes"
+                              Parser="@(str=>int.Parse(str))"
+                              @bind-Value="car.CarTypeId">
+                    <option selected disabled value="0">Выберите тип авто ...</option>
+                </CustomSelect>
             </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Тип топлива</label>
+                <select class="form-control" value="@car.Fuel" @onchange="@SelectFuelChanged">
+                    <option disabled>Select type of fuel...</option>
+                    @foreach (var fuel in Enum.GetValues(typeof(TypeOfFuel)))
+                    {
+                        <option>@fuel</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
 
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label>VIN код</label>
+                <InputText class="form-control" @bind-Value="car.VinNumber"></InputText>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Год выпуска</label>
+                <InputNumber class="form-control" @bind-Value="car.FirstRegistrationYear"></InputNumber>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Полная масса</label>
+                <InputNumber class="form-control" @bind-Value="fullMass"></InputNumber>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Количество дверей</label>
+                <InputNumber class="form-control" @bind-Value="numberOfDoors"></InputNumber>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label>Сидячих мест с водителем</label>
+                <InputNumber class="form-control" @bind-Value="numberOfPassengers"></InputNumber>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="form-group">
+                <label>Объём двигателя</label>
+                <InputNumber class="form-control" @bind-Value="car.EngineCapacity"></InputNumber>
+            </div>
+        </div>
+    </div>
+
+    <div class="row m-2">
+        <div class="col">
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+            </div>
         </div>
     </div>
 </EditForm>
@@ -86,8 +115,24 @@
         CarModelId = 1
     };
 
+    Dictionary<string, int?> carTypes = new Dictionary<string, int?>();
+    int fullMass;
+    int numberOfPassengers;
+    int numberOfDoors;
 
 
+    protected override void OnInitialized()
+    {
+        var carTypeList = _context.CarTypes.OrderBy(ts => ts.TypeName).ToList();
+
+        foreach (var item in carTypeList)
+        {
+            carTypes.Add(item.TypeName, item.Id);
+        }
+
+
+        //base.OnInitialized();
+    }
 
     void SelectFuelChanged(ChangeEventArgs e)
     {
@@ -96,12 +141,41 @@
         car.Fuel = tof;
     }
 
+    public void HandleValidSubmit()
+    {
+        car.RegistrationNumber = "REGISTR";
+
+        if (car.CarOwnerId == null)
+        {
+            car.CarOwnerId = 1;
+        }
+
+        _context.Cars.Add(car);
+
+        _context.SaveChanges();
+
+        int j = 0;
+
+        //FormSubmitMessage = "Valid Data Submitted";
+        //Context.SaveChanges();
+    }
+    public void HandleInvalidSubmit()
+    { }// =>
+       //FormSubmitMessage = "Invalid Data Submitted";
+
+
+
+
+
+
+
+
     private void btnDocClick(MouseEventArgs e)
     {
         string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles/Registrations");
         string pathLocal = Path.Combine(hostingEnvironment.WebRootPath, "Templates/Registration");
         string destinationFile = null;
-        string templFile = Path.Combine(pathLocal, "StatementHSC.docx");
+        string templFile;
 
 
         uploadFolder = Path.Combine(uploadFolder, "VINCODE");
@@ -119,13 +193,24 @@
             //throw;
         }
 
-        destinationFile = Path.Combine(uploadFolder, "StatementHSC.docx");
+        var modelQuery = _context.CarModels
+            .Include(cm => cm.Manufacturer)
+            .Where(cm => cm.CarModelId == car.CarModelId).FirstOrDefault();
+        string carModel = (modelQuery !=null) ? $"{modelQuery.Manufacturer.Name} {modelQuery.Model}": "";
 
+        string carType = (from c in _context.CarTypes
+                          where c.Id == car.CarTypeId
+                          select c.TypeName).First();
+
+
+
+        //Подготовка заявки в МРЭО
         try
         {
+            templFile = Path.Combine(pathLocal, "StatementHSC.docx");
+            destinationFile = Path.Combine(uploadFolder, "StatementHSC.docx");
+
             System.IO.File.Copy(templFile, destinationFile, true);
-
-
 
             using (WordprocessingDocument document = WordprocessingDocument.Open(destinationFile, true))
             {
@@ -144,9 +229,40 @@
                 {
                     switch (item.Text)
                     {
-                        case "RENAULT":
-                            item.Text = "MB AMG";
+                        case "CarManufacturer":
+                            item.Text = modelQuery.Manufacturer.Name;
                             break;
+                        case "CarModel":
+                            item.Text = modelQuery.Model;
+                            break;
+                        case "CarType":
+                            item.Text = carType;
+                            break;
+                        case "CarFuel":
+                            item.Text = car.Fuel.Value.ToString().Substring(0,1);
+                            break;
+                        case "CarYear":
+                            item.Text = car.FirstRegistrationYear.ToString();
+                            break;
+                        case "CarVIN":
+                            item.Text = car.VinNumber.ToUpper();
+                            break;
+                        case "CarMass":
+                            item.Text =  fullMass.ToString();
+                            break;
+                        case "CarEng":
+                            item.Text = car.EngineCapacity.ToString();
+                            break;
+                        case "CarPas":
+                            item.Text = (numberOfPassengers-1).ToString();
+                            break;
+                        case "CarDor":
+                            item.Text = numberOfDoors.ToString();
+                            break;
+
+
+
+
                         //case "TaxNumber":
                         //    item.Text = car.CarOwner.TaxNumber;
                         //    break;
@@ -207,9 +323,114 @@
 
 
             }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+
+        //Подготовка приказа на регистрацию
+        try
+        {
+            templFile = Path.Combine(pathLocal, "RegistrationOrder.docx");
+            destinationFile = Path.Combine(uploadFolder, "Приказ на регистрацию КТ.docx");
+            System.IO.File.Copy(templFile, destinationFile, true);
+
+
+            using (WordprocessingDocument document = WordprocessingDocument.Open(destinationFile, true))
+            {
+
+                // Find all structured document tags
+                IEnumerable<Text> placeHolders = document.MainDocumentPart.RootElement.Descendants<Text>();
+
+                foreach (var item in placeHolders)
+                {
+                    switch (item.Text)
+                    {
+                        case "OrderDate":
+                            item.Text = DateTime.Now.ToShortDateString();
+                            break;
+                        case "Car_Model":
+                            item.Text = carModel;
+                            break;
+                        case "Car_Year":
+                            item.Text = car.FirstRegistrationYear.ToString();
+                            break;
+                        case "Car_Vin":
+                            item.Text = "Тестовый ВИН";
+                            break;
+                        //case "TaxNumber":
+                        //    item.Text = car.CarOwner.TaxNumber;
+                        //    break;
+                        //case "Address":
+                        //    item.Text = car.CarOwner.Address;
+                        //    break;
+                        //case "RegistrationNumber":
+                        //    item.Text = car.RegistrationNumber;
+                        //    break;
+                        //case "FirstRegistrationYear":
+                        //    item.Text = car.FirstRegistrationYear.ToString();
+                        //    break;
+                        //case "VinNumber":
+                        //    item.Text = car.VinNumber;
+                        //    break;
+                        //case "Manufacturer":
+                        //    item.Text = car.CarModel.Manufacturer.Name;
+                        //    break;
+                        //case "Model":
+                        //    item.Text = car.CarModel.Model;
+                        //    break;
+
+
+                        default:
+                            break;
+                    }
+                    //item.InsertAt(new Text("Hello!"), 0);
+                    //item.RemoveAllChildren();
+                    //Text txt = new Text("Hello, Word!");
+                    //item.AppendChild<Text>(new Text("Hell0, world")); // .Descendants<Text>(). .First().Text = "Hello, world!";
+
+                }
+
+                ///// List<SdtBlock> sdtList = document.MainDocumentPart.RootElement.Descendants<SdtBlock>().ToList();
+
+                //sdtList[0].InnerText = "Changed By Code";
+
+                // Get the MainPart of the document
+                MainDocumentPart mainPart = document.MainDocumentPart;
+
+                // Get the Document Settings Part
+                //DocumentSettingsPart documentSettingPart1 = mainPart.DocumentSettingsPart;
+
+                // Create a new attachedTemplate and specify a relationship ID
+                // AttachedTemplate attachedTemplate1 = new AttachedTemplate() { Id = "relationId1" };
+
+                // Append the attached template to the DocumentSettingsPart
+                //documentSettingPart1.Settings.Append(attachedTemplate1);
+
+                // Add an ExternalRelationShip of type AttachedTemplate.
+                // Specify the path of template and the relationship ID
+                //documentSettingPart1.AddExternalRelationship("http://schemas.openxmlformats.org/officeDocument/2006/relationships/attachedTemplate", new Uri(sourceFile, UriKind.Absolute), "relationId1");
+
+                // Save the document
+                mainPart.Document.Save();
+
+            }
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
 
 
 
+        //Подготовка архива документов и его загрузка
+        try
+        {
             string uploadZipFolder = Path.Combine(hostingEnvironment.WebRootPath, "OutFiles");//Registration/VINCODE");
             uploadZipFolder = Path.Combine(uploadZipFolder, "Registrations");
             uploadZipFolder = Path.Combine(uploadZipFolder, "VINCODE");
@@ -250,47 +471,14 @@
 
             iJSRuntime.InvokeAsync<object>(
                 "saveAsFile",
-                "CarBase_" + DateTime.Now.ToString() + ".zip",
+                "RegistrationDocuments_" + DateTime.Now.ToString() + ".zip",
                 Convert.ToBase64String(data)
             );
-
-
-
-
-
-
-
-
-
-            // MemoryStream ms = new MemoryStream();
-            // byte[] fileContent;
-
-            // fileContent = ms.ToArray();
-            // ms.Close();
-
-            // iJSRuntime.InvokeAsync<object>(
-            //"saveAsFile",
-            //"CarBase_" + DateTime.Now.ToString() + ".xlsx",
-            //Convert.ToBase64String(fileContent)
-            //);
-
-
-
-
-
-
-
-
-
         }
         catch (Exception)
         {
 
             throw;
         }
-
-
-
-        int z = 0;
     }
 }

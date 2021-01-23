@@ -28,6 +28,8 @@
                     <th>СТО</th>
                     <th>Дата начала</th>
                     <th>Дата окончания</th>
+                    <th>Одометр</th>
+                    <th>Стоимость</th>
                     <th></th>
                 </tr>
             </thead>
@@ -39,6 +41,8 @@
                         <td>@item.ServiceStation</td>
                         <td>@item.StartDate.ToShortDateString()</td>
                         <td>@(item.DateOfCompletion != null ? ((DateTime)item.DateOfCompletion).ToShortDateString() : "")</td>
+                        <td>@item.Odometer</td>
+                        <td>@item.Ammount</td>
                         <td>
                             <span>
                                 <NavLink class="btn btn-sm btn-info"
@@ -124,7 +128,9 @@
                 Id = item.ID,
                 StartDate = item.OpenDate,
                 DateOfCompletion = item.CompleteDate,
-                ServiceStation = item.ServiceStation.Name
+                ServiceStation = item.ServiceStation.Name,
+                Odometer=item.Odometr,
+                Ammount=item.Ammount
             });
         }
 
@@ -161,7 +167,7 @@
     public string GetEditUrl(long id) => $"/service/edit/{id}";
     public string GetServiceUrl(long id) => $"/service/create/{id}";
 
-    string GetDetailsUrl(long id) => $"/forms/details/{id}";
+    string GetDetailsUrl(long id) => $"/service/details/{id}";
 
 
     private void backOnClick(MouseEventArgs e)

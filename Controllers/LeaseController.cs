@@ -39,15 +39,15 @@ namespace KernelCars.Controllers
         public IActionResult Create(int Id)
         {
             int carId = Id;
-            
+
             var carQuery = _context.Cars
-                .Include(c=>c.CarOwner)
+                .Include(c => c.CarOwner)
                 .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
-                .Include(c=>c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee);
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee);
             var car = carQuery.Where(c => c.Id == carId).First();
             LeaseContract leaseContract = new LeaseContract
             {
-                Car=car//,
+                Car = car//,
                 //ToDate = new DateTime(DateTime.Now.Year, 6, 30)
             };
 
@@ -81,7 +81,7 @@ namespace KernelCars.Controllers
               .Include(c => c.CarOwner)
               .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
               .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee);
-            
+
             model.Car = carQuery.Where(c => c.Id == model.CarId).First();
 
             model.LeaseAmmount = (decimal)model.LeaseAmmount;
@@ -201,7 +201,7 @@ namespace KernelCars.Controllers
 
 
         }
-        
+
         private void CreateLeaseContractArchive(LeaseContract contract)
         {
             string uploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "LeaseContracts");

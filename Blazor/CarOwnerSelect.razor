@@ -21,13 +21,32 @@
 {
     DataContext _context => Service;
 
-    List<string> ownersList;
+    [Parameter]
+    public bool OnlyFirms { get; set; } = true;
+
+
+    List<string> ownersList = new List<string>();
 
 
     protected override void OnInitialized()
     {
-        ownersList = (from e in _context.Employees
-                         select e.FullName).ToList();
+        
+        if (!OnlyFirms)
+        {
+            ownersList = (from e in _context.Employees
+                          select e.FullName).ToList();
+        }
+        else
+        {
+            var ownersListQuery = _context.Employees;
+            foreach (var item in ownersListQuery)
+            {
+                if (item.IsFirm)
+                {
+                    ownersList.Add(item.FullName);
+                }
+            }
+        }
         //base.OnInitialized();
     }
 

@@ -9,10 +9,11 @@
 
 <h4 class="bg-primary text-white text-center p-2">Автомобили</h4>
 <NavLink class="btn btn-sm btn-light" href="/cars/create">Новый автомобиль</NavLink>
+<NavLink class="btn btn-sm btn-light" href="/cars/create/rent">Новый арендный автомобиль</NavLink>
 
 <div class="form-group">
     <label class="form-text">Поиск авто</label>
-    <input class="form-control" placeholder="Введите номер или фамилию ...." @oninput="@SearchChanged" />
+    <input class="form-control" placeholder="Введите номер или фамилию водителя ...." @oninput="@SearchChanged" />
 </div>
 
 <Pagination TotalPagesQuantity="totalPageQuantity" CurrentPage="@currentPage" Radius="10"

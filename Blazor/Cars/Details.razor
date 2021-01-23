@@ -85,7 +85,7 @@
                         </tr>
                         <tr>
                             <td>Тип:</td>
-                            <td>@carTyreSize</td>
+                            <td>@carType</td>
                         </tr>
                         <tr>
                             <td>Цвет:</td>
@@ -169,7 +169,7 @@
             <div class="text-center">
                 <span class="@CSSisEnableService"><NavLink class="btn btn-info" href="@($"/Cars/Service/List/{Id}")">Сервис</NavLink></span>
                 <NavLink class="btn btn-info" href="@StatusUrl">Распределение</NavLink>
-                <NavLink class="btn btn-info" href="@($"/driver/list/{Id}")">Водитель</NavLink>
+                <NavLink class="btn btn-info" href="@($"/drivers/list/{Id}")">Водитель</NavLink>
                 <span class="@CSSisRentCar"><NavLink class="btn btn-info" href="@($"/lease/create/{Id}")">Аренда</NavLink></span>
                 <span class="@CSSisEnableService"> <NavLink class="btn btn-info" href="@EditUrl">Страховка</NavLink></span>
                 <NavLink class="btn btn-info" href="@($"/cars/edit/{Id}")">Edit</NavLink>
@@ -216,6 +216,7 @@
         string carModel;
         string carCurrentLocation;
         string carTyreSize;
+        string carType;
 
 
         string dispLoad = "";
@@ -236,6 +237,7 @@
             CarData = await Context.Cars
                     .Include(c => c.CarModel).ThenInclude(c => c.Manufacturer)
                     .Include(c => c.CarOwner)
+                    .Include(c=>c.CarType)
                     //.Include(c => c.CarSevices)
                     //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
                     //.Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
@@ -327,6 +329,7 @@
                 }
             }
             carTyreSize = CarData.Tyres != null ? CarData.Tyres.Size.ToString() : "";
+            carType = CarData.CarType != null ? CarData.CarType.TypeName : "";
             //isEnableService = CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault() != null ? CarData.CarStatuses.Where(cs => cs.EndDate == null).LastOrDefault().IsEnableService : false;
 
             //isRentCar = CarData != null ? CarData.IsRentCar : false;

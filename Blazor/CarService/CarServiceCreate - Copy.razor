@@ -1,4 +1,4 @@
-﻿@page "/service/create/{carid:long}"
+﻿@*@page "/service/create/{carid:long}"*@
 @*@page "/service/edit/{id:int}"*@
 @using KernelCars.Blazor.Cars
 @using KernelCars.Models.ViewModels
@@ -24,7 +24,7 @@
 
 </div>
 
-<h5 class="bg-primary text-white text-center p-2">Запись на сервисное обслуживание</h5>
+<h4 class="bg-primary text-white text-center p-2">Запись на сервисное обслуживание</h4>
 
 @*<KernelCars.Components.Modal @ref="Modal" filePath=@filePath></KernelCars.Components.Modal>
 
@@ -36,17 +36,6 @@
 
     <div class="form-row">
         <div class="col-8">
-            <div class="form-row">
-                <div class="form-group  col-12">
-                    <label>Станция тех.обслуживания</label>
-                    <CustomSelect TValue="int" Values="ServiceStations"
-                                  Parser="@(str => int.Parse(str))"
-                                  @bind-Value="carService.ServiceStationID">
-                        <option selected disabled value="0">Выберите СТО ...</option>
-                    </CustomSelect>
-                </div>
-            </div>
-
             <div class="form-row">
                 <div class="col">
                     <div class="form-group">
@@ -63,84 +52,81 @@
             </div>
 
 
-
             <div class="form-row">
-                <div class="col-12">
-                    <div class="form-group">
-                        <label>Виды работ</label>
-                        @*<div class="col-md-offset-2 col-md-10">*@
-                        <table class="table table-sm">
-                            @{
-                                int cnt = 0;
-
-                                foreach (var item in assignedTOF)
-                                {
-                                    if (cnt++ % 5 == 0)
-                                    {
-                                        @:<tr>
-                                        }
-                                        @:<td>
-                                            <div>
-                                                <input type="checkbox"
-                                                       name="selectedWorks"
-                                                       value="item.TypeOfServiceID"
-                                                       checked="@item.IsAssigned"
-                                                       @onchange="@((e) => WorkAssigment(e, item))" />
-                                                <label>@item.Service</label>
-                                            </div>
-                                        @:</td>
-                                    }
-                                    //if (cnt++ % 3 == 0)
-                                    //{
-                                @:</tr>
-                                @*}*@
-                            }
-                        </table>
-                        @*</div>*@
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    <div class="form-group">
-                        <label>Комментарии</label>
-                        <InputTextArea class="form-control" @bind-Value="carService.ServiceDescription"></InputTextArea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-row">
-                <div class="col">
+                <div class="col-3">
                     <div class="form-group">
                         <label>Текущие показания одометра</label>
                         <InputNumber class="form-control" @bind-Value="carService.Odometr"></InputNumber>
                     </div>
                 </div>
-                <div class="col">
+                <div class="col-9">
                     <div class="form-group">
-                        <label>Стоимость обслуживания</label>
-                        <InputNumber class="form-control" @bind-Value="carService.Ammount"></InputNumber>
+                        <label>Станция тех.обслуживания</label>
+                        <CustomSelect TValue="int" Values="ServiceStations"
+                                      Parser="@(str => int.Parse(str))"
+                                      @bind-Value="carService.ServiceStationID">
+                            <option selected disabled value="0">Выберите СТО ...</option>
+                        </CustomSelect>
                     </div>
                 </div>
             </div>
-            
+
             <div class="form-row">
+                <div class="col-7">
+                    <div class="form-group">
+                        <label>Виды работ</label>
+                        <div class="col-md-offset-2 col-md-10">
+                            <table class="table table-sm">
+                                @{
+                                    int cnt = 0;
+
+                                    foreach (var item in assignedTOF)
+                                    {
+                                        if (cnt++ % 2 == 0)
+                                        {
+                                            @:<tr>
+                                            }
+                                            @:<td>
+                                                <div>
+                                                    <input type="checkbox"
+                                                           name="selectedWorks"
+                                                           value="item.TypeOfServiceID"
+                                                           checked="@item.IsAssigned"
+                                                           @onchange="@((e) => WorkAssigment(e, item))" />
+                                                    <label>@item.Service</label>
+                                                </div>
+                                            @:</td>
+                                        }
+                                        if (cnt++ % 3 == 0)
+                                        {
+                                        @:</tr>
+                                    }
+                                }
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="form-group">
+                        <label>Комментарии</label>
+                        <InputTextArea class="form-control" @bind-Value="carService.ServiceDescription"></InputTextArea>
+                    </div>
+                </div>
+                @*<div class="form-row">
+                        <div class="form-group">
+                            <label for="exampleFormControlFile1">Example file input</label>
+                            <input type="file" class="form-control-file" id="exampleFormControlFile1" @onchange="OnInputFileChange">
+                        </div>
+                    </div>*@
+
                 <p>
                     <InputFile OnChange="HandleSelection"></InputFile>
                 </p>
                 <p>@status</p>
-                <iframe src=@filePath width="800" height="400"></iframe>
+
+                @*<input type="file" onchange="@UploadFile" id="fileUpload" />*@
+
             </div>
-            @*<div class="form-row"> </div>*@
-
-            @*<input type="file" onchange="@UploadFile" id="fileUpload" />*@
-
-
-
-
-
-
 
 
         </div>
@@ -168,14 +154,27 @@
         </div>
     </div>
 
-    <div class="form-row">
-        <div class="col m-5">
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Save</button>
-                <NavLink class="btn btn-secondary" href="/service">Back</NavLink>
-            </div>
-        </div>
+
+    @*<img src="IMG-8c41e13a064e53302494a836dec45900-V.jpg" @onclick="RotateImage" />*@
+    @*<img src=@imgSrc  @onclick="RotateImage"/>*@
+    <iframe src=@filePath width="600" height="200"></iframe>
+
+    @*<iframe src="/AccountingDocuments/АХ1938ВР/0bbe5c6b-b874-4d55-8251-53b1fa60b547_Август.pdf"></iframe>*@
+
+    @*<embed src=@filePath width="100%" height="2100px" />*@
+
+    @*<embed width="100%" height="100%" src=@filePath/>*@
+
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <NavLink class="btn btn-secondary" href="/service">Back</NavLink>
     </div>
+
+
+    @*<img src="~/IMG-8c41e13a064e53302494a836dec45900-V.jpg" />*@
+
+
+
 </EditForm>
 
 @code {
@@ -614,6 +613,6 @@
             status = $"Finished loading {file.Size} bytes from {file.Name}";
         }
     }
-     
+
 
 }
