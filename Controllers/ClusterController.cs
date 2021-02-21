@@ -1,10 +1,12 @@
 ﻿using KernelCars.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using KernelCars.Models;
 
 namespace KernelCars.Controllers
 {
@@ -17,9 +19,9 @@ namespace KernelCars.Controllers
             _context = ctx;
         }
         // GET: ClusterController
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_context.Clusters.ToList());
+            return View(await _context.Clusters.ToListAsync());
         }
 
         // GET: ClusterController/Details/5
@@ -37,37 +39,74 @@ namespace KernelCars.Controllers
         // POST: ClusterController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(
+            [Bind("ClusterName")] Cluster cluster)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(cluster);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                
             }
-            catch
+            catch (DbUpdateException /* ex */)
             {
-                return View();
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
             }
+            return View(cluster);
         }
 
         // GET: ClusterController/Edit/5
-        public ActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var cluster = await _context.Clusters.FindAsync(id);
+            if (cluster==null)
+            {
+                return NotFound();
+            }
+            return View(cluster);
         }
 
         // POST: ClusterController/Edit/5
-        [HttpPost]
+        [HttpPost,ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            try
+            if (id==null)
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
+
+            var cluterToUpdate = await _context.Clusters.FirstOrDefaultAsync(c => c.Id == id);
+            if (await TryUpdateModelAsync<KernelCars.Models.Cluster>(
+                cluterToUpdate,
+                "",
+                c=>c.ClusterName))
             {
-                return View();
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException /* ex */)
+                {
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
+                }
             }
+            return View(cluterToUpdate);
         }
 
         // GET: ClusterController/Delete/5

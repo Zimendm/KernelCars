@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using KernelCars.Models;
 using KernelCars.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace KernelCars.Controllers
 {
@@ -38,16 +39,26 @@ namespace KernelCars.Controllers
         // POST: LocationsController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> Create([Bind("LocationName")] Location location)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.Add(location);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+
             }
-            catch
+            catch (DbUpdateException /* ex */)
             {
-                return View();
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
             }
+            return View(location);
         }
 
         // GET: LocationsController/Edit/5

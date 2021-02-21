@@ -1,6 +1,8 @@
 ﻿@page "/"
 @namespace KernelCars.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model HostModel
+@using Microsoft.AspNetCore.Authorization
 @{
     Layout = null;
 }
@@ -39,3 +41,7 @@
     <script src="~/js/SaveAsFile.js"></script>
 </body>
 </html>
+@functions{
+    [Authorize]
+    public class HostModel : PageModel { }
+}

@@ -1,0 +1,23 @@
+﻿@model KernelCars.Models.Location
+
+<form formaction="Create" method="post">
+    <div class="form-group">
+        <label class="control-label" asp-for="LocationName"></label>
+        <input class="form-control" asp-for="LocationName" />
+    </div>
+    <div class="form-group">
+        <label class="control-label" asp-for="LocationAddress"></label>
+        <input class="form-control" asp-for="LocationAddress" />
+    </div>
+    <div class="form-group">
+        <label class="control-label" asp-for="RegionCoeff"></label>
+        <input class="form-control" asp-for="RegionCoeff" />
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
