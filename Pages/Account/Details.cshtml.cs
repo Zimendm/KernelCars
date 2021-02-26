@@ -16,7 +16,7 @@ namespace KernelCars.Pages.Account
         {
             userManager = manager;
         }
-        public IdentityUser IdentityUser { get; set; }
+        public AppUser IdentityUser { get; set; }
         public async Task OnGetAsync()
         {
             if (User.Identity.IsAuthenticated)

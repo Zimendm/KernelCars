@@ -73,6 +73,8 @@ namespace KernelCars
             services.AddSingleton<KernelCars.Components.ReportingService>();
             services.AddScoped(sp => new HttpClient());
 
+            services.AddScoped<UserInfo>();
+
             services.AddDbContext<DataContext>(options=>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -135,7 +137,9 @@ namespace KernelCars
                 //endpoints.MapFallbackToController("Blazor", "Home");
             });
 
-           //app.UseAuthentication();
+            IdentitySeedData.CreateAdminAccount(app.ApplicationServices, Configuration);
+
+            //app.UseAuthentication();
 
 
             //IdentitySeedData.EnsurePopulated(app);

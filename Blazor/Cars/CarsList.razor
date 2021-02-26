@@ -13,8 +13,20 @@
 @*<h3>CarsList from Blazor Folder</h3>*@
 
 <h4 class="bg-primary text-white text-center p-2">Автомобили</h4>
-<NavLink class="btn btn-sm btn-light" href="/cars/create">Новый автомобиль</NavLink>
-<NavLink class="btn btn-sm btn-light" href="/cars/create/rent">Новый арендный автомобиль</NavLink>
+
+<AuthorizeView Roles="Admins">
+    <Authorized>
+        <NavLink class="btn btn-sm btn-light" href="/cars/create">Новый автомобиль</NavLink>
+        <NavLink class="btn btn-sm btn-light" href="/cars/create/rent">Новый арендный автомобиль</NavLink>
+    </Authorized>
+    <!--<NotAuthorized>-->
+        @*(Not authorized)*@
+    <!--</NotAuthorized>-->
+</AuthorizeView>
+
+
+@*<NavLink class="btn btn-sm btn-light" href="/cars/create">Новый автомобиль</NavLink>
+<NavLink class="btn btn-sm btn-light" href="/cars/create/rent">Новый арендный автомобиль</NavLink>*@
 
 <div class="form-group">
     <label class="form-text">Поиск авто</label>

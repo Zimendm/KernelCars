@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@inject UserInfo _user
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
-@attribute [Authorize]
 
 <div class="sidebar">
     <NavMenu />
@@ -9,7 +9,9 @@
 
 <div class="main">
     <div class="top-row px-4">
-        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        @*<a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>*@
+        <p>You are registered as: @_user.GetUserName().Result <NavLink href="/account/logout">Logout</NavLink></p>
+        
     </div>
 
     <div class="content px-4">
