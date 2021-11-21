@@ -1,66 +1,69 @@
 ﻿@page
 @model ListModel
+    @using Microsoft.AspNetCore.Authorization;
+    @using Microsoft.AspNetCore.Mvc.RazorPages;
 
-@{
-    Layout = "_Layout";
-}
-
-<table class="table table-sm table-bordered">
-    <tr><th>ID</th><th>Name</th><th>Email</th><th></th></tr>
-    @if (Model.Users.Count() == 0)
-    {
-        <tr><td colspan="4" class="text-center">No User Accounts</td></tr>
+    @{
+        Layout = "_Layout";
     }
-    else
-    {
-        foreach (IdentityUser user in Model.Users)
+
+    <table class="table table-sm table-bordered">
+        <tr><th>ID</th><th>Name</th><th>Email</th><th></th></tr>
+        @if (Model.Users.Count() == 0)
         {
-            <tr>
-                <td>@user.Id</td>
-                <td>@user.UserName</td>
-                <td>@user.Email</td>
-                <td class="text-center">
-                    <form asp-page="List" method="post">
-                        <input type="hidden" name="Id" value="@user.Id" />
-                        <a class="btn btn-sm btn-warning" asp-page="Editor"
-                           asp-route-id="@user.Id" asp-route-mode="edit">Edit</a>
-                        <button type="submit" class="btn btn-sm btn-danger">
-                            Delete
-                        </button>
-                    </form>
-                </td>
-            </tr>
+            <tr><td colspan="4" class="text-center">No User Accounts</td></tr>
         }
-    }
-</table>
-
-<a class="btn btn-primary" asp-page="create">Create</a>
-
-
-@functions {
-    public class ListModel : AdminPageModel
-    {
-        public UserManager<AppUser> UserManager;
-        public ListModel(UserManager<AppUser> userManager)
+        else
         {
-            UserManager = userManager;
-        }
-
-        public IEnumerable<AppUser> Users { get; set; }
-
-        public void OnGet()
-        {
-            Users = UserManager.Users;
-        }
-
-        public async Task<IActionResult> OnPostAsync(string id)
-        {
-            AppUser user = await UserManager.FindByIdAsync(id);
-            if (user != null)
+            foreach (IdentityUser user in Model.Users)
             {
-                await UserManager.DeleteAsync(user);
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.UserName</td>
+                    <td>@user.Email</td>
+                    <td class="text-center">
+                        <form asp-page="List" method="post">
+                            <input type="hidden" name="Id" value="@user.Id" />
+                            <a class="btn btn-sm btn-warning" asp-page="Editor"
+                               asp-route-id="@user.Id" asp-route-mode="edit">Edit</a>
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
             }
-            return RedirectToPage();
+        }
+    </table>
+
+    <a class="btn btn-primary" asp-page="create">Create</a>
+
+
+    @functions {
+        [Authorize(Roles = "Admins")]
+        public class ListModel : AdminPageModel
+        {
+            public UserManager<AppUser> UserManager;
+            public ListModel(UserManager<AppUser> userManager)
+            {
+                UserManager = userManager;
+            }
+
+            public IEnumerable<AppUser> Users { get; set; }
+
+            public void OnGet()
+            {
+                Users = UserManager.Users;
+            }
+
+            public async Task<IActionResult> OnPostAsync(string id)
+            {
+                AppUser user = await UserManager.FindByIdAsync(id);
+                if (user != null)
+                {
+                    await UserManager.DeleteAsync(user);
+                }
+                return RedirectToPage();
+            }
         }
     }
-}

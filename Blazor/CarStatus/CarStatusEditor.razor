@@ -209,7 +209,8 @@
     protected void clusterSelected(string e)
     {
         //ChangeEventArgs
-        units = _context.Units.Include(u => u.Firm).Where(u => u.ClusterId == int.Parse((string)e)).ToList();
+        clusterID = int.Parse((string)e);
+        units = _context.Units.Include(u => u.Firm).Where(u => u.ClusterId == clusterID).ToList();
         firms = new Dictionary<string, int>();
 
         foreach (var item in units)
@@ -224,7 +225,7 @@
     protected void firmSelected(string e)
     {
         firmID = int.Parse((string)e);
-        departments =  _context.Units.Include(u => u.Department).Where(u => u.FirmId == firmID).ToDictionary(u => u.Department.Name, f => f.UnitId);
+        departments =  _context.Units.Include(u => u.Department).Where(u => u.FirmId == firmID).Where(u=>u.ClusterId==clusterID).ToDictionary(u => u.Department.Name, f => f.UnitId);
     }
 
     protected void departmentSelected(ChangeEventArgs e)

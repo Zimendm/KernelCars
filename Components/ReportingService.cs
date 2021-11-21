@@ -22,7 +22,9 @@ namespace KernelCars.Components
 
             dtServices.Columns.Add("Модель");
             dtServices.Columns.Add("Гос.номер");
+            dtServices.Columns.Add("Год выпуска");
             dtServices.Columns.Add("Эксплуатирует");
+            dtServices.Columns.Add("Направление бизнеса");
             dtServices.Columns.Add("Подразделение");
             dtServices.Columns.Add("Владелец");
             dtServices.Columns.Add("Закрепление");
@@ -35,6 +37,7 @@ namespace KernelCars.Components
                 .Include(c => c.CarUsers).ThenInclude(c => c.Employee)
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Firm).ThenInclude(c => c.Employee)
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Department)
+                .Include(c => c.CarStatuses).ThenInclude(c => c.Unit).ThenInclude(c => c.Cluster)
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Status)
                 .Include(c => c.CarStatuses).ThenInclude(c => c.Location)
                 .ToList();
@@ -44,6 +47,7 @@ namespace KernelCars.Components
                 DataRow row = dtServices.NewRow();
                 row["Модель"] = item.CarModel.Manufacturer.Name + " " + item.CarModel.Model;
                 row["Гос.номер"] = item.RegistrationNumber;
+                row["Год выпуска"] = item.FirstRegistrationYear;
 
                 row["Владелец"] = item.CarOwner.FullName;
                 row["Закрепление"] = item.CarUserForView;
@@ -51,6 +55,7 @@ namespace KernelCars.Components
                 if (item.CarStatuses.Count > 0)
                 {
                     row["Эксплуатирует"] = item.CarStatuses.LastOrDefault().Unit.Firm.Employee.FullName;
+                    row["Направление бизнеса"] = item.CarStatuses.LastOrDefault().Unit.Cluster.ClusterName;
                     row["Подразделение"] = item.CarStatuses.LastOrDefault().Unit.Department.Name;
                     row["Размещение"] = item.CarStatuses.LastOrDefault().Location.LocationName;
 

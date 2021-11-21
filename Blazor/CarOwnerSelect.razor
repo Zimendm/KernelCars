@@ -7,11 +7,7 @@
 
 
 <datalist id="carOwners">
-   @*@for (int i = 0; i < 10; i++)
-   {
-       <option>@i.ToString()</option>
-   }*@
-    @foreach (var owner in ownersList)
+   @foreach (var owner in ownersList)
     {
         <option>@owner</option>
     }
@@ -30,7 +26,6 @@
 
     protected override void OnInitialized()
     {
-        
         if (!OnlyFirms)
         {
             ownersList = (from e in _context.Employees
@@ -47,7 +42,5 @@
                 }
             }
         }
-        //base.OnInitialized();
     }
-
 }

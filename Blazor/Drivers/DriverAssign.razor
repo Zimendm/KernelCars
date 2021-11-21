@@ -1,11 +1,35 @@
 ﻿@page "/driver/assignment/{CarId:long}"
+@using KernelCars.Components
 @inherits OwningComponentBase<DataContext>
 
 <div class="card">
     <div class="card-header">
         <h4>Автомобиль: <b>@carModel</b> Гос.номер: <b>@carData.RegistrationNumber</b> Год выпуска: <b>@carData.FirstRegistrationYear</b></h4>
     </div>
-    <div class="card-body">Hello!</div>
+    <div class="card-body">
+        <EditForm Model="carUser" OnValidSubmit="HandleValidSubmit">
+            <div class="form-row">
+                <div class="form-group col">
+                    <EmployeeSelect TValue="int"
+                                    Parser="@(str => int.Parse(str))"
+                                    Caption="Водитель автомобиля"
+                                    @bind-Value="carUser.EmployeeId">
+                    </EmployeeSelect>
+                </div>
+                <div class="form-group col">
+                    <label class="col-form-label">Закреплён с </label>
+                    <input class="form-control" type="date" @bind="carUser.StartUsingDate" />
+
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <NavLink class="btn btn-secondary" href=@($"/drivers/list/{CarId}")>Back</NavLink>
+            </div>
+
+        </EditForm>
+    </div>
 </div>
 
 
@@ -19,6 +43,9 @@
     DataContext _context => Service;
 
     Car carData = new Car() { CarModel = new CarModel() };
+    CarUser carUser = new CarUser() {StartUsingDate=DateTime.Now };
+
+
     string carModel;
 
 
@@ -28,6 +55,53 @@
         carModel = $"{carData.CarModel.Manufacturer.Name} {carData.CarModel.Model}";
 
         //return base.OnParametersSetAsync();
+    }
+
+
+    public async Task HandleValidSubmit()
+    {
+        carUser.CarId = CarId;
+        //int z = 0;
+
+
+
+
+        //var lcarstatus = await _context.CarStatuses.Where(cs => cs.CarId == CarId).ToListAsync();
+        //carStatus.Unit = null;
+
+        //foreach (var item in lcarstatus)
+        //{
+        //    if (item.EndDate == null)
+        //    {
+        //        item.EndDate = carStatus.BeginDate;
+        //    }
+        //}
+
+
+        ////carStatus.LocationId = 1;
+
+
+        _context.Add(carUser);
+
+        //if (carUser != null)
+        //{
+        //    _context.Add(carUser);
+        //}
+
+        ////}
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+        ////UpdateCarServiceWorks();
+
+        //NavManager.NavigateTo($"status/list/{CarId}");
     }
 
 }

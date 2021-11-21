@@ -3,6 +3,7 @@
 @*@layout EmptyLayout*@
 
 @using BlazorInputFile
+@using KernelCars.Components 
 
 @inject HttpClient Http
 
@@ -31,12 +32,19 @@
                 <label>Год выпуска</label>
                 <InputNumber class="form-control" @bind-Value="CarData.FirstRegistrationYear"></InputNumber>
             </div>
-            <CarOwnerSelect OnlyFirms="false"></CarOwnerSelect>
+            @*<CarOwnerSelect OnlyFirms="false"></CarOwnerSelect>*@
+
+            <EmployeeSelect TValue="int?"
+                            Parser="@(str => int.Parse(str))"
+                            Caption="Владелец автомобиля"
+                            OnlyPerson="false"
+                            @bind-Value="CarData.CarOwnerId">
+            </EmployeeSelect>
             <!--<div class="form-group">
-            <label>Дата регистрации</label>-->
+    <label>Дата регистрации</label>-->
             @*<ValidationMessage For="@(() => CarData.RegistrationDate)" />*@
             <!--<InputText class="form-control" @bind-Value="CarData.RegistrationDate"></InputText>
-            </div>-->
+    </div>-->
             <div class="form-group">
                 <label>Свидетельство о регистрации</label>
                 @*<ValidationMessage For="@(() => CarData.RegistrationDate)" />*@
@@ -85,7 +93,7 @@
             <div class="form-row">
                 <div class="col">
                     <div class="form-group">
-                        <label>Тип</label>
+                        <label class="col-form-label">Тип</label>
                         <CustomSelect TValue="int?"
                                       Values="carTypes"
                                       Parser="@(str=>int.Parse(str))"
@@ -245,7 +253,7 @@
         <div class="col">
             <div class="text-center">
                 <button type="submit" class="btn btn-primary">Submit</button>
-                <NavLink class="btn btn-secondary" href="/cars">Back</NavLink>
+                <NavLink class="btn btn-secondary" href=@($"/cars/details/{Id}")>Back</NavLink>
             </div>
         </div>
     </div>

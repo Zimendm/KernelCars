@@ -32,6 +32,10 @@
                     <td>@CarData.FullNameFirmForView</td>
                 </tr>
                 <tr>
+                    <td>Направление бизнеса: </td>
+                    <td>@CarData.ClusterNameForView</td>
+                </tr>
+                <tr>
                     <td>Подразделение: </td>
                     <td>@CarData.DepartmentNameForView</td>
                 </tr>
@@ -306,6 +310,7 @@
             CarData.CarStatuses = Context.CarStatuses
                .Include(cs => cs.Unit).ThenInclude(cs => cs.Firm).ThenInclude(cs => cs.Employee)
                .Include(c => c.Unit).ThenInclude(c => c.Department)
+               .Include(c => c.Unit).ThenInclude(c => c.Cluster)
                .Include(c => c.Status)
                .Include(c => c.Location)
                .Where(s => s.CarId == Id).ToList();

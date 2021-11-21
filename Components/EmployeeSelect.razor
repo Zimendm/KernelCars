@@ -1,0 +1,110 @@
+﻿@typeparam TValue
+@inherits InputBase<TValue>
+
+@*@inherits OwningComponentBase<DataContext>*@
+
+<div class="form-group">
+    <label class="col-form-label">@Caption</label>
+    <input class="form-control" list="carDrivers" value="@currentEmployee" @onchange="HandleSelect"/>
+</div>
+
+
+<datalist id="carDrivers">
+    @foreach (var owner in driversList)
+    {
+        <option>@owner</option>
+    }
+</datalist>
+
+@code {
+
+    [Inject]
+    DataContext Context { get; set; }
+
+    [Parameter]
+    public IDictionary<string, TValue> Values { get; set; }
+
+    [Parameter]
+    public Func<string, TValue> Parser { get; set; }
+
+    [Parameter]
+    public EventCallback<string> SelectedValueChanged { get; set; }
+
+    [Parameter]
+    public string Caption { get; set; } = "";
+
+    [Parameter]
+    public bool OnlyPerson { get; set; } = true;
+
+
+    List<string> driversList = new List<string>();
+
+    string currentEmployee = "";
+    int idToFind = 0;
+    TValue result;
+
+
+    protected override void OnInitialized()
+    {
+        //var ownersListQuery =  Context.Employees.OrderBy(e=>e.FullName).ToList();
+
+        var ownersListQuery = (from c in Context.Employees
+                               orderby c.LastName
+                               select c).ToList();
+
+
+        //currentEmployee = Context.Employees.Find(Convert.ToInt32(CurrentValue)).FullName;
+
+        idToFind = Convert.ToInt32(CurrentValue);
+        if (idToFind!=0)
+        {
+            currentEmployee = ownersListQuery.Find(e => e.Id == idToFind).FullName;
+        }
+
+        foreach (var item in ownersListQuery)
+        {
+            if (OnlyPerson)
+            {
+                if(!item.IsFirm)
+                {
+                    driversList.Add(item.FullName);
+                }
+            }
+            else
+            {
+                driversList.Add(item.FullName);
+            }
+        }
+
+    }
+
+    protected override bool TryParseValueFromString(string value, out TValue result, out string validationErrorMessage)
+    {
+        try
+        {
+            result = Parser(value);
+            validationErrorMessage = null;
+            return true;
+        }
+        catch
+        {
+            result = default(TValue);
+            validationErrorMessage = "The value is not valid";
+            return false;
+        }
+    }
+
+
+    public async Task HandleSelect(ChangeEventArgs e)
+    {
+        var ownersListQuery = Context.Employees;
+        @foreach (var item in ownersListQuery)
+        {
+            if (item.FullName == e.Value.ToString())
+            {
+                CurrentValueAsString = item.Id.ToString();
+            }
+        }
+        await SelectedValueChanged.InvokeAsync(CurrentValueAsString);
+    }
+}

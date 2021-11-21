@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace KernelCars.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles ="Admins")]
     public class SettingsController : Controller
     {
         public IActionResult Index()
