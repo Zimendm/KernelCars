@@ -180,7 +180,7 @@ namespace KernelCars.Controllers
 
                     wordDoc.MainDocumentPart.Document = doc;
 
-                    wordDoc.Close();
+                    wordDoc.Dispose();
                 }
                 return File(mem.ToArray(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "ABC.docx");
 
@@ -548,7 +548,7 @@ namespace KernelCars.Controllers
 
                     wordDoc.MainDocumentPart.Document = doc;
 
-                    wordDoc.Close();
+                    wordDoc.Dispose();
                 }
                 return File(mem.ToArray(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "ABC.docx");
 

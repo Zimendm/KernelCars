@@ -153,7 +153,7 @@ namespace KernelCars.Components
 
             workbookpart.Workbook.Save();
             // Close the document.
-            spreadsheetDocument.Close();
+            spreadsheetDocument.Dispose();
             ms.Position = 0;
             
 

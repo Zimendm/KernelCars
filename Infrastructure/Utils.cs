@@ -148,7 +148,7 @@ namespace KernelCars.Infrastructure
             workbookpart.Workbook.Save();
 
             // Close the document.
-            spreadsheetDocument.Close();
+            spreadsheetDocument.Dispose();
         }
 
 
@@ -234,7 +234,7 @@ namespace KernelCars.Infrastructure
             workbookpart.Workbook.Save();
 
             // Close the document.
-            spreadsheetDocument.Close();
+            spreadsheetDocument.Dispose();
         }
 
         public static SelectList PopulateManagersDropDownList(KernelCars.Data.DataContext _context, object selectedManager = null)

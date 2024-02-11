@@ -342,7 +342,7 @@ namespace KernelCars.Controllers
             workbookpart.Workbook.Save();
 
             // Close the document.
-            spreadsheetDocument.Close();
+            spreadsheetDocument.Dispose();
 
 
 
